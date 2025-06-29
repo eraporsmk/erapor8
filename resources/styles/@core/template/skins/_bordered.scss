@@ -1,0 +1,82 @@
+@use "sass:map";
+@use "@core-scss/base/mixins";
+@use "@configured-variables" as variables;
+
+$header: ".layout-navbar";
+
+@if variables.$layout-vertical-nav-navbar-is-contained {
+  $header: ".layout-navbar .navbar-content-container";
+}
+
+.skin--bordered {
+  // Expansion Panels
+  @include mixins.bordered-skin(
+    ".v-expansion-panels:not(.expansion-panels-width-border) .v-expansion-panel, .v-expansion-panel__shadow"
+  );
+
+  // Navbar
+
+  // -- Vertical
+  @if variables.$layout-vertical-nav-navbar-is-contained {
+    @include mixins.bordered-skin(".layout-nav-type-vertical #{$header}");
+    .layout-nav-type-vertical.window-scrolled #{$header} {
+      border-block-start: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+    }
+  }
+  /* stylelint-disable-next-line @stylistic/indentation */
+ @else {
+    @include mixins.bordered-skin(".layout-nav-type-vertical #{$header}", "border-bottom");
+  }
+
+  // Dialog close button
+  @include mixins.bordered-skin(".v-dialog-close-btn");
+
+  // Vertical Nav
+  .layout-vertical-nav {
+    box-shadow: none;
+  }
+
+  .v-expansion-panels.expansion-panels-width-border {
+    .v-expansion-panel__shadow {
+      box-shadow: none !important;
+    }
+
+    .v-expansion-panel {
+      border: none !important;
+
+      &:not(:last-child) {
+        margin-block-end: -1px;
+      }
+
+      &::after {
+        content: "";
+      }
+    }
+  }
+
+  // select remove box shadow
+  .v-select__content,
+  .v-combobox__content,
+  .v-autocomplete__content {
+    box-shadow: none;
+  }
+
+  .flatpickr-calendar {
+    border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    box-shadow: none !important;
+  }
+
+  // calendar
+  .fc .fc-popover {
+    box-shadow: none;
+  }
+
+  // navigation drawer
+  .v-navigation-drawer:not(.app-customizer) {
+    box-shadow: none;
+  }
+
+  .shepherd-element {
+    box-shadow: none;
+  }
+}

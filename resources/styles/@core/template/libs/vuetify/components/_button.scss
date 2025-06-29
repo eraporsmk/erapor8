@@ -1,0 +1,280 @@
+@use "sass:list";
+@use "sass:map";
+@use "@core-scss/template/mixins" as templateMixins;
+@use "@configured-variables" as variables;
+
+/* 👉 Button
+ Above map but opacity values as key and variant as value */
+
+$btn-active-overlay-opacity: (
+  0.08: (outlined, flat, text, plain),
+  0.24: (tonal),
+);
+$btn-hover-overlay-opacity: (
+  0: (elevated),
+  0.08: (outlined, flat, text, plain),
+  0.24: (tonal),
+);
+$btn-focus-overlay-opacity: (
+  0.08: (outlined, flat, text, plain),
+  0.24: (tonal),
+);
+
+body .v-btn {
+  // ℹ️ This is necessary because as we have darker overlay on hover for elevated variant, button text doesn't get dimmed
+  // This style is already applied to `.v-icon`
+  .v-btn__content {
+    z-index: 0;
+  }
+
+  transition: all 0.135s ease; /* Add transition */
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  // Add transition on hover
+  &:not(.v-btn--loading) .v-btn__overlay {
+    transition: opacity 0.15s ease-in-out;
+    will-change: opacity;
+  }
+
+  // box-shadow
+  @each $color-name in variables.$theme-colors-name {
+    &:not(.v-btn--disabled) {
+      &.bg-#{$color-name}.v-btn--variant-elevated {
+        &,
+        &:hover,
+        &:active,
+        &:focus {
+          @include templateMixins.custom-elevation(var(--v-theme-#{$color-name}), "sm");
+        }
+      }
+    }
+  }
+
+  /*
+    Loop over $btn-active-overlay-opacity map and add active styles for each variant.
+    Group variants with same opacity value.
+  */
+  @each $opacity, $variants in $btn-active-overlay-opacity {
+    $overlay-selectors: ();
+    $underlay-selectors: ();
+
+    // append each variant to selectors list
+    @each $variant in $variants {
+      $overlay-selectors: list.append($overlay-selectors, "&.v-btn--variant-#{$variant}:active > .v-btn__overlay,");
+      $underlay-selectors: list.append($underlay-selectors, "&.v-btn--variant-#{$variant}:active > .v-btn__underlay,");
+    }
+
+    #{$overlay-selectors} {
+      --v-hover-opacity: #{$opacity};
+
+      opacity: var(--v-hover-opacity);
+    }
+
+    #{$underlay-selectors} {
+      opacity: 0;
+    }
+  }
+
+  @each $opacity, $variants in $btn-focus-overlay-opacity {
+    $selectors: ();
+
+    // append each variant to selectors list
+    @each $variant in $variants {
+      $selectors: list.append($selectors, "&.v-btn--variant-#{$variant}:focus > .v-btn__overlay,");
+    }
+
+    #{$selectors} {
+      opacity: $opacity;
+    }
+  }
+
+  /*
+    Loop over $btn-hover-overlay-opacity map and add hover styles for each variant.
+    Group variants with same opacity value.
+  */
+  @each $opacity, $variants in $btn-hover-overlay-opacity {
+    $selectors: ();
+
+    // append each variant to selectors list
+    @each $variant in $variants {
+      $selectors: list.append($selectors, "&.v-btn--variant-#{$variant}:hover > .v-btn__overlay,");
+    }
+
+    #{$selectors} {
+      --v-hover-opacity: #{$opacity};
+    }
+  }
+
+  // Default (elevated) button
+  &--variant-elevated,
+  &--variant-flat {
+    // We want a darken color on hover
+    &:not(.v-btn--loading, .v-btn--disabled) {
+      @each $color-name in variables.$theme-colors-name {
+        &.bg-#{$color-name} {
+          &:hover,
+          &:active,
+          &:focus {
+            background-color: rgb(var(--v-theme-#{$color-name}-darken-1)) !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Outlined button
+  &:not(.v-btn--icon, .v-tab).v-btn--variant-text {
+    &.v-btn--size-default {
+      padding-inline: 0.75rem;
+    }
+
+    &.v-btn--size-small {
+      padding-inline: 0.5625rem;
+    }
+
+    &.v-btn--size-large {
+      padding-inline: 1rem;
+    }
+  }
+
+  // Button border-radius
+  &:not(.v-btn--icon).v-btn--size-x-small {
+    border-radius: 2px;
+  }
+
+  &:not(.v-btn--icon).v-btn--size-small {
+    border-radius: 4px;
+    line-height: 1.125rem;
+    padding-block: 0;
+    padding-inline: 0.875rem;
+  }
+
+  &:not(.v-btn--icon).v-btn--size-default {
+    .v-btn__content,
+    .v-btn__append,
+    .v-btn__prepend {
+      .v-icon {
+        --v-icon-size-multiplier: 0.7113;
+
+        block-size: 1rem;
+        font-size: 1rem;
+        inline-size: 1rem;
+      }
+
+      .v-icon--start {
+        margin-inline: -2px 6px;
+      }
+
+      .v-icon--end {
+        margin-inline: 6px -2px;
+      }
+    }
+  }
+
+  &:not(.v-btn--icon).v-btn--size-large {
+    --v-btn-height: 3rem;
+
+    border-radius: 8px;
+    line-height: 1.625rem;
+    padding-block: 0;
+    padding-inline: 1.625rem;
+  }
+
+  &:not(.v-btn--icon).v-btn--size-x-large {
+    border-radius: 10px;
+  }
+
+  // icon buttons
+  &.v-btn--icon.v-btn--density-default {
+    block-size: var(--v-btn-height);
+    inline-size: var(--v-btn-height);
+
+    &.v-btn--size-default {
+      .v-icon {
+        --v-icon-size-multiplier: 0.978 !important;
+
+        block-size: 1.375rem;
+        font-size: 1.375rem;
+        inline-size: 1.375rem;
+      }
+    }
+
+    &.v-btn--size-small {
+      --v-btn-height: 2.125rem;
+
+      .v-icon {
+        block-size: 1.25rem;
+        font-size: 1.25rem;
+        inline-size: 1.25rem;
+      }
+    }
+
+    &.v-btn--size-large {
+      --v-btn-height: 2.625rem;
+
+      .v-icon {
+        block-size: 1.75rem;
+        font-size: 1.75rem;
+        inline-size: 1.75rem;
+      }
+    }
+  }
+
+  &-group.v-btn-toggle {
+    .v-btn {
+      border-radius: 0.5rem;
+      block-size: 52px !important;
+      border-inline-end: none;
+      inline-size: 52px !important;
+
+      &.v-btn--density-comfortable {
+        border-radius: 0.375rem;
+        block-size: 44px !important;
+        inline-size: 44px !important;
+      }
+
+      &.v-btn--density-compact {
+        border-radius: 0.25rem;
+        block-size: 36px !important;
+        inline-size: 36px !important;
+      }
+
+      &.v-btn--icon .v-icon {
+        block-size: 1.5rem;
+        color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+        font-size: 1.5rem;
+        inline-size: 1.5rem;
+      }
+
+      &.v-btn--icon.v-btn--active {
+        .v-icon {
+          color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+        }
+      }
+    }
+
+    &.v-btn-group {
+      align-items: center;
+      padding: 7px;
+      border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+      block-size: 66px;
+
+      .v-btn.v-btn--active {
+        .v-btn__overlay {
+          --v-activated-opacity: 0.08;
+        }
+      }
+
+      &.v-btn-group--density-compact {
+        block-size: 50px;
+      }
+
+      &.v-btn-group--density-comfortable {
+        block-size: 58px;
+      }
+    }
+  }
+}

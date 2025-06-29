@@ -1,0 +1,48 @@
+// 👉 Table
+.v-table {
+  th {
+    color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity)) !important;
+    font-size: 0.8125rem;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+
+    .v-data-table-header__content {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
+
+// 👉 Datatable
+.v-data-table,
+.v-table {
+  table {
+    thead,
+    tbody {
+      tr {
+        th,
+        td {
+          &:first-child:has(.v-checkbox-btn) {
+            padding-inline-start: 13px !important;
+          }
+
+          &:first-child {
+            padding-inline-start: 24px !important;
+          }
+
+          &:last-child {
+            padding-inline-end: 24px !important;
+          }
+        }
+      }
+    }
+
+    tbody {
+      .v-data-table-group-header-row {
+        td {
+          background-color: rgb(var(--v-theme-surface));
+        }
+      }
+    }
+  }
+}

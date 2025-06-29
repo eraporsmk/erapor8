@@ -1,0 +1,18 @@
+@use "@core-scss/base/utils";
+@use "@configured-variables" as variables;
+
+// 👉 Body
+
+// set body font size 15px
+body {
+  font-size: 15px !important;
+
+  // We reduced this margin to get 40px input height
+  .v-input--density-compact {
+    --v-input-chips-margin-bottom: 1px;
+  }
+}
+
+.text-caption {
+  color: rgba(var(--v-theme-on-background), var(--v-disabled-opacity));
+}

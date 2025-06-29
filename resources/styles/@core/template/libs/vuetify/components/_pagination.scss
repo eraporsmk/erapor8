@@ -1,0 +1,140 @@
+/* stylelint-disable no-descending-specificity */
+@use "@core-scss/template/mixins" as templateMixins;
+@use "@configured-variables" as variables;
+
+// 👉 Pagination
+.v-pagination {
+  // pagination
+  .v-pagination__next,
+  .v-pagination__prev {
+    .v-btn--icon {
+      &.v-btn--size-small {
+        .v-icon {
+          font-size: 1rem;
+        }
+      }
+
+      &.v-btn--size-default {
+        .v-icon {
+          font-size: 1.125rem;
+        }
+      }
+
+      &.v-btn--size-large {
+        .v-icon {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+
+  // common style for all components
+  .v-pagination__next,
+  .v-pagination__prev,
+  .v-pagination__first,
+  .v-pagination__last,
+  .v-pagination__item {
+    .v-btn {
+      color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1;
+
+      --v-activated-opacity: 0.08;
+
+      &:hover {
+        .v-btn__overlay {
+          --v-hover-opacity: 0.16;
+        }
+      }
+
+      &.v-btn--disabled {
+        opacity: 0.45;
+      }
+
+      &.v-btn--size-large {
+        font-size: 0.9375rem;
+      }
+    }
+  }
+
+  // Disable scale animation for button
+  .v-pagination__item {
+    .v-btn {
+      transform: scale(1) !important;
+
+      /* We disabled transition because it looks ugly 🤮 */
+      transition-duration: 0s;
+
+      &:active {
+        transform: scale(1);
+      }
+    }
+  }
+
+  .v-pagination__list {
+    @each $color-name in variables.$theme-colors-name {
+      &:has(.v-pagination__item.v-pagination__item--is-active .v-btn.text-#{$color-name}) {
+        .v-pagination__item {
+          .v-btn {
+            &:hover {
+              color: rgb(var(--v-theme-#{$color-name}));
+
+              .v-btn__overlay {
+                background-color: rgb(var(--v-theme-#{$color-name}));
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .v-pagination__item--is-active {
+      .v-btn {
+        &:not([class*="text-"]) {
+          color: rgb(var(--v-theme-primary));
+
+          &:not(.v-btn--variant-outlined) {
+            .v-btn__underlay {
+              --v-activated-opacity: 0.04;
+            }
+          }
+
+          &.v-btn--variant-outlined {
+            border-color: rgb(var(--v-theme-primary));
+
+            .v-btn__overlay {
+              opacity: 0.16;
+            }
+          }
+        }
+
+        // box-shadow
+        @each $color-name in variables.$theme-colors-name {
+          &:not(.v-btn--disabled) {
+            &.text-#{$color-name} {
+              &,
+              &:hover,
+              &:active,
+              &:focus {
+                @include templateMixins.custom-elevation(var(--v-theme-#{$color-name}), "sm");
+              }
+
+              .v-btn__underlay {
+                opacity: 1 !important;
+              }
+
+              .v-btn__content {
+                color: #fff;
+              }
+
+              &.v-btn--variant-outlined {
+                background-color: rgb(var(--v-theme-#{$color-name}));
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

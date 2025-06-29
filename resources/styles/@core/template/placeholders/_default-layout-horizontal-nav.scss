@@ -1,0 +1,7 @@
+%default-layout-horizontal-nav-navbar-and-nav-container {
+  box-shadow: 0 1px 4px 0 rgba(var(--v-shadow-key-umbra-color), 0.1);
+
+  &.header-blur {
+    background-color: rgb(var(--v-theme-surface), 0.96);
+  }
+}

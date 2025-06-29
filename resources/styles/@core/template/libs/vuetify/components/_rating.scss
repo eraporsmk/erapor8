@@ -1,0 +1,20 @@
+// 👉 Rating
+.v-rating {
+  .v-rating__wrapper {
+    .v-btn .v-icon {
+      --v-icon-size-multiplier: 1;
+    }
+
+    .v-btn--density-default {
+      --v-btn-height: 26px;
+    }
+
+    .v-btn--density-compact {
+      --v-btn-height: 30px;
+    }
+
+    .v-btn--density-comfortable {
+      --v-btn-height: 32px;
+    }
+  }
+}
