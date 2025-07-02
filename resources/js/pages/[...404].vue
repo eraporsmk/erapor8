@@ -7,7 +7,7 @@ import miscMaskLight from '@images/pages/misc-mask-light.png'
 const authThemeMask = useGenerateImageVariant(miscMaskLight, miscMaskDark)
 
 definePage({
-  alias: '/pages/misc/not-found/:error(.*)',
+  alias: '/pages/misc/not-found/:404(.*)',
   meta: {
     layout: 'blank',
     public: true,

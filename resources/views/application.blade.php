@@ -15,6 +15,7 @@
         <div id="loading-bg">
             <div class="loading-logo">
                 <img src="{{ asset('images/logo/logo-small.png') }}" alt="Logo" />
+                </svg>
             </div>
             <div class=" loading">
                 <div class="effect-1 effects"></div>

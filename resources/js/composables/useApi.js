@@ -35,16 +35,5 @@ export const useApi = createFetch({
       
       return { data: parsedData, response }
     },
-    onFetchError({ error, data, response, context, execute }) {
-      // same as afterFetch
-      if(response.status === 401){
-        useCookie('userAbilityRules').value = null
-        useCookie('userData').value = null
-        useCookie('accessToken').value = null
-        useCookie('languages').value = null
-        window.location.replace('/login')
-      }
-      //return { error, data }
-    },
   },
 })

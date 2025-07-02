@@ -1,6 +1,9 @@
 <script setup>
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
+
+const router = useRouter()
 const ability = useAbility()
+
 // TODO: Get type from backend
 const userData = useCookie('userData')
 const bus = useEventBus('erapor');
@@ -12,9 +15,8 @@ bus.on(listener)
 const logout = async () => {
   await $api('/auth/logout', {
     method: 'GET',
-    async onResponse({ request, response, options }) {
-      let getData = response._data
-      
+    async onResponse() {
+      userData.value = null
       useCookie("sekolah").value = null;
       useCookie("semester").value = null;
       useCookie("roles").value = null;
@@ -31,6 +33,7 @@ const logout = async () => {
     },
   })
 }
+
 const userProfileList = [
   { type: 'divider' },
   {
@@ -46,29 +49,32 @@ const userProfileList = [
 </script>
 
 <template>
-  <VBadge dot location="bottom right" offset-x="3" offset-y="3" bordered color="success" v-if="userData">
+  <VBadge v-if="userData" dot bordered location="bottom right" offset-x="1" offset-y="2" color="success">
     <VAvatar class="cursor-pointer" color="primary" variant="tonal">
       <VImg :src="profilePhotoPath" />
 
       <!-- SECTION Menu -->
-      <VMenu activator="parent" width="230" location="bottom end" offset="14px">
+      <VMenu activator="parent" width="240" location="bottom end" offset="12px">
         <VList>
-          <!-- 👉 User Avatar & Name -->
           <VListItem>
-            <template #prepend>
-              <VListItemAction start>
-                <VBadge dot location="bottom right" offset-x="3" offset-y="3" color="success">
+            <div class="d-flex gap-2 align-center">
+              <VListItemAction>
+                <VBadge dot location="bottom right" offset-x="3" offset-y="3" color="success" bordered>
                   <VAvatar color="primary" variant="tonal">
                     <VImg :src="profilePhotoPath" />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
-            </template>
 
-            <VListItemTitle class="font-weight-semibold">
-              {{ userData.name }}
-            </VListItemTitle>
-            <VListItemSubtitle>{{userData.email}}</VListItemSubtitle>
+              <div>
+                <h6 class="text-h6 font-weight-medium">
+                  {{ userData.name }}
+                </h6>
+                <VListItemSubtitle class="text-disabled">
+                  {{ userData.email }}
+                </VListItemSubtitle>
+              </div>
+            </div>
           </VListItem>
           <VListItem>
             <VListItemSubtitle v-for="role in $roles" :key="role">{{ role }}</VListItemSubtitle>
@@ -79,11 +85,14 @@ const userProfileList = [
                 <template #prepend>
                   <VIcon :icon="item.icon" size="22" />
                 </template>
+
                 <VListItemTitle>{{ item.title }}</VListItemTitle>
+
                 <template v-if="item.badgeProps" #append>
                   <VBadge rounded="sm" class="me-3" v-bind="item.badgeProps" />
                 </template>
               </VListItem>
+
               <VDivider v-else class="my-2" />
             </template>
 

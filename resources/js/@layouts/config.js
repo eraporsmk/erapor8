@@ -1,12 +1,10 @@
+import logo from '@images/logos/logo.png'
 import { AppContentLayoutNav, ContentWidth, FooterType, HorizontalNavType, NavbarType } from '@layouts/enums'
 import { breakpointsVuetify } from '@vueuse/core'
-
 export const layoutConfig = {
   app: {
     title: 'my-layout',
-    name: app_name,
-    version: app_version,
-    logo: h('img', { src: '/src/assets/logo.svg' }),
+    logo: logo,//h('img', { src: '/src/assets/logo.svg' }),
     contentWidth: ContentWidth.Boxed,
     contentLayoutNav: AppContentLayoutNav.Vertical,
     overlayNavFromBreakpoint: breakpointsVuetify.md,
@@ -27,6 +25,7 @@ export const layoutConfig = {
   verticalNav: {
     isVerticalNavCollapsed: false,
     defaultNavItemIconProps: { icon: 'tabler-circle' },
+    defaultNavItemAwesomeIconProps: 'hand-point-right',
   },
   horizontalNav: {
     type: HorizontalNavType.Sticky,

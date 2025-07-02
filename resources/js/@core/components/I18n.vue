@@ -15,9 +15,9 @@ const { locale } = useI18n({ useScope: 'global' })
 </script>
 
 <template>
-  <IconBtn class="me-2">
-    <!--VIcon icon="tabler-language" /-->
-    <img :src="`/images/flags/${locale}.png`" alt="id" width="22" height="14" class="">
+  <IconBtn>
+    <VIcon icon="tabler-language" />
+
     <!-- Menu -->
     <VMenu
       activator="parent"
@@ -39,7 +39,7 @@ const { locale } = useI18n({ useScope: 'global' })
         >
           <!-- Language label -->
           <VListItemTitle>
-            {{lang.flag}} {{ lang.label }}
+            {{ lang.label }}
           </VListItemTitle>
         </VListItem>
       </VList>

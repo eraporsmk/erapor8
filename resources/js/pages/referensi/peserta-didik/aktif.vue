@@ -3,12 +3,13 @@ definePage({
   meta: {
     action: 'read',
     subject: 'Ref_Siswa',
+    title: 'Peserta Didik Aktif',
   },
 })
 </script>
 <template>
   <div>
-    <VCard title="Create Awesome 🙌">
+    <VCard title="Peserta Didik Aktif">
       <VCardText>This is your second page.</VCardText>
       <VCardText>
         Chocolate sesame snaps pie carrot cake pastry pie lollipop muffin.

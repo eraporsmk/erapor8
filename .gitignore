@@ -1,6 +1,7 @@
+/alur
 /.phpunit.cache
 /node_modules
-#/public/build
+/public/build
 /public/hot
 /public/storage
 /storage/*.key

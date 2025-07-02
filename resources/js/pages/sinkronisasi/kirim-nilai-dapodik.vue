@@ -1,15 +1,11 @@
 <script setup>
 import MatevRapor from '@/views/sinkronisasi/dapodik/MatevRapor.vue';
 import RombonganBelajar from '@/views/sinkronisasi/dapodik/RombonganBelajar.vue';
-import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
-useHead({
-  title: `Kirim Nilai ke Dapodik | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     action: 'read',
     subject: 'Administrator',
+    title: 'Kirim Nilai ke Dapodik',
   },
 })
 const currentTab = ref('Rombongan Belajar')

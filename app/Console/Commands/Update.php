@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use App\Models\Setting;
 use App\Models\TahunAjaran;
 use App\Models\Semester;
@@ -32,6 +33,16 @@ class Update extends Command
      */
     public function handle()
     {
+        $win = Str::contains(php_uname('s'), 'Windows');
+        $mac = Str::contains(php_uname('s'), 'Windows');
+        $linux = Str::contains(php_uname('s'), 'Windows');
+        $this->call('storage:unlink');
+        if($win){
+            exec('rmdir /s /q '.public_path('storage'));
+        } elseif($mac || $linux){
+            exec('rm -rf '.public_path('storage'));
+        }
+        $this->call('storage:link');
         $ajaran = [
             [
                 'tahun_ajaran_id' => 2025,

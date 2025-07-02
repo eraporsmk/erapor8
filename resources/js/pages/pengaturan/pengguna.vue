@@ -1,14 +1,10 @@
 <script setup>
-import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
 import bcrypt from "bcryptjs";
-useHead({
-  title: `Data Pengguna | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     action: 'read',
     subject: 'Administrator',
+    title: 'Data Pengguna',
   },
 })
 

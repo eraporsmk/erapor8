@@ -8,7 +8,6 @@ import { default as authV2LoginIllustrationDark, default as authV2LoginIllustrat
 import authV2MaskDark from "@images/pages/misc-mask-dark.png";
 import authV2MaskLight from "@images/pages/misc-mask-light.png";
 import { themeConfig } from "@themeConfig";
-import { useHead } from '@unhead/vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 const authThemeImg = useGenerateImageVariant(
@@ -19,13 +18,11 @@ const authThemeImg = useGenerateImageVariant(
   true
 );
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark);
-useHead({
-  title: `Login | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     layout: "blank",
     unauthenticatedOnly: true,
+    title: 'Login',
   },
 });
 const refVForm = ref();
@@ -81,7 +78,7 @@ const login = async () => {
     useCookie("roles").value = roles;
     useCookie("profilePhotoPath").value = userData.profile_photo_path;
     role.value = roles.join(', ')
-    
+
     await nextTick(() => {
       router.replace(route.query.to ? String(route.query.to) : "/").then(() => {
         notify()

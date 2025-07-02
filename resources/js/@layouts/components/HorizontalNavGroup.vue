@@ -49,49 +49,47 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <HorizontalNavPopper
-    v-if="canViewNavMenuGroup(item)"
-    :is-rtl="configStore.isAppRTL"
-    class="nav-group"
-    tag="li"
-    content-container-tag="ul"
-    :class="[{
+  <HorizontalNavPopper v-if="canViewNavMenuGroup(item)" :is-rtl="configStore.isAppRTL" class="nav-group" tag="li"
+    content-container-tag="ul" :class="[{
       'active': isGroupActive,
       'children-at-end': childrenAtEnd,
       'sub-item': isSubItem,
       'disabled': item.disable,
-    }]"
-    :popper-inline-end="childrenAtEnd"
-  >
+    }]" :popper-inline-end="childrenAtEnd">
     <div class="nav-group-label">
-      <Component
-        :is="layoutConfig.app.iconRenderer || 'div'"
-        class="nav-item-icon"
-        v-bind="item.icon || layoutConfig.verticalNav.defaultNavItemIconProps"
-      />
-      <Component
-        :is="layoutConfig.app.i18n.enable ? 'i18n-t' : 'span'"
-        v-bind="getDynamicI18nProps(item.title, 'span')"
-        class="nav-item-title"
-      >
+      <!--font-awesome-icon :icon="['fas', item.icon || layoutConfig.verticalNav.defaultNavItemAwesomeIconProps]"
+        class="nav-item-icon" v-if="typeof item.icon == 'string'" />
+      <Component :is="layoutConfig.app.iconRenderer || 'div'" class="nav-item-icon"
+        v-bind="item.icon || layoutConfig.verticalNav.defaultNavItemIconProps" v-if="typeof item.icon == 'object'" /-->
+      <template v-if="item.icon">
+        <template v-if="typeof item.icon == 'string'">
+          <font-awesome-icon :icon="['fas', item.icon]" class="nav-item-icon" />
+        </template>
+        <template v-else>
+          <Component :is="layoutConfig.app.iconRenderer || 'div'" v-bind="item.icon" class="nav-item-icon" />
+        </template>
+      </template>
+      <template v-else>
+        <template v-if="layoutConfig.verticalNav.defaultNavItemAwesomeIconProps">
+          <font-awesome-icon :icon="['fas', layoutConfig.verticalNav.defaultNavItemAwesomeIconProps]"
+            class="nav-item-icon" />
+        </template>
+        <template v-else>
+          <Component :is="layoutConfig.app.iconRenderer || 'div'"
+            v-bind="layoutConfig.verticalNav.defaultNavItemIconProps" class="nav-item-icon" />
+        </template>
+      </template>
+      <Component :is="layoutConfig.app.i18n.enable ? 'i18n-t' : 'span'" v-bind="getDynamicI18nProps(item.title, 'span')"
+        class="nav-item-title">
         {{ item.title }}
       </Component>
-      <Component
-        v-bind="layoutConfig.icons.chevronDown"
-        :is="layoutConfig.app.iconRenderer || 'div'"
-        class="nav-group-arrow"
-      />
+      <Component v-bind="layoutConfig.icons.chevronDown" :is="layoutConfig.app.iconRenderer || 'div'"
+        class="nav-group-arrow" />
     </div>
 
     <template #content>
-      <Component
-        :is="'children' in child ? 'HorizontalNavGroup' : HorizontalNavLink"
-        v-for="child in item.children"
-        :key="child.title"
-        :item="child"
-        children-at-end
-        is-sub-item
-      />
+      <Component :is="'children' in child ? 'HorizontalNavGroup' : HorizontalNavLink" v-for="child in item.children"
+        :key="child.title" :item="child" children-at-end is-sub-item />
     </template>
   </HorizontalNavPopper>
 </template>
@@ -108,7 +106,7 @@ watch(() => route.path, () => {
     .popper-content {
       z-index: 1;
 
-      > div {
+      >div {
         overflow: hidden auto;
       }
     }

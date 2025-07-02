@@ -1,13 +1,9 @@
 <script setup>
-import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
-useHead({
-  title: `Profil Pengguna | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     action: 'read',
     subject: 'Web',
+    title: 'Profil Pengguna',
   },
 })
 const loadingBody = ref(true)
@@ -88,7 +84,7 @@ const submitForm = async () => {
         profilePhotoPath.value = getData.user.profile_photo_path
         useCookie("profilePhotoPath").value = profilePhotoPath.value;
         try {
-          bus.emit(profilePhotoPath.value); 
+          bus.emit(profilePhotoPath.value);
         } catch (error) {
           //console.error(error)
         }
@@ -109,7 +105,6 @@ const submitForm = async () => {
             <span class="text-disabled text-subtitle-2">Perbaharui informasi profil dan alamat email akun Anda jika
               diperlukan.</span>
           </template>
-          <VCardText></VCardText>
           <VDivider />
           <VCardText v-if="showNotif">
             <VAlert border="bottom" :color="notif.color" variant="tonal">

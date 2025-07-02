@@ -39,7 +39,7 @@ export const canNavigate = to => {
 
   // Get the most specific route (last one in the matched array)
   const targetRoute = to.matched[to.matched.length - 1]
-  
+
   // If the target route has specific permissions, check those first
   if (targetRoute?.meta?.action && targetRoute?.meta?.subject)
     return ability.can(targetRoute.meta.action, targetRoute.meta.subject)

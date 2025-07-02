@@ -23,7 +23,6 @@ export default defineConfig({
           .replace(/([a-z\d])([A-Z])/g, '$1-$2')
           .toLowerCase()
       },
-
       routesFolder: 'resources/js/pages',
     }),
     vue({
@@ -63,7 +62,7 @@ export default defineConfig({
       ],
     }), // Docs: https://github.com/antfu/unplugin-auto-import#unplugin-auto-import
     AutoImport({
-      imports: ['vue', VueRouterAutoImports, '@vueuse/core', '@vueuse/math', 'pinia','vue-i18n'],
+      imports: ['vue', VueRouterAutoImports, '@vueuse/core', '@vueuse/math', 'vue-i18n', 'pinia'],
       dirs: [
         './resources/js/@core/utils',
         './resources/js/@core/composable/',
@@ -79,12 +78,12 @@ export default defineConfig({
         enabled: true,
         filepath: './.eslintrc-auto-import.json',
       },
-    }),
+    }), // Docs: https://github.com/intlify/bundle-tools/tree/main/packages/unplugin-vue-i18n#intlifyunplugin-vue-i18n
     VueI18nPlugin({
       runtimeOnly: true,
       compositionOnly: true,
       include: [
-        fileURLToPath(new URL('./src/plugins/i18n/locales/**', import.meta.url)),
+        fileURLToPath(new URL('./resources/js/plugins/i18n/locales/**', import.meta.url)),
       ],
     }),
     svgLoader(),
@@ -100,6 +99,8 @@ export default defineConfig({
       '@images': fileURLToPath(new URL('./resources/images/', import.meta.url)),
       '@styles': fileURLToPath(new URL('./resources/styles/', import.meta.url)),
       '@configured-variables': fileURLToPath(new URL('./resources/styles/variables/_template.scss', import.meta.url)),
+      '@db': fileURLToPath(new URL('./resources/js/plugins/fake-api/handlers/', import.meta.url)),
+      '@api-utils': fileURLToPath(new URL('./resources/js/plugins/fake-api/utils/', import.meta.url)),
     },
   },
   build: {

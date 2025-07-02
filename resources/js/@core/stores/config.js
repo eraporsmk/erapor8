@@ -1,7 +1,7 @@
-import { storeToRefs } from 'pinia'
-import { useTheme } from 'vuetify'
 import { cookieRef, useLayoutConfigStore } from '@layouts/stores/config'
 import { themeConfig } from '@themeConfig'
+import { storeToRefs } from 'pinia'
+import { useTheme } from 'vuetify'
 
 // SECTION Store
 export const useConfigStore = defineStore('config', () => {
@@ -21,7 +21,7 @@ export const useConfigStore = defineStore('config', () => {
 
   // 👉 isVerticalNavSemiDark
   const skin = cookieRef('skin', themeConfig.app.skin)
-
+  const contentLayoutNav = cookieRef('contentLayoutNav', themeConfig.app.contentLayoutNav)
   // ℹ️ We need to use `storeToRefs` to forward the state
   const { isLessThanOverlayNavBreakpoint, appContentWidth, navbarType, isNavbarBlurEnabled, appContentLayoutNav, isVerticalNavCollapsed, footerType, isAppRTL } = storeToRefs(useLayoutConfigStore())
   
@@ -29,7 +29,7 @@ export const useConfigStore = defineStore('config', () => {
     theme,
     isVerticalNavSemiDark,
     skin,
-
+    contentLayoutNav,
     // @layouts exports
     isLessThanOverlayNavBreakpoint,
     appContentWidth,

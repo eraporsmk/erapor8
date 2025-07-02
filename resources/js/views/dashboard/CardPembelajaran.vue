@@ -110,7 +110,7 @@ const changeStatus = (val) => {
   isConfirmDialogVisible.value = true
 }
 const confirmDialog = async (val) => {
-  if(!val){
+  if (!val) {
     status_penilaian.value = !status_penilaian.value
   }
   await $api('/dashboard/status-penilaian', {
@@ -155,7 +155,6 @@ const refreshNilai = () => {
                 @update:model-value="changeStatus" />
             </div>
           </template>
-          <VCardText></VCardText>
           <VDivider />
           <VTable class="text-no-wrap">
             <thead>
@@ -211,8 +210,10 @@ const refreshNilai = () => {
           </VTable>
         </VCard>
       </VCol>
-      <DetilNilaiDialog v-model:isDialogVisible="isDialogVisible" :item-data="itemData" :title-detil-nilai="titleDetilNilai"
-        :merdeka="merdeka" :is-ppa="is_ppa" :data-siswa="data_siswa" :sub-mapel="sub_mapel" @refresh="refreshNilai"></DetilNilaiDialog>
+      <DetilNilaiDialog v-model:isDialogVisible="isDialogVisible" :item-data="itemData"
+        :title-detil-nilai="titleDetilNilai" :merdeka="merdeka" :is-ppa="is_ppa" :data-siswa="data_siswa"
+        :sub-mapel="sub_mapel" @refresh="refreshNilai">
+      </DetilNilaiDialog>
       <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" confirmation-question="Apakah Anda yakin?"
         :confirmation-text="textDialog" :confirm-color="notif.color" :confirm-title="notif.title"
         :confirm-msg="notif.text" @confirm="confirmDialog" @close="confirmClose" />

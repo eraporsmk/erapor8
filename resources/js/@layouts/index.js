@@ -10,12 +10,12 @@ export const createLayouts = userConfig => {
 
     // Non reactive Values
     layoutConfig.app.title = userConfig.app?.title ?? layoutConfig.app.title
-    layoutConfig.app.nama = userConfig.app?.nama ?? layoutConfig.app.nama
     layoutConfig.app.logo = userConfig.app?.logo ?? layoutConfig.app.logo
     layoutConfig.app.overlayNavFromBreakpoint = userConfig.app?.overlayNavFromBreakpoint ?? layoutConfig.app.overlayNavFromBreakpoint
     layoutConfig.app.i18n.enable = userConfig.app?.i18n?.enable ?? layoutConfig.app.i18n.enable
     layoutConfig.app.iconRenderer = userConfig.app?.iconRenderer ?? layoutConfig.app.iconRenderer
     layoutConfig.verticalNav.defaultNavItemIconProps = userConfig.verticalNav?.defaultNavItemIconProps ?? layoutConfig.verticalNav.defaultNavItemIconProps
+    layoutConfig.verticalNav.defaultNavItemAwesomeIconProps = userConfig.verticalNav?.defaultNavItemAwesomeIconProps ?? layoutConfig.verticalNav.defaultNavItemAwesomeIconProps
     layoutConfig.icons.chevronDown = userConfig.icons?.chevronDown ?? layoutConfig.icons.chevronDown
     layoutConfig.icons.chevronRight = userConfig.icons?.chevronRight ?? layoutConfig.icons.chevronRight
     layoutConfig.icons.close = userConfig.icons?.close ?? layoutConfig.icons.close

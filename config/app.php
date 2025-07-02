@@ -13,9 +13,7 @@ return [
     |
     */
 
-    'name' => 'e-Rapor SMK',
-    'version' => env('APP_VERSION', '8.0.0'),
-    'registration' => env('APP_REGISTRATION', FALSE),
+    'name' => env('APP_NAME', 'Laravel'),
 
     /*
     |--------------------------------------------------------------------------
@@ -67,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

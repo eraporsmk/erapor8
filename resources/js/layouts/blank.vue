@@ -28,15 +28,13 @@ watch([
     data-allow-mismatch
   >
     <RouterView #="{Component}">
-      <transition name="out-in">
-        <Suspense
-          :timeout="0"
-          @fallback="isFallbackStateActive = true"
-          @resolve="isFallbackStateActive = false"
-        >
-          <Component :is="Component" />
-        </Suspense>
-      </transition>
+      <Suspense
+        :timeout="0"
+        @fallback="isFallbackStateActive = true"
+        @resolve="isFallbackStateActive = false"
+      >
+        <Component :is="Component" />
+      </Suspense>
     </RouterView>
   </div>
 </template>

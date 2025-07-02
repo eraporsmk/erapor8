@@ -13,7 +13,7 @@
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "santigarcor/laratrust": "^8.4",
+        "santigarcor/laratrust": "^8.5",
         "staudenmeir/eloquent-has-many-deep": "^1.20"
     },
     "require-dev": {

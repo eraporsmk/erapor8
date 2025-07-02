@@ -21,7 +21,7 @@
 */
 %nav-link-active {
   background-color: rgb(var(--v-global-theme-primary));
-  color: rgb(var(--v-theme-on-primary)) !important;
+  color: rgb(var(--v-theme-on-primary));
 
   @include mixins.elevation(3);
 }

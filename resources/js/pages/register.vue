@@ -7,20 +7,17 @@ import { default as authV2RegisterIllustrationDark, default as authV2RegisterIll
 import authV2MaskDark from '@images/pages/misc-mask-dark.png';
 import authV2MaskLight from '@images/pages/misc-mask-light.png';
 import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import { VForm } from 'vuetify/components/VForm';
 const imageVariant = useGenerateImageVariant(authV2RegisterIllustrationLight, authV2RegisterIllustrationDark, authV2RegisterIllustrationBorderedLight, authV2RegisterIllustrationBorderedDark, true)
 const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 const router = useRouter();
-useHead({
-  title: `Register | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     layout: 'blank',
     unauthenticatedOnly: true,
+    title: 'Register',
   },
 })
 onBeforeMount(async () => {
@@ -34,7 +31,7 @@ const fetchData = async () => {
     if (getData.sekolah) {
       if (!getData.allowRegister) {
         await nextTick(() => {
-          router.replace('/404')
+          //router.replace('/:404(.*)')
         });
       } else {
         loadingBody.value = false;

@@ -104,6 +104,7 @@ const detilUser = async (guru_id) => {
         const response = await useApi(createUrl(`/referensi/ptk/detil/${guru_id}`));
         let getData = response.data.value
         cardTitle.value = `Detil PTK (${getData.ptk.nama_lengkap})`
+        detilData.value = getData.ptk
         form.value.gelar_depan = getData.ptk.gelar_depan
         form.value.gelar_belakang = getData.ptk.gelar_belakang
     } catch (error) {

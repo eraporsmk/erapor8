@@ -361,11 +361,10 @@
     "watchTriggerable": true,
     "watchWithFilter": true,
     "whenever": true,
-    "$user": true,
-    "$semester": true,
-    "$role": true,
-    "$sekolah": true,
+    "$profilePhotoPath": true,
     "$roles": true,
-    "$profilePhotoPath": true
+    "$sekolah": true,
+    "$semester": true,
+    "$user": true
   }
 }

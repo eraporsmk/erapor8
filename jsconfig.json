@@ -43,6 +43,12 @@
       "@validators": [
         "./resources/js/@core/utils/validators"
       ],
+      "@db/*": [
+        "resources/js/plugins/fake-api-delete/handlers/*"
+      ],
+      "@api-utils/*": [
+        "resources/js/plugins/fake-api-delete/utils/*"
+      ],
       "@core-scss/*": [
         "resources/styles/@core/*"
       ]

@@ -35,7 +35,6 @@
 }
 
 // ℹ️ Icon styling for icon nested inside another nav item (2nd level)
-//%vertical-nav-items-nested-icon {
-  //color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
-  //color: rgb(var(--v-theme-on-primary));
-//}
+%vertical-nav-items-nested-icon {
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
+}

@@ -246,7 +246,7 @@ class DashboardController extends Controller
     }
     private function dashboard_guru(){
         $data_rombel = RombonganBelajar::withWhereHas('pembelajaran', $this->kondisi())->with(['wali_kelas' => function($query){
-         $query->select('guru_id', 'nama');
+         $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
       }])->orderBy('tingkat')->get();
       $result = [];
       $no = 1;
@@ -304,7 +304,7 @@ class DashboardController extends Controller
             });
          })->with([
             'guru' => function($query){
-               $query->select('guru_id', 'nama');
+               $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
                }, 
             'pengajar' => function($query){
                $query->select('guru_id', 'nama');

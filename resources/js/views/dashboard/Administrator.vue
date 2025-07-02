@@ -116,7 +116,6 @@ const confirmClose = () => {
             </VCardText>
           </VCard>
           <VCard title="Data Sekolah" class="mb-10" v-else>
-            <VCardText></VCardText>
             <VDivider />
             <VTable class="text-no-wrap">
               <tbody>

@@ -1,21 +1,17 @@
 <script setup>
-import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
-useHead({
-  title: `Kirim Data e-Rapor | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     action: 'read',
     subject: 'Administrator',
+    title: 'Kirim Data e-Rapor',
   },
 })
 const loadingBody = ref(true)
 const isAlertDialogVisible = ref(false)
 const notif = ref({
-    color: '',
-    title: '',
-    text: '',
+  color: '',
+  title: '',
+  text: '',
 })
 onMounted(async () => {
   await fetchData();
@@ -64,7 +60,7 @@ const kirimData = async () => {
       let getData = response._data
       loading.value = false
       isAlertDialogVisible.value = true
-        notif.value = {
+      notif.value = {
         color: getData.color,
         title: getData.title,
         text: getData.text,
@@ -73,7 +69,7 @@ const kirimData = async () => {
   })
 }
 const confirmAlert = () => {
-    fetchData()
+  fetchData()
 }
 </script>
 <template>
@@ -82,11 +78,7 @@ const confirmAlert = () => {
       <VCol cols="6" xl="8" md="8" sm="6">
         <VCard v-if="loadingBody">
           <VCardText class="text-center">
-            <VProgressCircular
-              :size="60"
-              indeterminate
-              color="error"
-            />
+            <VProgressCircular :size="60" indeterminate color="error" />
           </VCardText>
         </VCard>
         <VCard v-else>
@@ -114,11 +106,7 @@ const confirmAlert = () => {
       <VCol cols="6" xl="4" md="4" sm="6">
         <VCard v-if="loadingBody">
           <VCardText class="text-center">
-            <VProgressCircular
-              :size="60"
-              indeterminate
-              color="error"
-            />
+            <VProgressCircular :size="60" indeterminate color="error" />
           </VCardText>
         </VCard>
         <VCard v-else>
@@ -148,11 +136,7 @@ const confirmAlert = () => {
       <VCol cols="12">
         <VCard v-if="loadingBody">
           <VCardText class="text-center">
-            <VProgressCircular
-              :size="60"
-              indeterminate
-              color="error"
-            />
+            <VProgressCircular :size="60" indeterminate color="error" />
           </VCardText>
         </VCard>
         <VCard v-else>
@@ -220,6 +204,6 @@ const confirmAlert = () => {
       </VCard>
     </VDialog>
     <AlertDialog v-model:isDialogVisible="isAlertDialogVisible" :confirm-color="notif.color"
-            :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmAlert"></AlertDialog>
+      :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmAlert"></AlertDialog>
   </div>
 </template>

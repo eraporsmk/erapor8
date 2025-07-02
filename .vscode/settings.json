@@ -1,9 +1,9 @@
 {
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "files.insertFinalNewline": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "[javascript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "[typescript]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint",
@@ -92,6 +92,5 @@
         "borderStyle": "solid"
       }
     ]
-  },
-  "vue3snippets.enable-compile-vue-file-on-did-save-code": false
+  }
 }

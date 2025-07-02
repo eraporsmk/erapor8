@@ -1,13 +1,9 @@
 <script setup>
-import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
-useHead({
-  title: `Ambil Data Dapodik | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     action: 'read',
     subject: 'Administrator',
+    title: 'Tarik Dapodik',
   },
 })
 const loadingBody = ref(true)
@@ -16,9 +12,9 @@ const data_sinkron = ref([])
 const error = ref()
 const isAlertDialogVisible = ref(false)
 const notif = ref({
-    color: '',
-    title: '',
-    text: '',
+  color: '',
+  title: '',
+  text: '',
 })
 const fetchData = async () => {
   try {
@@ -105,7 +101,7 @@ onMounted(async () => {
   await fetchData();
 });
 const confirmAlert = () => {
-    fetchData()
+  fetchData()
 }
 </script>
 <template>
@@ -178,6 +174,6 @@ const confirmAlert = () => {
       </VCardText>
     </VCard>
     <AlertDialog v-model:isDialogVisible="isAlertDialogVisible" :confirm-color="notif.color"
-            :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmAlert"></AlertDialog>
+      :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmAlert"></AlertDialog>
   </div>
 </template>

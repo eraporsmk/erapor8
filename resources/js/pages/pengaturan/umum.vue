@@ -1,14 +1,10 @@
 <script setup>
-import { themeConfig } from '@themeConfig';
-import { useHead } from '@unhead/vue';
 import { Indonesian } from "flatpickr/dist/l10n/id.js";
-useHead({
-  title: `Pengaturan Umum | ${themeConfig.app.title}`
-})
 definePage({
   meta: {
     action: 'read',
     subject: 'Administrator',
+    title: 'Pengaturan Umum',
   },
 })
 const refVForm = ref();
@@ -33,9 +29,9 @@ const data_rombel = ref([])
 const loadingBody = ref(true)
 const isAlertDialogVisible = ref(false)
 const notif = ref({
-    color: '',
-    title: '',
-    text: '',
+  color: '',
+  title: '',
+  text: '',
 })
 const fetchData = async () => {
   try {
@@ -124,8 +120,8 @@ const submitForm = async () => {
   })
 }
 const confirmAlert = () => {
-    fetchData()
-    form.value.file = null
+  fetchData()
+  form.value.file = null
 }
 const dateConfig = ref({
   locale: Indonesian,
@@ -136,14 +132,9 @@ const dateConfig = ref({
 <template>
   <section>
     <VCard title="Pengaturan Umum">
-      <VCardText></VCardText>
       <VDivider />
       <VCardText class="text-center" v-if="loadingBody">
-        <VProgressCircular
-          :size="60"
-          indeterminate
-          color="error"
-        />
+        <VProgressCircular :size="60" indeterminate color="error" />
       </VCardText>
       <VCardText v-else>
         <VForm ref="refVForm" @submit.prevent="onFormSubmit">
@@ -206,6 +197,6 @@ const dateConfig = ref({
       </VCardText>
     </VCard>
     <AlertDialog v-model:isDialogVisible="isAlertDialogVisible" :confirm-color="notif.color"
-            :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmAlert"></AlertDialog>
+      :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmAlert"></AlertDialog>
   </section>
 </template>

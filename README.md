@@ -121,7 +121,7 @@ composer install
 ## Update Versi Aplikasi
 
 ```bash
-php artisan erapor:update
+php artisan app:update
 ```
 
 ## Edit file .env untuk menampilkan foto profile

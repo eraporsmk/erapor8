@@ -4,7 +4,7 @@ import { breakpointsVuetifyV3 } from '@vueuse/core'
 import { VIcon } from 'vuetify/components/VIcon'
 
 // ❗ Logo SVG must be imported with ?raw suffix
-import logo from '@images/logo.png'
+import logo from '@images/logos/logo.png'
 import { AppContentLayoutNav, ContentWidth, FooterType, NavbarType } from '@layouts/enums'
 
 export const { themeConfig, layoutConfig } = defineThemeConfig({
@@ -18,32 +18,23 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     contentLayoutNav: AppContentLayoutNav.Vertical,
     overlayNavFromBreakpoint: breakpointsVuetifyV3.lg - 1, // 1 for matching with vuetify breakpoint. Docs: https://next.vuetifyjs.com/en/features/display-and-platform/
     i18n: {
-      enable: false,
-      defaultLocale: 'pt',
+      enable: true,
+      defaultLocale: 'en',
       langConfig: [
-        {
-          label: 'Portuguese',
-          i18nLang: 'pt',
-          flag: '🇵🇹',
-          isRTL: false,
-        },
         {
           label: 'English',
           i18nLang: 'en',
-          flag: '🇺🇸',
           isRTL: false,
         },
         {
-          label: 'Tetun',
-          i18nLang: 'te',
-          flag: '🇹🇱',
+          label: 'French',
+          i18nLang: 'fr',
           isRTL: false,
         },
         {
-          label: 'Indonesia',
-          i18nLang: 'id',
-          flag: '🇮🇩',
-          isRTL: false,
+          label: 'Arabic',
+          i18nLang: 'ar',
+          isRTL: true,
         },
       ],
     },
@@ -55,10 +46,11 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     type: NavbarType.Sticky,
     navbarBlur: true,
   },
-  footer: { type: FooterType.Sticky },
+  footer: { type: FooterType.Static },
   verticalNav: {
     isVerticalNavCollapsed: false,
     defaultNavItemIconProps: { icon: 'tabler-circle' },
+    defaultNavItemAwesomeIconProps: 'hand-point-right',
     isVerticalNavSemiDark: false,
   },
   horizontalNav: {

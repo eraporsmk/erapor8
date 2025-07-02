@@ -8,7 +8,6 @@ export {}
 declare global {
   const $api: typeof import('./resources/js/utils/api.js')['$api']
   const $profilePhotoPath: typeof import('./resources/js/utils/mixins.js')['$profilePhotoPath']
-  const $role: typeof import('./resources/js/utils/mixins.js')['$role']
   const $roles: typeof import('./resources/js/utils/mixins.js')['$roles']
   const $sekolah: typeof import('./resources/js/utils/mixins.js')['$sekolah']
   const $semester: typeof import('./resources/js/utils/mixins.js')['$semester']
