@@ -102,4 +102,37 @@ class PesertaDidik extends Model
             'anggota_rombel_id'
         )->where('kompetensi_id', 4);
 	}
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'peserta_didik_id', 'peserta_didik_id');
+    }
+    public function pekerjaan_ayah(){
+		return $this->hasOne(Pekerjaan::class, 'pekerjaan_id', 'kerja_ayah');
+	}
+	public function pekerjaan_ibu(){
+		return $this->hasOne(Pekerjaan::class, 'pekerjaan_id', 'kerja_ibu');
+	}
+	public function pekerjaan_wali(){
+		return $this->hasOne(Pekerjaan::class, 'pekerjaan_id', 'kerja_wali');
+	}
+    protected function photo(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => ($value) ? "/storage/$value" : '/images/avatars/blank-profile.png',
+        );
+    }
+    public function anggota_akt_pd()
+	{
+		return $this->hasOne(AnggotaAktPd::class, 'peserta_didik_id', 'peserta_didik_id');
+	}
+    public function kelas(){
+		return $this->hasOneThrough(
+            RombonganBelajar::class,
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'rombongan_belajar_id', 
+            'peserta_didik_id',
+            'rombongan_belajar_id'
+        );
+	}
 }

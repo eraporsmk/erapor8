@@ -12,6 +12,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  isNotifVisible: {
+    type: Boolean,
+    required: true,
+  },
   confirmTitle: {
     type: String,
     required: true,
@@ -28,6 +32,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:isDialogVisible',
+  'update:isNotifVisible',
   'confirm',
   'close'
 ])
@@ -37,7 +42,9 @@ const confirmed = ref(false)
 const updateModelValue = val => {
   emit('update:isDialogVisible', val)
 }
-
+const updateNotifValue = val => {
+  emit('update:isNotifVisible', val)
+}
 const onConfirmation = () => {
   emit('confirm', true)
   updateModelValue(false)
@@ -49,6 +56,7 @@ const onCancel = () => {
   emit('update:isDialogVisible', false)
 }
 const closeConfirm = () => {
+  updateNotifValue(false)
   confirmed.value = false
   emit('close', true)
 }
@@ -56,20 +64,11 @@ const closeConfirm = () => {
 
 <template>
   <!-- 👉 Confirm Dialog -->
-  <VDialog
-    max-width="500"
-    :model-value="props.isDialogVisible"
-    @update:model-value="updateModelValue"
-  >
+  <VDialog max-width="500" :model-value="props.isDialogVisible" @update:model-value="updateModelValue">
     <VCard class="text-center px-10 py-6">
       <VCardText>
-        <VBtn
-          icon
-          variant="outlined"
-          color="warning"
-          class="my-4"
-          style=" block-size: 88px;inline-size: 88px; pointer-events: none;"
-        >
+        <VBtn icon variant="outlined" color="warning" class="my-4"
+          style=" block-size: 88px;inline-size: 88px; pointer-events: none;">
           <span class="text-5xl">!</span>
         </VBtn>
 
@@ -91,10 +90,19 @@ const closeConfirm = () => {
   </VDialog>
 
   <!-- confirmed -->
-  <VDialog v-model="confirmed" max-width="500">
+  <VDialog v-model="confirmed" width="300">
+    <VCard color="primary" width="300">
+      <VCardText class="pt-3">
+        Mohon menunggu...
+        <VProgressLinear indeterminate bg-color="rgba(var(--v-theme-surface), 0.1)" :height="8" class="mb-0 mt-4" />
+      </VCardText>
+    </VCard>
+  </VDialog>
+  <VDialog :model-value="props.isNotifVisible" @update:model-value="updateNotifValue" max-width="500">
     <VCard>
       <VCardText class="text-center px-10 py-6">
-        <VBtn icon variant="outlined" :color="props.confirmColor" class="my-4" style=" block-size: 88px;inline-size: 88px; pointer-events: none;">
+        <VBtn icon variant="outlined" :color="props.confirmColor" class="my-4"
+          style=" block-size: 88px;inline-size: 88px; pointer-events: none;">
           <VIcon :icon="(props.confirmColor == 'success') ? 'tabler-checks' : 'tabler-xbox-x'" size="38" />
         </VBtn>
         <h1 class="text-h4 mb-4">

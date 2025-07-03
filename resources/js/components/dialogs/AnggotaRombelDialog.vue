@@ -19,12 +19,15 @@ const props = defineProps({
 })
 const updateModelValue = val => {
   emit('update:isDialogVisible', val)
+  emit('close')
 }
 const emit = defineEmits([
   'update:isDialogVisible',
-  'refresh'
+  'refresh',
+  'close'
 ])
 const isConfirmDialogVisible = ref(false)
+const isNotifVisible = ref(false)
 const notif = ref({
   color: '',
   title: '',
@@ -32,8 +35,10 @@ const notif = ref({
 })
 const loadings = ref([])
 const anggotaRombelId = ref()
-const hapus = async (anggota_rombel_id) => {
+const deleteData = ref()
+const hapus = async (anggota_rombel_id, data) => {
   anggotaRombelId.value = anggota_rombel_id
+  deleteData.value = data
   isConfirmDialogVisible.value = true
 }
 const confirmDialog = async () => {
@@ -41,16 +46,26 @@ const confirmDialog = async () => {
   await $api('/referensi/rombongan-belajar/hapus-anggota-rombel', {
     method: 'POST',
     body: {
-      anggota_rombel_id: anggotaRombelId.value
+      anggota_rombel_id: anggotaRombelId.value,
+      data: deleteData.value,
     },
     onResponse({ request, response, options }) {
       let getData = response._data
       loadings.value[anggotaRombelId.value] = false
       notif.value = getData
+      isNotifVisible.value = true
     }
   })
 }
 const confirmClose = async () => {
+  isNotifVisible.value = false
+  setTimeout(() => {
+    notif.value = {
+      color: '',
+      title: '',
+      text: '',
+    }
+  }, 300)
   emit('refresh')
 }
 </script>
@@ -59,15 +74,18 @@ const confirmClose = async () => {
   <VDialog :model-value="props.isDialogVisible" @update:model-value="updateModelValue" fullscreen :scrim="false"
     transition="dialog-bottom-transition">
     <VCard>
-      <div>
-        <VToolbar color="primary">
-          <VBtn icon variant="plain" @click="updateModelValue(false)">
-            <VIcon color="white" icon="tabler-x" />
+      <VToolbar color="primary" class="sticky-header">
+        <VBtn icon variant="plain" @click="updateModelValue(false)">
+          <VIcon color="white" icon="tabler-x" />
+        </VBtn>
+        <VToolbarTitle>{{ dialogTitle }}</VToolbarTitle>
+        <VSpacer />
+        <VToolbarItems>
+          <VBtn variant="text" @click="updateModelValue(false)">
+            <VIcon icon="tabler-x" class="me-2"></VIcon> Tutup
           </VBtn>
-          <VToolbarTitle>{{ dialogTitle }}</VToolbarTitle>
-          <VSpacer />
-        </VToolbar>
-      </div>
+        </VToolbarItems>
+      </VToolbar>
       <VTable class="permission-table mb-6">
         <thead>
           <tr>
@@ -97,9 +115,16 @@ const confirmClose = async () => {
               <td>{{ item.tempat_tanggal_lahir }}</td>
               <td>{{ item.agama?.nama }}</td>
               <td class="text-center">
-                <VBtn :loading="loadings[item.anggota_rombel.anggota_rombel_id]"
-                  :disabled="loadings[item.anggota_rombel.anggota_rombel_id]" color="error" icon="tabler-trash"
-                  @click="hapus(item.anggota_rombel.anggota_rombel_id)" />
+                <template v-if="item.anggota_akt_pd">
+                  <VBtn :loading="loadings[item.anggota_akt_pd.anggota_akt_pd_id]"
+                    :disabled="loadings[item.anggota_akt_pd.anggota_akt_pd_id]" color="error" icon="tabler-trash"
+                    @click="hapus(item.anggota_akt_pd.anggota_akt_pd_id, 'prakerin')" />
+                </template>
+                <template v-else>
+                  <VBtn :loading="loadings[item.anggota_rombel.anggota_rombel_id]"
+                    :disabled="loadings[item.anggota_rombel.anggota_rombel_id]" color="error" icon="tabler-trash"
+                    @click="hapus(item.anggota_rombel.anggota_rombel_id, 'rombel')" />
+                </template>
               </td>
             </tr>
           </template>
@@ -112,9 +137,10 @@ const confirmClose = async () => {
       </VTable>
     </VCard>
   </VDialog>
-  <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" confirmation-question="Apakah Anda yakin?"
-    confirmation-text="Tindakan ini tidak dapat dikembalikan!" :confirm-color="notif.color" :confirm-title="notif.title"
-    :confirm-msg="notif.text" @confirm="confirmDialog" @close="confirmClose" />
+  <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
+    confirmation-question="Apakah Anda yakin?" confirmation-text="Tindakan ini tidak dapat dikembalikan!"
+    :confirm-color="notif.color" :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDialog"
+    @close="confirmClose" />
 </template>
 <style lang="scss">
 .permission-table {
@@ -130,5 +156,11 @@ const confirmClose = async () => {
       white-space: nowrap;
     }
   }
+}
+
+.sticky-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 1;
 }
 </style>

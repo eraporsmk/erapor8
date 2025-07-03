@@ -17,7 +17,7 @@ import { HorizontalNavLayout } from '@layouts'
       <RouterLink to="/" class="app-logo d-flex align-center gap-x-3">
         <img :src="themeConfig.app.logo" height="24" />
         <h1 class="app-title font-weight-bold leading-normal text-xl text-capitalize">
-          {{ themeConfig.app.title }}
+          {{ themeConfig.app.title }} &raquo; {{ $sekolah?.nama }} | {{ $semester?.nama }}
         </h1>
       </RouterLink>
       <VSpacer />

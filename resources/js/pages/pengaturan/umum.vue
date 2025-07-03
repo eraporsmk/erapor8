@@ -18,7 +18,8 @@ const form = ref({
   rombel_4_tahun: [],
   url_dapodik: null,
   token_dapodik: null,
-  file: null,
+  photo: null,
+  bg_login: null,
 })
 onMounted(async () => {
   await fetchData();
@@ -33,6 +34,7 @@ const notif = ref({
   title: '',
   text: '',
 })
+const bgLogin = ref()
 const fetchData = async () => {
   try {
     const response = await useApi(createUrl('/setting', {
@@ -45,6 +47,7 @@ const fetchData = async () => {
     data_semester.value = getData.semester
     data_guru.value = getData.data_guru
     data_rombel.value = getData.data_rombel
+    bgLogin.value = getData.bg_login
     form.value.semester_id = getData.semester_id;
     form.value.tanggal_rapor = getData.tanggal_rapor
     form.value.tanggal_rapor_kelas_akhir = getData.tanggal_rapor_kelas_akhir
@@ -81,11 +84,14 @@ const onFormSubmit = () => {
     }
   });
 }
-const logoError = ref(false)
-const logoErrorMessage = ref()
+const errors = ref({
+  photo: undefined,
+  bg_login: undefined,
+})
 const submitForm = async () => {
   const dataForm = new FormData();
-  dataForm.append('photo', (form.value.file) ? form.value.file : '');
+  dataForm.append('photo', (form.value.photo) ? form.value.photo : '');
+  dataForm.append('bg_login', (form.value.bg_login) ? form.value.bg_login : '');
   dataForm.append('semester_id', form.value.semester_id);
   dataForm.append('sekolah_id', $user.sekolah_id);
   dataForm.append('semester_aktif', $semester.semester_id);
@@ -103,11 +109,8 @@ const submitForm = async () => {
     body: dataForm,
     onResponse({ request, response, options }) {
       let getData = response._data
-      logoError.value = false
-      logoErrorMessage.value = null
       if (getData.errors) {
-        logoError.value = true
-        logoErrorMessage.value = getData.message
+        errors.value = getData.errors
       } else {
         isAlertDialogVisible.value = true
         notif.value = {
@@ -121,13 +124,23 @@ const submitForm = async () => {
 }
 const confirmAlert = () => {
   fetchData()
-  form.value.file = null
+  form.value.photo = null
+  form.value.bg_login = null
 }
 const dateConfig = ref({
   locale: Indonesian,
   altFormat: "j F Y",
   altInput: true,
 });
+const resetBgLogin = async () => {
+  console.log('resetBgLogin');
+  await $api('/setting/reset-bg', {
+    method: 'POST',
+    onResponse() {
+      fetchData()
+    }
+  })
+}
 </script>
 <template>
   <section>
@@ -180,6 +193,18 @@ const dateConfig = ref({
                   <AppTextField v-model="form.token_dapodik" label="Token Web Services Dapodik"
                     placeholder="Token Web Services Dapodik" />
                 </VCol>
+                <VCol cols="12">
+                  <label class="v-label text-body-2 text-high-emphasis" for="bg_login">Kustom Background (Laman Login
+                    &amp; Register)</label>
+                  <VFileInput id="bg_login" v-model="form.bg_login" :error-messages="errors.bg_login" accept="image/*"
+                    label="Unggah Kustom Background" v-if="bgLogin">
+                    <template v-slot:append>
+                      <VIcon icon="tabler-trash" color="error" size="26" @click="resetBgLogin" />
+                    </template>
+                  </VFileInput>
+                  <VFileInput id="bg_login" v-model="form.bg_login" :error-messages="errors.bg_login" accept="image/*"
+                    label="Unggah Kustom Background" v-else />
+                </VCol>
                 <VCol cols="12" class="d-flex gap-4">
                   <VBtn type="submit">
                     Simpan
@@ -189,7 +214,7 @@ const dateConfig = ref({
             </VCol>
             <VCol cols="5">
               <VImg alt="Logo Sekolah" :src="logo_sekolah" cover class="w-100 mx-auto mb-10" />
-              <VFileInput v-model="form.file" :error="logoError" :error-messages="logoErrorMessage" accept="image/*"
+              <VFileInput v-model="form.photo" :error-messages="errors.photo" accept="image/*"
                 label="Unggah Logo Sekolah" />
             </VCol>
           </VRow>

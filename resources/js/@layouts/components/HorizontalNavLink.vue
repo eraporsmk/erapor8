@@ -24,16 +24,17 @@ const props = defineProps({
   <li v-if="can(item.action, item.subject)" class="nav-link" :class="[{
     'sub-item': props.isSubItem,
     'disabled': item.disable,
+    'text-error': item.color == 'error',
+    'text-success': item.color == 'success'
   }]">
     <Component :is="item.to ? 'RouterLink' : 'a'" v-bind="getComputedNavLinkToProp(item)"
       :class="{ 'router-link-active router-link-exact-active': isNavLinkActive(item, $router) }">
-      <!--font-awesome-icon :icon="['fas', item.icon || layoutConfig.verticalNav.defaultNavItemAwesomeIconProps]"
-        class="nav-item-icon" v-if="typeof item.icon == 'string'" />
-      <Component :is="layoutConfig.app.iconRenderer || 'div'" class="nav-item-icon"
-        v-bind="item.icon || layoutConfig.verticalNav.defaultNavItemIconProps" v-if="typeof item.icon == 'object'" /-->
       <template v-if="item.icon">
         <template v-if="typeof item.icon == 'string'">
-          <font-awesome-icon :icon="['fas', item.icon]" class="nav-item-icon" />
+          <font-awesome-icon :icon="['fas', item.icon]" class="nav-item-icon" :class="{
+            'text-error': item.color == 'error',
+            'text-success': item.color == 'success'
+          }" />
         </template>
         <template v-else>
           <Component :is="layoutConfig.app.iconRenderer || 'div'" v-bind="item.icon" class="nav-item-icon" />
@@ -42,7 +43,10 @@ const props = defineProps({
       <template v-else>
         <template v-if="layoutConfig.verticalNav.defaultNavItemAwesomeIconProps">
           <font-awesome-icon :icon="['fas', layoutConfig.verticalNav.defaultNavItemAwesomeIconProps]"
-            class="nav-item-icon" />
+            class="nav-item-icon" :class="{
+              'text-error': item.color == 'error',
+              'text-success': item.color == 'success'
+            }" />
         </template>
         <template v-else>
           <Component :is="layoutConfig.app.iconRenderer || 'div'"

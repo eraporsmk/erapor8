@@ -59,24 +59,4 @@ class PtkController extends Controller
         ];
         return response()->json($data);
     }
-    private function updateGelar($urut, $data){
-        $find = GelarPtk::where(function($query) use ($data){
-            $query->where('guru_id', request()->guru_id);
-            $query->where('gelar_akademik_id', $data);
-        })->first();
-        if($find){
-            $find->no_urut = $urut;
-        } else {
-            GelarPtk::create(
-                [
-                    'sekolah_id' => request()->sekolah_id,
-                    'guru_id' => request()->guru_id,
-                    'gelar_akademik_id' => $data,
-                    'ptk_id' => request()->guru_id,
-                    'last_sync' => now(),
-                    'no_urut' => $urut,
-                ]
-            );
-        }
-    }
 }

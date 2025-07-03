@@ -56,6 +56,12 @@ onMounted(async () => {
 watch(options, async () => {
   await fetchData();
 }, { deep: true });
+watch(
+  () => options.value.searchQuery,
+  () => {
+    options.value.page = 1
+  }
+)
 const updateSortBy = (val) => {
   options.value.sortby = val[0]?.key
   options.value.sortbydesc = val[0]?.order
@@ -128,6 +134,7 @@ const confirmGenerate = async (val) => {
 const loadings = ref([])
 const isDialogVisible = ref(false)
 const isConfirmDialogVisible = ref(false)
+const isNotifVisible = ref(false)
 const dialogTitle = ref()
 const dialogBody = ref({
   userId: null,
@@ -215,6 +222,7 @@ const confirmDelete = async (val) => {
       onResponse({ request, response, options }) {
         let getData = response._data
         notif.value = getData
+        isNotifVisible.value = true
       }
     })
   }
@@ -241,6 +249,14 @@ const onsubmit = async () => {
 const confirmDialog = () => {
   isDialogVisible.value = false
   selectedRoles.value = []
+  isNotifVisible.value = false
+  setTimeout(() => {
+    notif.value = {
+      color: '',
+      title: '',
+      text: '',
+    }
+  }, 300)
   fetchData()
 }
 const confirmClose = (val) => {
@@ -256,7 +272,6 @@ const confirmClose = (val) => {
         <VCardTitle>Akses Pengguna</VCardTitle>
       </VCardItem>
       <VDivider />
-
       <VCardText class="d-flex flex-wrap gap-4">
         <div class="me-3 d-flex gap-3">
           <AppSelect v-model="options.itemsPerPage" :items="[
@@ -265,10 +280,6 @@ const confirmClose = (val) => {
             { value: 50, title: '50' },
             { value: 100, title: '100' },
           ]" style="inline-size: 6.25rem;" />
-          <!--
-          <AppSelect :model-value="per_page" :items="[
-          <VSelect v-model="options.itemsPerPage" :items="[10, 20, 30, 40, 50]" label="Items per page" />
-          -->
         </div>
         <VSpacer />
 
@@ -316,7 +327,9 @@ const confirmClose = (val) => {
             {{ item.default_password }}
           </template>
           <template v-else>
-            Custom
+            <VChip size="x-small" color="error">
+              Custom
+            </VChip>
           </template>
         </template>
         <!-- Actions -->
@@ -404,9 +417,10 @@ const confirmClose = (val) => {
         </VCardText>
       </VCard>
     </VDialog>
-    <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" confirmation-question="Apakah Anda yakin?"
-      confirmation-text="Tindakan ini tidak dapat dikembalikan!" :confirm-color="notif.color"
-      :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDelete" @close="confirmClose" />
+    <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
+      confirmation-question="Apakah Anda yakin?" confirmation-text="Tindakan ini tidak dapat dikembalikan!"
+      :confirm-color="notif.color" :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDelete"
+      @close="confirmClose" />
     <AlertDialog v-model:isDialogVisible="isAlertDialogVisible" :confirm-color="notif.color"
       :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDialog" />
     <VDialog max-width="500" v-model="generateUserDialog">

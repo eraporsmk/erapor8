@@ -75,6 +75,12 @@ onMounted(async () => {
 watch(options, async () => {
   await fetchData();
 }, { deep: true });
+watch(
+  () => options.value.searchQuery,
+  () => {
+    options.value.page = 1
+  }
+)
 watch(props, async () => {
   if (props.isTabActive == 'Mata Evaluasi Rapor') {
     await fetchData()
@@ -105,9 +111,11 @@ watch(props, async () => {
         { value: 20, title: '20' },
         { value: 50, title: '50' },
         { value: 100, title: '100' },
-      ]" :items="items" :server-items-length="total" :items-length="total" :headers="headers" items-per-page-text="Item" class="text-no-wrap" :options="options" :loading="loadingTable" loading-text="Loading..." @update:sortBy="updateSortBy">
+      ]" :items="items" :server-items-length="total" :items-length="total" :headers="headers"
+        items-per-page-text="Item" class="text-no-wrap" :options="options" :loading="loadingTable"
+        loading-text="Loading..." @update:sortBy="updateSortBy">
         <template #item.guru="{ item }">
-          {{item.pembelajaran.guru.nama_lengkap}}
+          {{ item.pembelajaran.guru.nama_lengkap }}
         </template>
         <template #item.status="{ item }">
           <VChip size="small" color="success" v-if="item.status">

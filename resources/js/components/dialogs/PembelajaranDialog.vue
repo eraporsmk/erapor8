@@ -56,20 +56,18 @@ const hapus = async (pembelajaran_id) => {
   <VDialog :model-value="props.isDialogVisible" @update:model-value="updateModelValue" fullscreen :scrim="false"
     transition="dialog-bottom-transition">
     <VCard>
-      <div>
-        <VToolbar color="primary">
-          <VBtn icon variant="plain" @click="updateModelValue(false)">
-            <VIcon color="white" icon="tabler-x" />
+      <VToolbar color="primary" class="sticky-header">
+        <VBtn icon variant="plain" @click="updateModelValue(false)">
+          <VIcon color="white" icon="tabler-x" />
+        </VBtn>
+        <VToolbarTitle>{{ dialogTitle }}</VToolbarTitle>
+        <VSpacer />
+        <VToolbarItems>
+          <VBtn variant="text" @click="onSubmit">
+            <VIcon icon="tabler-device-floppy" class="me-2"></VIcon> Simpan
           </VBtn>
-          <VToolbarTitle>{{ dialogTitle }}</VToolbarTitle>
-          <VSpacer />
-          <VToolbarItems>
-            <VBtn variant="text" @click="onSubmit">
-              Simpan
-            </VBtn>
-          </VToolbarItems>
-        </VToolbar>
-      </div>
+        </VToolbarItems>
+      </VToolbar>
       <VTable class="permission-table mb-6">
         <thead>
           <tr>
@@ -155,5 +153,11 @@ const hapus = async (pembelajaran_id) => {
       white-space: nowrap;
     }
   }
+}
+
+.sticky-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 1;
 }
 </style>

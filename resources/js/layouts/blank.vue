@@ -23,18 +23,13 @@ watch([
 <template>
   <AppLoadingIndicator ref="refLoadingIndicator" />
 
-  <div
-    class="layout-wrapper layout-blank"
-    data-allow-mismatch
-  >
-    <RouterView #="{Component}">
-      <Suspense
-        :timeout="0"
-        @fallback="isFallbackStateActive = true"
-        @resolve="isFallbackStateActive = false"
-      >
-        <Component :is="Component" />
-      </Suspense>
+  <div class="layout-wrapper layout-blank" data-allow-mismatch>
+    <RouterView #="{ Component }">
+      <transition name="zoom-fade">
+        <Suspense :timeout="0" @fallback="isFallbackStateActive = true" @resolve="isFallbackStateActive = false">
+          <Component :is="Component" />
+        </Suspense>
+      </transition>
     </RouterView>
   </div>
 </template>
@@ -42,5 +37,20 @@ watch([
 <style>
 .layout-wrapper.layout-blank {
   flex-direction: column;
+}
+
+.zoom-fade-enter-active,
+.zoom-fade-leave-active {
+  transition: transform 0.35s, opacity 0.28s ease-in-out;
+}
+
+.zoom-fade-enter {
+  transform: scale(0.97);
+  opacity: 0;
+}
+
+.zoom-fade-leave-to {
+  transform: scale(1.03);
+  opacity: 0;
 }
 </style>

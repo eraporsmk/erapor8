@@ -86,6 +86,7 @@ export default [
             icon: 'hands-holding-child',
             action: 'read',
             subject: 'Password_pd',
+            color: 'error',
           },
         ]
       },

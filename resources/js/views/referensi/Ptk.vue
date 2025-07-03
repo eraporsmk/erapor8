@@ -39,7 +39,6 @@ const options = ref({
     page: 1,
     itemsPerPage: 10,
     searchQuery: '',
-    selectedRole: null,
     sortby: 'nama',
     sortbydesc: 'ASC',
 });
@@ -81,6 +80,12 @@ onMounted(async () => {
 watch(options, async () => {
     await fetchData();
 }, { deep: true });
+watch(
+    () => options.value.searchQuery,
+    () => {
+        options.value.page = 1
+    }
+)
 const isDialogVisible = ref(false)
 const isAlertDialogVisible = ref(false)
 const notif = ref({
@@ -229,10 +234,10 @@ const confirmDialog = async () => {
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
                                         <label class="v-label text-body-2 text-high-emphasis" for="nuptk">NUPTK</label>
-                                        </VCol>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.nuptk"
-                                            placeholder="NUPTK" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.nuptk" placeholder="NUPTK"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
@@ -240,10 +245,10 @@ const confirmDialog = async () => {
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
                                         <label class="v-label text-body-2 text-high-emphasis" for="nip">NIP</label>
-                                        </VCol>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.nip"
-                                            placeholder="NIP" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.nip" placeholder="NIP"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
@@ -251,18 +256,19 @@ const confirmDialog = async () => {
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
                                         <label class="v-label text-body-2 text-high-emphasis" for="nik">NIK</label>
-                                        </VCol>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.nik"
-                                            placeholder="NIK" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.nik" placeholder="NIK"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="jenis_kelamin">Jenis Kelamin</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis" for="jenis_kelamin">Jenis
+                                            Kelamin</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
                                         <AppTextField id="nama" :value="detilData?.jenis_kelamin_str"
                                             placeholder="Jenis Kelamin" persistent-placeholder disabled />
@@ -272,8 +278,9 @@ const confirmDialog = async () => {
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="tempat_lahir">Tempat Lahir</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis" for="tempat_lahir">Tempat
+                                            Lahir</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
                                         <AppTextField id="nama" :value="detilData?.tempat_lahir"
                                             placeholder="Tempat Lahir" persistent-placeholder disabled />
@@ -283,8 +290,10 @@ const confirmDialog = async () => {
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="tanggal_lahir_indo">Tanggal Lahir</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="tanggal_lahir_indo">Tanggal
+                                            Lahir</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
                                         <AppTextField id="nama" :value="detilData?.tanggal_lahir_indo"
                                             placeholder="Tanggal Lahir" persistent-placeholder disabled />
@@ -294,22 +303,24 @@ const confirmDialog = async () => {
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="agama_id">Agama</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="agama_id">Agama</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.agama?.nama"
-                                            placeholder="Agama" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.agama?.nama" placeholder="Agama"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="alamat">Alamat</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="alamat">Alamat</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.alamat"
-                                            placeholder="Alamat" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.alamat" placeholder="Alamat"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
@@ -317,10 +328,10 @@ const confirmDialog = async () => {
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
                                         <label class="v-label text-body-2 text-high-emphasis" for="rt">RT</label>
-                                        </VCol>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.rt"
-                                            placeholder="RT" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.rt" placeholder="RT"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
@@ -328,18 +339,19 @@ const confirmDialog = async () => {
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
                                         <label class="v-label text-body-2 text-high-emphasis" for="rw">RW</label>
-                                        </VCol>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.rw"
-                                            placeholder="RW" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.rw" placeholder="RW"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="desa_kelurahan">Desa/Kelurahan</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="desa_kelurahan">Desa/Kelurahan</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
                                         <AppTextField id="nama" :value="detilData?.desa_kelurahan"
                                             placeholder="Desa/Kelurahan" persistent-placeholder disabled />
@@ -349,33 +361,36 @@ const confirmDialog = async () => {
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="kecamatan">Kecamatan</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="kecamatan">Kecamatan</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.kecamatan"
-                                            placeholder="Kecamatan" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.kecamatan" placeholder="Kecamatan"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="kode_pos">Kodepos</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="kode_pos">Kodepos</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.kode_pos"
-                                            placeholder="Kodepos" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.kode_pos" placeholder="Kodepos"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
                             <VCol cols="12">
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
-                                        <label class="v-label text-body-2 text-high-emphasis" for="no_hp">Telp/HP</label>
-                                        </VCol>
+                                        <label class="v-label text-body-2 text-high-emphasis"
+                                            for="no_hp">Telp/HP</label>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.no_hp"
-                                            placeholder="Telp/HP" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.no_hp" placeholder="Telp/HP"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>
@@ -383,10 +398,10 @@ const confirmDialog = async () => {
                                 <VRow no-gutters>
                                     <VCol cols="12" md="3" class="d-flex align-items-center">
                                         <label class="v-label text-body-2 text-high-emphasis" for="email">Email</label>
-                                        </VCol>
+                                    </VCol>
                                     <VCol cols="12" md="9">
-                                        <AppTextField id="nama" :value="detilData?.email"
-                                            placeholder="Email" persistent-placeholder disabled />
+                                        <AppTextField id="nama" :value="detilData?.email" placeholder="Email"
+                                            persistent-placeholder disabled />
                                     </VCol>
                                 </VRow>
                             </VCol>

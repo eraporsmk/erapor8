@@ -8,6 +8,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SinkronisasiController;
 use App\Http\Controllers\PtkController;
 use App\Http\Controllers\RombelController;
+use App\Http\Controllers\PdController;
+use App\Http\Controllers\ReferensiController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::get('semester', [AuthController::class, 'semester']);
@@ -50,6 +52,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('hapus-akses', [SettingController::class, 'hapus_akses']);
         Route::post('update-akses', [SettingController::class, 'update_akses']);
         Route::post('generate-pengguna', [SettingController::class, 'generate_pengguna']);
+        Route::post('reset-bg', [SettingController::class, 'reset_bg']);
     });
     Route::group(['prefix' => 'referensi'], function () {
         Route::group(['prefix' => 'ptk'], function () {
@@ -64,6 +67,20 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             Route::post('/hapus-pembelajaran', [RombelController::class, 'hapus_pembelajaran']);
             Route::post('/anggota-rombel', [RombelController::class, 'anggota_rombel']);
             Route::post('/hapus-anggota-rombel', [RombelController::class, 'hapus_anggota_rombel']);
+        });
+        Route::group(['prefix' => 'pd'], function () {
+            Route::get('/', [PdController::class, 'index']);
+            Route::get('/detil/{id}', [PdController::class, 'show']);
+            Route::post('/update', [PdController::class, 'update']);
+        });
+        Route::get('/mata-pelajaran', [ReferensiController::class, 'index']);
+        Route::group(['prefix' => 'ekstrakurikuler'], function () {
+            Route::get('/', [ReferensiController::class, 'ekstrakurikuler']);
+        });
+        Route::group(['prefix' => 'dudi'], function () {
+            Route::get('/', [ReferensiController::class, 'dudi']);
+            Route::post('/detil-dudi', [ReferensiController::class, 'detil_dudi']);
+            Route::post('/anggota-prakerin', [ReferensiController::class, 'anggota_prakerin']);
         });
     });
 });

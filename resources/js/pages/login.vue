@@ -96,6 +96,7 @@ const onSubmit = () => {
 };
 const allowRegister = ref(false)
 const data_semester = ref([])
+const bgLogin = ref()
 onMounted(async () => {
   await fetchData();
 });
@@ -106,6 +107,7 @@ const fetchData = async () => {
     data_semester.value = getData.semester
     form.value.semester_id = getData.semester_id
     allowRegister.value = getData.allowRegister
+    bgLogin.value = getData.bg_login
   } catch (error) {
     console.error(error);
   }
@@ -126,7 +128,8 @@ const fetchData = async () => {
     <VCol md="8" class="d-none d-md-flex">
       <div class="position-relative bg-background w-100 me-0">
         <div class="d-flex align-center justify-center w-100 h-100" style="padding-inline: 6.25rem">
-          <VImg max-width="613" :src="authThemeImg" class="auth-illustration mt-16 mb-2" />
+          <VImg max-width="613" :src="bgLogin" class="auth-illustration mt-16 mb-2" v-if="bgLogin" />
+          <VImg max-width="613" :src="authThemeImg" class="auth-illustration mt-16 mb-2" v-else />
         </div>
 
         <img class="auth-footer-mask flip-in-rtl" :src="authThemeMask" alt="auth-footer-mask" height="280"

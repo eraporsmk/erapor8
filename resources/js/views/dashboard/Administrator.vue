@@ -11,6 +11,7 @@ const text_wa = ref()
 const loadingBody = ref(true)
 const textDialog = ref('')
 const isConfirmDialogVisible = ref(false)
+const isNotifVisible = ref(false)
 const notif = ref({
   color: '',
   title: '',
@@ -59,15 +60,20 @@ const confirmDialog = async (val) => {
     },
     onResponse({ request, response, options }) {
       let getData = response._data
-      notif.value = {
-        color: getData.color,
-        title: getData.title,
-        text: getData.text,
-      }
+      isNotifVisible.value = true
+      notif.value = getData
     },
   })
 }
 const confirmClose = () => {
+  isNotifVisible.value = false
+  setTimeout(() => {
+    notif.value = {
+      color: '',
+      title: '',
+      text: '',
+    }
+  }, 300)
   fetchData()
 }
 </script>
@@ -165,9 +171,12 @@ const confirmClose = () => {
                 </tr>
               </tbody>
             </VTable>
+            <VDivider />
+            <VCardText>
+              Aplikasi e-Rapor SMK ini dibuat dan dikembangkan oleh Direktorat Sekolah Menengah Kejuruan Kementerian
+              Pendidikan Dasar dan Menengah Republik Indonesia
+            </VCardText>
           </VCard>
-          <p>Aplikasi e-Rapor SMK ini dibuat dan dikembangkan oleh Direktorat Sekolah Menengah Kejuruan<br>
-            Kementerian Pendidikan Dasar dan Menengah Republik Indonesia</p>
         </VCol>
         <VCol cols="5" md="5" sm="12">
           <VCard title="Informasi Aplikasi" v-if="loadingBody">
@@ -175,8 +184,8 @@ const confirmClose = () => {
               <VProgressCircular :size="60" indeterminate color="error" class="my-10" />
             </VCardText>
           </VCard>
-          <VCard title="Informasi Aplikasi" v-else>
-            <VDivider class="mt-2" />
+          <VCard title="Informasi Aplikasi" class="pb-2" v-else>
+            <VDivider />
             <VTable density="compact" class="text-no-wrap">
               <tbody>
                 <tr>
@@ -206,8 +215,8 @@ const confirmClose = () => {
               <VProgressCircular :size="60" indeterminate color="error" class="my-10" />
             </VCardText>
           </VCard>
-          <VCard title="Helpdesk e-Rapor SMK" class="mt-4" v-else>
-            <VDivider class="mt-2" />
+          <VCard title="Helpdesk e-Rapor SMK" class="mt-4 pb-2" v-else>
+            <VDivider />
             <VTable density="compact" class="text-no-wrap">
               <thead>
                 <tr>
@@ -231,9 +240,9 @@ const confirmClose = () => {
         </VCol>
       </VRow>
     </VCol>
-    <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" confirmation-question="Apakah Anda yakin?"
-      :confirmation-text="textDialog" :confirm-color="notif.color" :confirm-title="notif.title"
-      :confirm-msg="notif.text" @confirm="confirmDialog" @close="confirmClose" />
+    <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
+      confirmation-question="Apakah Anda yakin?" :confirmation-text="textDialog" :confirm-color="notif.color"
+      :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDialog" @close="confirmClose" />
   </VRow>
 </template>
 <style lang="scss" scoped>

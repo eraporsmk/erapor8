@@ -365,6 +365,7 @@
     "$roles": true,
     "$sekolah": true,
     "$semester": true,
-    "$user": true
+    "$user": true,
+    "tingkatKelas": true
   }
 }

@@ -27,6 +27,7 @@ const pembelajaran = ref([])
 const pembelajaran_pilihan = ref([])
 const textDialog = ref('')
 const isConfirmDialogVisible = ref(false)
+const isNotifVisible = ref(false)
 const loadingBtn = ref([])
 const notif = ref({
   color: '',
@@ -121,15 +122,20 @@ const confirmDialog = async (val) => {
     },
     onResponse({ request, response, options }) {
       let getData = response._data
-      notif.value = {
-        color: getData.color,
-        title: getData.title,
-        text: getData.text,
-      }
+      isNotifVisible.value = true
+      notif.value = getData
     },
   })
 }
 const confirmClose = () => {
+  isNotifVisible.value = false
+  setTimeout(() => {
+    notif.value = {
+      color: '',
+      title: '',
+      text: '',
+    }
+  }, 300)
   fetchData()
 }
 const refreshNilai = () => {
@@ -214,9 +220,9 @@ const refreshNilai = () => {
         :title-detil-nilai="titleDetilNilai" :merdeka="merdeka" :is-ppa="is_ppa" :data-siswa="data_siswa"
         :sub-mapel="sub_mapel" @refresh="refreshNilai">
       </DetilNilaiDialog>
-      <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" confirmation-question="Apakah Anda yakin?"
-        :confirmation-text="textDialog" :confirm-color="notif.color" :confirm-title="notif.title"
-        :confirm-msg="notif.text" @confirm="confirmDialog" @close="confirmClose" />
+      <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
+        confirmation-question="Apakah Anda yakin?" :confirmation-text="textDialog" :confirm-color="notif.color"
+        :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDialog" @close="confirmClose" />
     </VRow>
   </div>
 </template>

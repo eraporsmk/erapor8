@@ -19,7 +19,7 @@ import { VerticalNavLayout } from '@layouts'
         <IconBtn id="vertical-nav-toggle-btn" class="ms-n3 d-lg-none" @click="toggleVerticalOverlayNavActive(true)">
           <VIcon size="26" icon="tabler-menu-2" />
         </IconBtn>
-        <h2 class="app-logo-title">{{ $sekolah?.nama }} | {{ $semester?.nama }}</h2>
+        <h2 class="app-logo-title d-none d-md-block">{{ $sekolah?.nama }} | {{ $semester?.nama }}</h2>
         <VSpacer />
         <NavbarThemeSwitcher />
         <NavbarShortcuts class="me-1" />

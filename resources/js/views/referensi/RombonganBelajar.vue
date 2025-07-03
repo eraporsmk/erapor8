@@ -86,6 +86,12 @@ onMounted(async () => {
 watch(options, async () => {
     await fetchData();
 }, { deep: true });
+watch(
+    () => options.value.searchQuery,
+    () => {
+        options.value.page = 1
+    }
+)
 const rombonganBelajarId = ref()
 const showPembelajaran = ref(false)
 const showAnggota = ref(false)
@@ -230,11 +236,11 @@ const savePembelajaran = async () => {
                     :total-items="total" />
             </template>
         </VDataTableServer>
-        <PembelajaranDialog v-model:isDialogVisible="showPembelajaran"
-            v-model:isLoading="isLoading" :dialog-title="dialogTitle" v-model:listData="pembelajaran" :list-guru="guru"
-            :list-kelompok="kelompok" @save="savePembelajaran" @refresh="reFecthData" />
-        <AnggotaRombelDialog v-model:isDialogVisible="showAnggota"
-            v-model:isLoading="isLoading" :dialog-title="dialogTitle" v-model:listData="anggotaRombel" @refresh="reFecthAnggota" />
+        <PembelajaranDialog v-model:isDialogVisible="showPembelajaran" v-model:isLoading="isLoading"
+            :dialog-title="dialogTitle" v-model:listData="pembelajaran" :list-guru="guru" :list-kelompok="kelompok"
+            @save="savePembelajaran" @refresh="reFecthData" />
+        <AnggotaRombelDialog v-model:isDialogVisible="showAnggota" v-model:isLoading="isLoading"
+            :dialog-title="dialogTitle" v-model:listData="anggotaRombel" @refresh="reFecthAnggota" />
         <VSnackbar v-model="isSnackbarVisible" color="success" :location="snackBarLocaltion">
             {{ snackBarText }}
         </VSnackbar>

@@ -152,6 +152,12 @@ onMounted(async () => {
 watch(options, async () => {
   await fetchData();
 }, { deep: true });
+watch(
+  () => options.value.searchQuery,
+  () => {
+    options.value.page = 1
+  }
+)
 watch(props, async () => {
   if (props.isTabActive == 'Rombongan Belajar') {
     await fetchData()

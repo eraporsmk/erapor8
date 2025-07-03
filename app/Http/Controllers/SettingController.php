@@ -40,7 +40,7 @@ class SettingController extends Controller
             'kepala_sekolah' => ($sekolah->kepala_sekolah) ? $sekolah->kepala_sekolah->guru_id : $sekolah->guru_id,
             'jabatan' => get_setting('jabatan', request()->sekolah_id, request()->semester_id),
             'zona' => get_setting('zona', request()->sekolah_id),
-            'data_guru' => Ptk::where('sekolah_id', request()->sekolah_id)->select('guru_id', 'nama')->get(),
+            'data_guru' => Ptk::where('sekolah_id', request()->sekolah_id)->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang')->get(),
             'data_rombel' => RombonganBelajar::where(function($query){
                 $query->where('jenis_rombel', 1);
                 $query->where('sekolah_id', request()->sekolah_id);
@@ -51,6 +51,7 @@ class SettingController extends Controller
             'url_dapodik' => get_setting('url_dapodik', request()->sekolah_id),
             'token_dapodik' => get_setting('token_dapodik', request()->sekolah_id),
             'logo_sekolah' => get_setting('logo_sekolah', request()->sekolah_id),
+            'bg_login' => get_setting('bg_login'),
             'periode' => substr(request()->semester_id, -1),
             'sekolah' => $sekolah,
         ];
@@ -63,6 +64,7 @@ class SettingController extends Controller
                 'semester_id' => 'required',
                 'zona' => 'required',
                 'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
+                'bg_login' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
             ],
             [
                 'semester_id.required' => 'Periode Aktif tidak boleh kosong.',
@@ -70,7 +72,10 @@ class SettingController extends Controller
                 'jabatan.required' => 'Jabatan Kepala sekolah tidak boleh kosong.',
                 'photo.image' => 'Logo sekolah harus berupa berkas gambar',
                 'photo.mimes' => 'Logo sekolah harus berekstensi (jpg, jpeg, png)',
-                'photo.max' => 'Logo sekolah maksimal 1Mb.',
+                'photo.max' => 'Logo sekolah maksimal 1 MB.',
+                'bg_login.image' => 'Kustom Background harus berupa berkas gambar',
+                'bg_login.mimes' => 'Kustom Background harus berekstensi (jpg, jpeg, png)',
+                'bg_login.max' => 'Kustom Background maksimal 1 MB.',
             ]
         );
         Semester::where('periode_aktif', 1)->update(['periode_aktif' => 0]);
@@ -181,13 +186,20 @@ class SettingController extends Controller
             );
         }
         $logo_sekolah = NULL;
+        if($request->bg_login){
+            $bg_login = $request->bg_login->store('images');
+            Setting::updateOrCreate(
+                [
+                    'key' => 'bg_login',
+                ],
+                [
+                    'value' => '/storage/images/'.basename($bg_login),
+                ]
+            );
+        }
         if($request->photo){
             $sekolah = Sekolah::find($request->sekolah_id);
-            /*if (!File::isDirectory(storage_path('app/public/images'))) {
-                File::makeDirectory(storage_path('app/public/images'));
-            }*/
             $logo = $request->photo->store('images');
-            $path = $request->photo->path();
             $sekolah->logo_sekolah = basename($logo);
             $sekolah->save();
             Setting::updateOrCreate(
@@ -228,6 +240,9 @@ class SettingController extends Controller
             'logo_sekolah' => $logo_sekolah,
         ];
         return response()->json($data);
+    }
+    public function reset_bg(){
+        Setting::where('key', 'bg_login')->delete();
     }
     public function users(){
         $team = Team::where('name', request()->periode_aktif)->first();

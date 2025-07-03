@@ -10,6 +10,7 @@ use App\Models\PesertaDidik;
 use App\Models\AnggotaRombel;
 use App\Models\Kelompok;
 use App\Models\Ptk;
+use App\Models\AnggotaAktPd;
 
 class RombelController extends Controller
 {
@@ -111,27 +112,58 @@ class RombelController extends Controller
         ]);
     }
     public function hapus_anggota_rombel(){
-        $find = AnggotaRombel::find(request()->anggota_rombel_id);
-        if($find){
-            if($find->delete()){
-                $data = [
-                    'color' => 'success',
-                    'title' => 'Berhasil',
-                    'text' => 'Anggota Rombel berhasil dikeluarkan',
-                ];
+        $data = [
+            'color' => 'error',
+            'title' => 'Gagal!',
+            'text' => 'Permintaan tidak ditemukan!',
+        ];
+        if(request()->data == 'rombel'){
+            $find = AnggotaRombel::find(request()->anggota_rombel_id);
+            if($find){
+                if($find->delete()){
+                    $data = [
+                        'color' => 'success',
+                        'title' => 'Berhasil',
+                        'text' => 'Anggota Rombel berhasil dikeluarkan',
+                    ];
+                } else {
+                    $data = [
+                        'color' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Anggota Rombel gagal dikeluarkan. Silahkan coba beberapa saat lagi!',
+                    ];
+                }
             } else {
                 $data = [
                     'color' => 'error',
                     'title' => 'Gagal!',
-                    'text' => 'Anggota Rombel gagal dikeluarkan. Silahkan coba beberapa saat lagi!',
+                    'text' => 'Anggota Rombel tidak ditemukan. Silahkan muat ulang aplikasi!',
                 ];
             }
-        } else {
-            $data = [
-                'color' => 'error',
-                'title' => 'Gagal!',
-                'text' => 'Anggota Rombel tidak ditemukan. Silahkan muat ulang aplikasi!',
-            ];
+        }
+        if(request()->data == 'prakerin'){
+            $find = AnggotaAktPd::find(request()->anggota_rombel_id);
+            if($find){
+                if($find->delete()){
+                    $data = [
+                        'color' => 'success',
+                        'title' => 'Berhasil!',
+                        'text' => 'Data Peserta Prakerin berhasil di hapus',
+                    ];
+                } else {
+                    $data = [
+                        'color' => 'error',
+                        'title' => 'Gagal!',
+                        'text' => 'Data Peserta Prakerin tidak ditemukan. Silahkan coba beberapa saat lagi!',
+                    ];
+                }
+            } else {
+                $data = [
+                    'color' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Data Peserta Prakerin di hapus. Silahkan coba beberapa saat lagi!',
+                ];
+            }
         }
         return response()->json($data);
     }

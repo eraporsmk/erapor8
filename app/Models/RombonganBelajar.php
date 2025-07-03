@@ -43,4 +43,8 @@ class RombonganBelajar extends Model
 	{
 		return $this->belongsTo(JurusanSp::class, 'jurusan_sp_id', 'jurusan_sp_id');
 	}
+	public function anggota_rombel()
+	{
+		return $this->hasMany(AnggotaRombel::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
+	}
 }

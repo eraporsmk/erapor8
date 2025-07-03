@@ -33,20 +33,16 @@ watch([
 </script>
 
 <template>
-  <Component
-    v-bind="layoutAttrs"
-    :is="configStore.appContentLayoutNav === AppContentLayoutNav.Vertical ? DefaultLayoutWithVerticalNav : DefaultLayoutWithHorizontalNav"
-  >
+  <Component v-bind="layoutAttrs"
+    :is="configStore.appContentLayoutNav === AppContentLayoutNav.Vertical ? DefaultLayoutWithVerticalNav : DefaultLayoutWithHorizontalNav">
     <AppLoadingIndicator ref="refLoadingIndicator" />
 
     <RouterView v-slot="{ Component }">
-      <Suspense
-        :timeout="0"
-        @fallback="isFallbackStateActive = true"
-        @resolve="isFallbackStateActive = false"
-      >
-        <Component :is="Component" />
-      </Suspense>
+      <transition name="zoom-fade">
+        <Suspense :timeout="0" @fallback="isFallbackStateActive = true" @resolve="isFallbackStateActive = false">
+          <Component :is="Component" />
+        </Suspense>
+      </transition>
     </RouterView>
   </Component>
 </template>
@@ -54,4 +50,19 @@ watch([
 <style lang="scss">
 // As we are using `layouts` plugin we need its styles to be imported
 @use "@layouts/styles/default-layout";
+
+.zoom-fade-enter-active,
+.zoom-fade-leave-active {
+  transition: transform 0.35s, opacity 0.28s ease-in-out;
+}
+
+.zoom-fade-enter {
+  transform: scale(0.97);
+  opacity: 0;
+}
+
+.zoom-fade-leave-to {
+  transform: scale(1.03);
+  opacity: 0;
+}
 </style>

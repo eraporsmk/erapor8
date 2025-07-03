@@ -20,12 +20,19 @@ const hideTitleAndBadge = configStore.isVerticalNavMini()
 </script>
 
 <template>
-  <li v-if="can(item.action, item.subject)" class="nav-link" :class="{ disabled: item.disable }">
+  <li v-if="can(item.action, item.subject)" class="nav-link" :class="{
+    disabled: item.disable,
+    'text-error': item.color == 'error',
+    'text-success': item.color == 'success'
+  }">
     <Component :is="item.to ? 'RouterLink' : 'a'" v-bind="getComputedNavLinkToProp(item)"
       :class="{ 'router-link-active router-link-exact-active': isNavLinkActive(item, $router) }">
       <template v-if="item.icon">
         <template v-if="typeof item.icon == 'string'">
-          <font-awesome-icon :icon="['fas', item.icon]" class="nav-item-icon" />
+          <font-awesome-icon :icon="['fas', item.icon]" class="nav-item-icon" :class="{
+            'text-error': item.color == 'error',
+            'text-success': item.color == 'success'
+          }" />
         </template>
         <template v-else>
           <Component :is="layoutConfig.app.iconRenderer || 'div'" v-bind="item.icon" class="nav-item-icon" />
@@ -34,7 +41,10 @@ const hideTitleAndBadge = configStore.isVerticalNavMini()
       <template v-else>
         <template v-if="layoutConfig.verticalNav.defaultNavItemAwesomeIconProps">
           <font-awesome-icon :icon="['fas', layoutConfig.verticalNav.defaultNavItemAwesomeIconProps]"
-            class="nav-item-icon" />
+            class="nav-item-icon" :class="{
+              'text-error': item.color == 'error',
+              'text-success': item.color == 'success'
+            }" />
         </template>
         <template v-else>
           <Component :is="layoutConfig.app.iconRenderer || 'div'"
