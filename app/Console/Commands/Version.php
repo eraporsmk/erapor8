@@ -28,31 +28,31 @@ class Version extends Command
     {
         if (version_compare(phpversion(), '8.2', '<')) {
             $this->error('Versi PHP tidak kompatible! Versi PHP saat ini: '.phpversion().'. Versi PHP yang dibutuhkan: 8.2');
-            die();
-        }
-        if ($this->option('force')){
-            $this->prosesUpdate();
         } else {
-            $this->info('Mengecek versi aplikasi...');
-            $response = Http::post('sync.erapor-smk.net/api/v8/version');
-            $now = get_setting('app_version');
-            if($response->successful()){
-                $version = $response->object();
-                if (version_compare($version->version, $now) < 0) {
-                    $this->info('Aplikasi Versi baru tersedia: '.$version->version);
-                    $this->info('Versi Aplikasi saat ini: '.$now);
-                    $update = $this->anticipate('Apakah Anda ingin mengupdate versi aplikasi? (Y/y: Ya, N/n: Tidak)', ['Y', 'N']);
-                    if(strtolower($update) == 'y'){
-                        $this->prosesUpdate();
+            if ($this->option('force')){
+                $this->prosesUpdate();
+            } else {
+                $this->info('Mengecek versi aplikasi...');
+                $response = Http::post('sync.erapor-smk.net/api/v8/version');
+                $now = get_setting('app_version');
+                if($response->successful()){
+                    $version = $response->object();
+                    if (version_compare($version->version, $now) < 0) {
+                        $this->info('Aplikasi Versi baru tersedia: '.$version->version);
+                        $this->info('Versi Aplikasi saat ini: '.$now);
+                        $update = $this->anticipate('Apakah Anda ingin mengupdate versi aplikasi? (Y/y: Ya, N/n: Tidak)', ['Y', 'N']);
+                        if(strtolower($update) == 'y'){
+                            $this->prosesUpdate();
+                        }
+                    } else {
+                        $this->error('Aplikasi Versi baru belum tersedia');
+                        $this->info('Versi Aplikasi: '.$now);
+                        $this->info('Versi Database: '.get_setting('db_version'));
                     }
                 } else {
-                    $this->error('Aplikasi Versi baru belum tersedia');
                     $this->info('Versi Aplikasi: '.$now);
                     $this->info('Versi Database: '.get_setting('db_version'));
                 }
-            } else {
-                $this->info('Versi Aplikasi: '.$now);
-                $this->info('Versi Database: '.get_setting('db_version'));
             }
         }
     }
