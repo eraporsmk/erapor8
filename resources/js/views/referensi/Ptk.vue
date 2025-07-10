@@ -4,6 +4,10 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    addBtn: {
+        type: Boolean,
+        default: false,
+    },
     data: {
         type: String,
         required: true,
@@ -92,6 +96,7 @@ watch(
 )
 const isDialogVisible = ref(false)
 const isAlertDialogVisible = ref(false)
+const isConfirmDialogVisible = ref(false)
 const notif = ref({
     color: null,
     title: null,
@@ -105,29 +110,38 @@ const form = ref({
     gelar_depan: null,
     gelar_belakang: null,
     sekolah_id: $user.sekolah_id,
+    dudi_id: null,
+    asesor: props.data == 'asesor' ? true : false,
 })
+const dataDudi = ref([])
 const detilUser = async (guru_id) => {
     form.value.guru_id = guru_id
     loadings.value[guru_id] = true
-    try {
-        const response = await useApi(createUrl(`/referensi/ptk/detil/${guru_id}`));
-        let getData = response.data.value
-        cardTitle.value = `Detil PTK (${getData.ptk.nama_lengkap})`
-        detilData.value = getData.ptk
-        form.value.gelar_depan = getData.ptk.gelar_depan
-        form.value.gelar_belakang = getData.ptk.gelar_belakang
-    } catch (error) {
-        console.error(error);
-    } finally {
-        loadings.value[guru_id] = false
-        isDialogVisible.value = true
-    }
+    await $api('/referensi/ptk/detil', {
+        method: 'POST',
+        body: {
+            guru_id: guru_id,
+            sekolah_id: $user.sekolah_id,
+            asesor: props.data == 'asesor' ? true : false
+        },
+        onResponse({ response }) {
+            let getData = response._data
+            cardTitle.value = `Detil PTK (${getData.ptk.nama_lengkap})`
+            detilData.value = getData.ptk
+            dataDudi.value = getData.dudi
+            form.value.gelar_depan = getData.ptk.gelar_depan
+            form.value.gelar_belakang = getData.ptk.gelar_belakang
+            form.value.dudi_id = getData.dudi_id
+            loadings.value[guru_id] = false
+            isDialogVisible.value = true
+        }
+    })
 }
 const onFormSubmit = async () => {
     await $api('/referensi/ptk/update', {
         method: 'POST',
         body: form.value,
-        onResponse({ request, response, options }) {
+        onResponse({ response }) {
             let getData = response._data
             isDialogVisible.value = false
             notif.value = getData
@@ -135,15 +149,39 @@ const onFormSubmit = async () => {
         }
     })
 }
-const confirmDialog = async () => {
+const confirmClose = async () => {
     await fetchData()
+}
+const isDialogAddNew = ref(false)
+const deletedId = ref()
+const hapus = async (id) => {
+    deletedId.value = id
+    isConfirmDialogVisible.value = true
+}
+const confirmDelete = async () => {
+    await $api('/referensi/ptk/hapus', {
+        method: 'POST',
+        body: {
+            guru_id: deletedId.value,
+            data: props.data,
+        },
+        onResponse({ response }) {
+            let getData = response._data
+            notif.value = getData
+            isDialogVisible.value = false
+            isAlertDialogVisible.value = true
+        }
+    })
 }
 </script>
 <template>
     <VCard class="mb-6">
-        <VCardItem class="pb-4">
-            <VCardTitle>{{ titleCard }}</VCardTitle>
-        </VCardItem>
+        <template v-slot:title class="pb-4">{{ titleCard }}</template>
+        <template #append v-if="addBtn">
+            <div class="d-flex align-center">
+                <VBtn prepend-icon="tabler-plus" @click="isDialogAddNew = true">Tambah Data</VBtn>
+            </div>
+        </template>
         <VDivider />
         <VCardText class="d-flex flex-wrap gap-4">
             <div class="d-flex gap-2 align-center">
@@ -413,10 +451,27 @@ const confirmDialog = async () => {
                                     </VCol>
                                 </VRow>
                             </VCol>
+                            <VCol cols="12" v-if="data == 'asesor'">
+                                <VRow no-gutters>
+                                    <VCol cols="12" md="3" class="d-flex align-items-center">
+                                        <label class="v-label text-body-2 text-high-emphasis" for="dudi_id">DUDI</label>
+                                    </VCol>
+                                    <VCol cols="12" md="9">
+                                        <AppAutocomplete v-model="form.dudi_id" placeholder="== Pilih DUDI =="
+                                            :items="dataDudi" clearable clear-icon="tabler-x" item-value="dudi_id"
+                                            item-title="nama" />
+                                    </VCol>
+                                </VRow>
+                            </VCol>
                         </VRow>
                     </VCardText>
                     <VDivider />
                     <VCardText class="d-flex justify-end flex-wrap gap-3 pt-5 overflow-visible">
+                        <VBtn color="error" @click="hapus(detilData?.guru_id)"
+                            v-if="detilData?.jenis_ptk_id === 97 || detilData?.jenis_ptk_id === 98">
+                            Hapus
+                        </VBtn>
+                        <v-spacer />
                         <VBtn color="secondary" variant="tonal" @click="isDialogVisible = false">
                             Tutup
                         </VBtn>
@@ -427,8 +482,12 @@ const confirmDialog = async () => {
                 </VCard>
             </VForm>
         </VDialog>
-        <AlertDialog v-model:isDialogVisible="isAlertDialogVisible" :confirm-color="notif.color"
-            :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDialog" />
+        <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isAlertDialogVisible"
+            confirmation-question="Apakah Anda yakin?" confirmation-text="Tindakan ini tidak dapat dikembalikan!"
+            :confirm-color="notif.color" :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDelete"
+            @close="confirmClose" />
+        <AddNewPtk :cardTitle="`Tambah ${titleCard}`" :jenisGtk="props.data" v-model:isDialogVisible="isDialogAddNew"
+            @close="confirmClose" />
     </VCard>
 </template>
 <style lang="scss">

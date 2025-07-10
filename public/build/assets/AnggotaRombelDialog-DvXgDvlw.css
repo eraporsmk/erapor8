@@ -1,0 +1,1 @@
+.permission-table td{border-block-end:1px solid rgba(var(--v-border-color),var(--v-border-opacity));padding-block:.5rem}.permission-table td:not(:first-child){padding-inline:.5rem}.permission-table td .v-label{white-space:nowrap}.sticky-header{position:sticky!important;top:0;z-index:1}

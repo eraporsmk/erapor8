@@ -369,7 +369,6 @@ const onFileChange = async (val) => {
         <VTable class="text-no-wrap">
           <thead>
             <tr>
-              <th class="text-center">No.</th>
               <th class="text-center">Nama Peserta Didik</th>
               <template v-if="showCp">
                 <template v-for="(tp, i) in arrayData.tp">
@@ -390,7 +389,6 @@ const onFileChange = async (val) => {
           </thead>
           <tbody>
             <tr v-for="(siswa, index) in arrayData.siswa">
-              <td class="text-center">{{ index + 1 }}</td>
               <td>
                 <ProfileSiswa :item="siswa" />
               </td>

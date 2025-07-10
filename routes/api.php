@@ -62,8 +62,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix' => 'referensi'], function () {
         Route::group(['prefix' => 'ptk'], function () {
             Route::get('/', [PtkController::class, 'index']);
-            Route::get('/detil/{id}', [PtkController::class, 'show']);
+            Route::post('/detil', [PtkController::class, 'show']);
             Route::post('/update', [PtkController::class, 'update']);
+            Route::post('/upload', [PtkController::class, 'upload']);
+            Route::post('/simpan', [PtkController::class, 'simpan']);
+            Route::post('/hapus', [PtkController::class, 'hapus']);
         });
         Route::group(['prefix' => 'rombongan-belajar'], function () {
             Route::get('/', [RombelController::class, 'index']);

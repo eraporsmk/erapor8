@@ -9,5 +9,5 @@ definePage({
 })
 </script>
 <template>
-  <Ptk :data="'asesor'" :titleCard="'Data Asesor'"></Ptk>
+  <Ptk :data="'asesor'" :titleCard="'Data Asesor'" :addBtn="true"></Ptk>
 </template>
