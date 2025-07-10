@@ -26,6 +26,10 @@ class Version extends Command
      */
     public function handle()
     {
+        if (version_compare(phpversion(), '8.2', '<')) {
+            $this->error('Versi PHP tidak kompatible! Versi PHP saat ini: '.phpversion().'. Versi PHP yang dibutuhkan: 8.2');
+            die();
+        }
         if ($this->option('force')){
             $this->prosesUpdate();
         } else {
@@ -56,6 +60,9 @@ class Version extends Command
         $token = config('app.github_token');
         $this->info('Silahkan tunggu, sedang proses update aplikasi....');
         //exec("git pull origin main");
+        exec("git clean -df");
+        exec("git stash");
+        exec("git config --global --add safe.directory C:/eRaporSMK/dataweb");
         exec("git pull https://eraporsmk:$token@github.com/eraporsmk/erapor8.git main");
         exec("composer update");
         $this->call('app:update');
