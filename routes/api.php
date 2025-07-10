@@ -123,5 +123,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/simpan', [PenilaianController::class, 'simpan']);
         Route::post('/destroy', [PenilaianController::class, 'destroy']);
         Route::get('/nilai-sikap/{id?}', [PenilaianController::class, 'nilai_sikap']);
+        Route::post('/upload-nilai', [PenilaianController::class, 'upload_nilai']);
     });
 });

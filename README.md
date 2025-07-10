@@ -2,7 +2,7 @@
 
 ## Server Requirements
 
-PHP >= PHP >= 8.2
+PHP >= 8.2
 
 Ctype PHP Extension
 

@@ -16,7 +16,11 @@ use App\Models\DeskripsiMataPelajaran;
 use App\Models\NilaiBudayaKerja;
 use App\Models\RombonganBelajar;
 use App\Models\NilaiEkstrakurikuler;
+use App\Imports\NilaiSumatifLingkupMateri;
+use App\Imports\NilaiSumatifAkhirSemester;
+use App\Imports\NilaiAkhirImport;
 use Carbon\Carbon;
+use Storage;
 
 class PenilaianController extends Controller
 {
@@ -52,7 +56,7 @@ class PenilaianController extends Controller
     public function simpan(){
         $insert = 0;
         $text = 'Unknow';
-        if(request()->opsi == 'nilai-tp'){
+        if(request()->opsi == 'sumatif-lingkup-materi'){
             foreach(request()->tp as $uuid => $nilai){
                 $segments = Str::of($uuid)->split('/[\s#]+/');
                 $anggota_rombel_id = $segments->first();
@@ -79,7 +83,7 @@ class PenilaianController extends Controller
             }
             $text = 'Nilai Sumatif Lingkup Materi';
         }
-        if(request()->opsi == 'nilai-sumatif'){
+        if(request()->opsi == 'sumatif-akhir-semester'){
             $text = 'Nilai Sumatif Akhir Semester';
             foreach(request()->sumatif as $uuid => $nilai){
                 $segments = Str::of($uuid)->split('/[\s#]+/');
@@ -545,6 +549,139 @@ class PenilaianController extends Controller
                     $query->where('sekolah_id', request()->sekolah_id);
                 })->first(),
             ]);
+        }
+    }
+    public function upload_nilai(){
+        request()->validate(
+            [
+                'template_excel' => 'mimes:xlsx', // 1MB Max
+            ],
+            [
+                'template_excel.mimes' => 'File harus berupa file dengan ekstensi: xlsx.',
+            ]
+        );
+        $list = [];
+        $collection = [];
+        $file_path = request()->template_excel->store('files', 'public');
+        if(request()->opsi == 'sumatif-lingkup-materi'){
+            $data_tp = TujuanPembelajaran::where(function($query){
+                $query->whereHas('tp_mapel', function($query){
+                    $query->where('tp_mapel.pembelajaran_id', request()->pembelajaran_id);
+                });
+            })->orderBy('created_at')->get();
+            $list = [];
+            $collection = (new NilaiSumatifLingkupMateri())->toCollection(storage_path('/app/public/'.$file_path));
+            
+            foreach($collection as $rows){
+                foreach ($rows as $row) {
+                    $nilai = [];
+                    foreach($data_tp as $index => $tp){
+                        $nilai[] = [
+                            'angka' => $row['tp_'.($index + 1)],
+                            'tp' => $row[str_replace('-', '_', $tp->tp_id)],
+                        ];
+                    }
+                    $list[] = [
+                        'anggota_rombel_id' => $row['pd_id'],
+                        'nilai' => $nilai,
+                    ];
+                }
+            }
+        } elseif(request()->opsi == 'sumatif-akhir-semester'){
+            $list = [];
+            $collection = (new NilaiSumatifAkhirSemester())->toCollection(storage_path('/app/public/'.$file_path));
+            
+            foreach($collection as $rows){
+                foreach ($rows as $row) {
+                    $list[] = [
+                        'anggota_rombel_id' => $row['pd_id'],
+                        'nilai_non_tes' => $row['nilai_non_tes'],
+                        'nilai_tes' => $row['nilai_tes'],
+                    ];
+                }
+            }
+        } else {
+            $collection = (new NilaiAkhirImport(request()->rombongan_belajar_id, request()->pembelajaran_id, request()->sekolah_id, request()->merdeka))->toCollection(storage_path('/app/public/'.$file_path));
+            if($collection->count() == 1){
+                $this->simpan_nilai_import($collection->first());
+                $data = [
+                    'color' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Nilai Akhir berhasil disimpan',
+                ];
+            } else {
+                $data = [
+                    'color' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Format Import salah. Silahkan Unduh Template ulang!',
+                ];
+            }
+            Storage::disk('public')->delete($file_path);
+            return response()->json($data);
+        }
+        Storage::disk('public')->delete($file_path);
+        
+        $data = [
+            'color' => 'success',
+            'title' => 'Berhasil!',
+            'text' => 'Nilai Akhir berhasil disimpan',
+            'collection' => $collection,
+            'data_nilai' => $list,
+        ];
+        return response()->json($data);
+    }
+    private function simpan_nilai_import($rows){
+        if(is_bool(request()->merdeka)){
+            $merdeka = request()->merdeka;
+        } else {
+            $merdeka = (request()->merdeka == 'true') ? TRUE : FALSE;
+        }
+        foreach ($rows as $row){
+            if($row[0]){
+                if(is_numeric($row[4])) {
+                    $a = NilaiAkhir::updateOrCreate(
+                        [
+                            'sekolah_id' => request()->sekolah_id,
+                            'anggota_rombel_id' => $row[1],
+                            'pembelajaran_id' => request()->pembelajaran_id,
+                            'kompetensi_id' => ($merdeka) ? 4 : 1,
+                        ],
+                        [
+                            'nilai' => ($row[4] >= 0 && $row[4] <= 100) ? number_format($row[4], 0) : 0,
+                        ]
+                    );
+                }
+                $this->insertTpNilai($row, $merdeka);
+            } else {
+                $this->insertTpNilai($row, $merdeka);
+            }
+        }
+    }
+    private function insertTpNilai($row, $merdeka){
+        $tp = TujuanPembelajaran::find($row[5]);
+        if ($merdeka) {
+            $update = [
+                'cp_id' => $tp->cp_id,
+                'last_sync' => now()
+            ];
+        } else {
+            $update = [
+                'kd_id' => $tp->kd_id,
+                'last_sync' => now()
+            ];
+        }
+        if(!is_null($row[6])){
+            TpNilai::updateOrCreate(
+                [
+                    'sekolah_id' => request()->sekolah_id,
+                    'anggota_rombel_id' => $row[1],
+                    'tp_id' => $row[5],
+                    'kompeten' => $row[6],
+                ],
+                $update
+            );
+        } else {
+            TpNilai::where('anggota_rombel_id', $row[1])->where('tp_id', $row[5])->delete();
         }
     }
 }

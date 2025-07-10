@@ -223,9 +223,25 @@ const changeTeknik = async (val) => {
 const confirmClose = () => {
   formReset();
 }
+const uploading = ref(false)
 const onFileChange = async (val) => {
-  console.log(val);
-  form.value.template_excel = null
+  uploading.value = true
+  const data = new FormData();
+  data.append('template_excel', val);
+  data.append('rombongan_belajar_id', form.value.rombongan_belajar_id)
+  data.append('pembelajaran_id', form.value.pembelajaran_id)
+  data.append('sekolah_id', defaultForm.sekolah_id)
+  data.append('merdeka', defaultForm.merdeka)
+  await $api("/penilaian/upload-nilai", {
+    method: "POST",
+    body: data,
+    onResponse({ response }) {
+      let getData = response._data;
+      isNotifVisible.value = true;
+      notif.value = getData;
+      uploading.value = false
+    }
+  })
 }
 </script>
 <template>
@@ -281,11 +297,10 @@ const onFileChange = async (val) => {
         </div>
       </VCardText>
       <VDivider />
-      <template v-if="arrayData.siswa.length">
+      <template v-if="arrayData.siswa.length && !uploading">
         <VTable>
           <thead>
             <tr>
-              <th class="text-center">No.</th>
               <th class="text-center">Nama Peserta Didik</th>
               <th class="text-center">Nilai Akhir</th>
               <th class="text-center">Ketercapaian Kompetensi</th>
@@ -293,11 +308,8 @@ const onFileChange = async (val) => {
             </tr>
           </thead>
           <tbody>
-            <template v-for="(siswa, index) in arrayData.siswa">
+            <template v-for="siswa in arrayData.siswa">
               <tr>
-                <td class="text-center pt-2" :rowspan="arrayData.tp.length + 1" style="vertical-align: top;">{{ index +
-                  1 }}
-                </td>
                 <td :rowspan="arrayData.tp.length + 1" class="text-no-wrap pt-2" style="vertical-align: top;">
                   <ProfileSiswa :item="siswa" />
                 </td>
@@ -309,7 +321,7 @@ const onFileChange = async (val) => {
               </tr>
               <template v-for="(tp, i) in arrayData.tp">
                 <tr>
-                  <td>
+                  <td style="vertical-align: top;" class="pt-2">
                     <AppSelect v-model="nilai.kompeten[siswa.anggota_rombel_id + '#' + tp.tp_id]"
                       placeholder="== Pilih Capaian ==" :items="dataCapaian" clearable clear-icon="tabler-x"
                       style="inline-size: 12rem;" />
@@ -331,5 +343,8 @@ const onFileChange = async (val) => {
     <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
       confirmation-question="Apakah Anda yakin?" :confirmation-text="confirmationText" :confirm-color="notif.color"
       :confirm-title="notif.title" :confirm-msg="notif.text" @close="confirmClose" />
+    <VOverlay v-model="uploading" contained persistent scroll-strategy="none" class="align-center justify-center">
+      <VProgressCircular indeterminate />
+    </VOverlay>
   </VCard>
 </template>

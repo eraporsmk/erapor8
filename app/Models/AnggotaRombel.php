@@ -70,4 +70,7 @@ class AnggotaRombel extends Model
 	public function single_nilai_ekstrakurikuler(){
 		return $this->hasOne(NilaiEkstrakurikuler::class, 'anggota_rombel_id', 'anggota_rombel_id');
 	}
+	public function tp_nilai(){
+		return $this->hasMany(TpNilai::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
 }

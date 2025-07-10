@@ -74,6 +74,7 @@ const defaultForm = {
   user_id: $user.user_id,
   guru_id: $user.guru_id,
   sekolah_id: $user.sekolah_id,
+  merdeka: false,
 };
 const resetForm = ref(false)
 const formReset = () => {
@@ -134,6 +135,7 @@ const getData = async (postData) => {
       }
       if (postData.data == "mapel") {
         arrayData.value.mapel = getData.mapel;
+        defaultForm.merdeka = getData.merdeka
       }
       if (postData.data == "teknik") {
         arrayData.value.teknik = getData;
@@ -212,7 +214,7 @@ const changeTeknik = async (val) => {
         arrayData.value.siswa.forEach((el) => {
           if (showCp.value) {
             namaTemplate.value = 'Sumatif Lingkup Materi'
-            defaultForm.opsi = "nilai-tp";
+            defaultForm.opsi = "sumatif-lingkup-materi";
             if (el.anggota_rombel.nilai_tp.length) {
               el.anggota_rombel.nilai_tp.forEach((tp) => {
                 nilai.value.tp[el.anggota_rombel.anggota_rombel_id + "#" + tp.tp_id] =
@@ -221,7 +223,7 @@ const changeTeknik = async (val) => {
             }
           } else {
             namaTemplate.value = 'Sumatif Akhir Semester'
-            defaultForm.opsi = "nilai-sumatif";
+            defaultForm.opsi = "sumatif-akhir-semester";
             if (el.anggota_rombel.nilai_sumatif.length) {
               el.anggota_rombel.nilai_sumatif.forEach((sumatif) => {
                 nilai.value.sumatif[
@@ -263,9 +265,44 @@ const setRerata = (anggota_rombel_id, jenis) => {
   }
   nilai.value.sumatif[`${anggota_rombel_id}#na`] = getRerata
 }
+const uploading = ref(false)
 const onFileChange = async (val) => {
-  console.log(val);
-  form.value.template_excel = null
+  uploading.value = true
+  const data = new FormData();
+  data.append('template_excel', val);
+  data.append('rombongan_belajar_id', form.value.rombongan_belajar_id)
+  data.append('pembelajaran_id', form.value.pembelajaran_id)
+  data.append('sekolah_id', form.value.sekolah_id)
+  data.append('merdeka', defaultForm.merdeka)
+  data.append('opsi', defaultForm.opsi)
+  await $api("/penilaian/upload-nilai", {
+    method: "POST",
+    body: data,
+    onResponse({ response }) {
+      let getData = response._data;
+      uploading.value = false
+      form.value.template_excel = null
+      getData.data_nilai.forEach((item) => {
+        if (defaultForm.opsi == 'sumatif-lingkup-materi') {
+          item.nilai.forEach((a) => {
+            nilai.value.tp[item.anggota_rombel_id + '#' + a.tp] = a.angka
+          })
+        } else {
+          nilai.value.sumatif[item.anggota_rombel_id + '#non-tes'] = item.nilai_non_tes
+          nilai.value.sumatif[item.anggota_rombel_id + '#tes'] = item.nilai_tes
+          var getRerata = 0;
+          if (item.nilai_non_tes && item.nilai_tes) {
+            getRerata = calculateAverage([item.nilai_non_tes, item.nilai_tes])
+          } else if (item.nilai_non_tes && !item.nilai_tes) {
+            getRerata = item.nilai_non_tes
+          } else if (!item.nilai_non_tes && item.nilai_tes) {
+            getRerata = item.nilai_tes
+          }
+          nilai.value.sumatif[item.anggota_rombel_id + '#na'] = getRerata
+        }
+      })
+    }
+  })
 }
 </script>
 <template>
@@ -328,7 +365,7 @@ const onFileChange = async (val) => {
         </VAlert>
       </VCardText>
       <VDivider />
-      <template v-if="arrayData.siswa.length">
+      <template v-if="arrayData.siswa.length && !uploading">
         <VTable class="text-no-wrap">
           <thead>
             <tr>
@@ -401,5 +438,8 @@ const onFileChange = async (val) => {
     <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
       confirmation-question="Apakah Anda yakin?" :confirmation-text="confirmationText" :confirm-color="notif.color"
       :confirm-title="notif.title" :confirm-msg="notif.text" @close="confirmClose" />
+    <VOverlay v-model="uploading" contained persistent scroll-strategy="none" class="align-center justify-center">
+      <VProgressCircular indeterminate />
+    </VOverlay>
   </VCard>
 </template>

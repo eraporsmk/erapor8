@@ -47,4 +47,12 @@ class RombonganBelajar extends Model
 	{
 		return $this->hasMany(AnggotaRombel::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
 	}
+	public function semester()
+	{
+		return $this->hasOne(Semester::class, 'semester_id', 'semester_id');
+	}
+	public function mapel()
+	{
+		return $this->hasOne(Pembelajaran::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
+	}
 }
