@@ -240,7 +240,6 @@ const confirmDelete = async (val) => {
       body: form.value,
       onResponse({ response }) {
         let getData = response._data
-        getItem.value = null
         isDialogVisible.value = false
         isNotifVisible.value = true
         notif.value = getData
