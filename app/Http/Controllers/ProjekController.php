@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\RencanaBudayaKerja;
 use App\Models\AspekBudayaKerja;
+use App\Models\NilaiBudayaKerja;
+use App\Models\CatatanBudayaKerja;
 
 class ProjekController extends Controller
 {
@@ -80,6 +82,44 @@ class ProjekController extends Controller
                 'deskripsi' => request()->deskripsi,
                 'no_urut' => request()->no_urut,
             ]);
+        }
+        if(request()->data == 'nilai'){
+            $text = 'Nilai Projek';
+            foreach(request()->deskripsi as $uuid => $catatan_budaya_kerja){
+                $segments = Str::of($uuid)->split('/[\s#]+/');
+                if($catatan_budaya_kerja){
+                    CatatanBudayaKerja::updateOrCreate(
+                        [
+                            'sekolah_id' => request()->sekolah_id,
+                            'rencana_budaya_kerja_id' => $segments->first(),
+                            'anggota_rombel_id' => $segments->last(),
+                        ],
+                        [
+                            'catatan' => $catatan_budaya_kerja,
+                            'last_sync' => now()
+                        ]
+                    );
+                } else {
+                    CatatanBudayaKerja::where('rencana_budaya_kerja_id', $segments->first())->where('anggota_rombel_id', $segments->last())->delete();
+                }
+            }
+            foreach(request()->nilai as $uuid => $nilai_p5){
+                $insert++;
+                $segments = Str::of($uuid)->split('/[\s#]+/');
+                $segment_nilai = Str::of($nilai_p5)->split('/[\s#]+/');
+                NilaiBudayaKerja::updateOrCreate(
+                    [
+                        'sekolah_id' => request()->sekolah_id,
+                        'anggota_rombel_id' => $segments->first(),
+                        'aspek_budaya_kerja_id' => $segments->last(),
+                        'elemen_id' => $segment_nilai->last(),
+                    ],
+                    [
+                        'opsi_id' => $segment_nilai->first(),
+                        'last_sync' => now(),
+                    ]
+                );
+            }
         }
         if($insert){
             $data = [

@@ -76,4 +76,7 @@ class Pembelajaran extends Model
 	public function induk(){
 		return $this->belongsTo(Pembelajaran::class, 'induk_pembelajaran_id', 'pembelajaran_id');
 	}
+	public function rencana_projek(){
+		return $this->hasMany(RencanaBudayaKerja::class, 'pembelajaran_id', 'pembelajaran_id');
+	}
 }

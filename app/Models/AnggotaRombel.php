@@ -76,4 +76,10 @@ class AnggotaRombel extends Model
 	public function nilai_ukk_satuan(){
 		return $this->hasOne(NilaiUkk::class, 'anggota_rombel_id', 'anggota_rombel_id');
 	}
+	public function nilai_budaya_kerja(){
+		return $this->hasMany(NilaiBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function catatan_budaya_kerja(){
+		return $this->hasOne(CatatanBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
 }

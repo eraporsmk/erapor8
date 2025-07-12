@@ -24,7 +24,9 @@ use App\Models\TeknikPenilaian;
 use App\Models\BudayaKerja;
 use App\Models\NilaiBudayaKerja;
 use App\Models\ElemenBudayaKerja;
+use App\Models\OpsiBudayaKerja;
 use App\Models\Ptk;
+use App\Models\RencanaBudayaKerja;
 use App\Imports\TemplateTp;
 use Storage;
 
@@ -322,12 +324,21 @@ class ReferensiController extends Controller
                     $query->whereIn('jenis_rombel', [1, 16]);   
                 }
                 if(request()->aksi){
-                    if(request()->aksi == 'rencana-p5' || request()->aksi == 'nilai-p5'){
+                    if(request()->aksi == 'rencana-p5'){
                         $query->whereHas('pembelajaran', function($query){
                             $query->whereHas('induk', function($query){
                                 $query->where('mata_pelajaran_id', 200040000);
                                 $query->where('guru_id', request()->guru_id);
                             });
+                        });
+                    }
+                    if(request()->aksi == 'nilai-p5'){
+                        $query->whereHas('pembelajaran', function($query){
+                            $query->whereHas('induk', function($query){
+                                $query->where('mata_pelajaran_id', 200040000);
+                                $query->where('guru_id', request()->guru_id);
+                            });
+                            $query->has('rencana_projek');
                         });
                     }
                     if(request()->aksi == 'rencana-ukk'){
@@ -585,7 +596,45 @@ class ReferensiController extends Controller
         if(request()->data == 'budaya-kerja'){
             $data = BudayaKerja::with(['elemen_budaya_kerja'])->orderBy('budaya_kerja_id')->get();
         }
+        if(request()->data == 'rencana-p5'){
+            $data = RencanaBudayaKerja::where(function($query){
+                $query->whereHas('pembelajaran', function($query){
+                    $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+                });
+                $query->has('aspek_budaya_kerja');
+            })->orderBy('no_urut')->get();
+        }
+        if(request()->data == 'nilai-p5'){
+            $data = [
+                'opsi_budaya_kerja' => OpsiBudayaKerja::where('opsi_id', '<>', 1)->orderBy('updated_at', 'ASC')->get(),
+                'rencana_budaya_kerja' => RencanaBudayaKerja::with(['aspek_budaya_kerja' => function($query){
+                    $query->with(['budaya_kerja', 'elemen_budaya_kerja']);
+                }])->find(request()->rencana_budaya_kerja_id),
+                'data_siswa' => PesertaDidik::select('peserta_didik_id', 'nama', 'nisn', 'photo')->withWhereHas('anggota_rombel', function($query){
+                    $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+                    $query->with([
+                        'nilai_budaya_kerja' => function($query){
+                            $query->whereHas('aspek_budaya_kerja', function($query){
+                                $query->where('rencana_budaya_kerja_id', request()->rencana_budaya_kerja_id);
+                            });
+                        }, 
+                        'catatan_budaya_kerja' => function($query){
+                            $query->where('rencana_budaya_kerja_id', request()->rencana_budaya_kerja_id);
+                        }
+                    ]);
+                })->orderBy('nama')->get(),
+            ];
+        }
         return response()->json($data);
+    }
+    private function kondisiProjek(){
+        return function($query){
+            $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+            $query->whereHas('induk', function($query){
+                $query->where('mata_pelajaran_id', 200040000);
+                $query->where('guru_id', request()->guru_id);
+            });
+        };
     }
     private function kurikulum($string){
         if(Str::contains($string, 'REV')){

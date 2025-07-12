@@ -1,1 +1,4 @@
 // Write your overrides
+.v-table .v-table__wrapper > table > thead > tr > th:not(:last-child), .v-table .v-table__wrapper > table > tbody > tr > td:not(:last-child) {
+    border-right: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+}
