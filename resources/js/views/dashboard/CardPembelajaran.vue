@@ -154,14 +154,16 @@ const refreshNilai = () => {
           <VProgressCircular :size="60" indeterminate color="error" class="my-10" />
         </VCard>
         <VCard v-else>
-          <template v-slot:title class="pb-4">{{ cardTitleAlt }}</template>
-          <template #append v-if="cardSubTitle">
-            <div class="d-flex align-center text-disabled text-subtitle-2">Status Penilaian di Rombongan Belajar ini :
-              &nbsp;&nbsp;&nbsp;
-              <VSwitch v-model="status_penilaian" :label="`${status_penilaian ? 'Aktif' : 'Non Aktif'}`"
-                @update:model-value="changeStatus" />
-            </div>
-          </template>
+          <VCardItem class="pb-4">
+            <VCardTitle>{{ cardTitleAlt }}</VCardTitle>
+            <template #append v-if="cardSubTitle">
+              <div class="d-flex align-center text-disabled text-subtitle-2">Status Penilaian di Rombongan Belajar ini :
+                &nbsp;&nbsp;&nbsp;
+                <VSwitch v-model="status_penilaian" :label="`${status_penilaian ? 'Aktif' : 'Non Aktif'}`"
+                  @update:model-value="changeStatus" />
+              </div>
+            </template>
+          </VCardItem>
           <VDivider />
           <VTable class="text-no-wrap">
             <thead>

@@ -16,12 +16,17 @@ class Ptk extends Model
 	protected $primaryKey = 'guru_id';
 	protected $guarded = [];
     protected $appends = ['nama_lengkap', 'tempat_tanggal_lahir', 'tanggal_lahir_indo', 'jenis_kelamin_str'];
-    protected function namaLengkap(): Attribute
+    /*protected function namaLengkap(): Attribute
     {
         return Attribute::make(
             get: fn (mixed $value, array $attributes) => $attributes['gelar_depan'].' '.strtoupper($attributes['nama']).$attributes['gelar_belakang'],
         );
-    }
+    }*/
+    public function getNamaLengkapAttribute(){
+		$gelar_depan = ($this->attributes['gelar_depan']) ? $this->attributes['gelar_depan'].' ' : NULL;
+		$gelar_belakang = ($this->attributes['gelar_belakang']) ? ', '.$this->attributes['gelar_belakang'] : NULL;
+		return $gelar_depan . strtoupper($this->attributes['nama']). $gelar_belakang;
+	}
     protected function tempatTanggalLahir(): Attribute
     {
         return Attribute::make(

@@ -28,6 +28,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    isKunci: {
+        type: Boolean,
+        default: false,
+    },
 })
 const emit = defineEmits([
     'update:form',
@@ -98,6 +102,16 @@ watch(() => props.resetForm, (newValue, oldValue) => {
         }
     }
 })
+watch(() => props.form.rombongan_belajar_id, (newValue, oldValue) => {
+    if (!newValue && oldValue) {
+        defaultValue.value.rombongan_belajar_id = null
+    }
+})
+watch(() => props.form.pembelajaran_id, (newValue, oldValue) => {
+    if (!newValue && oldValue) {
+        defaultValue.value.pembelajaran_id = null
+    }
+})
 </script>
 <template>
     <VCol cols="12">
@@ -146,7 +160,8 @@ watch(() => props.resetForm, (newValue, oldValue) => {
                 <AppSelect v-model="defaultValue.pembelajaran_id" placeholder="== Pilih Mata Pelajaran =="
                     :items="props.arrayData.mapel" clearable clear-icon="tabler-x" @update:model-value="changeMapel"
                     item-value="pembelajaran_id" item-title="nama_mata_pelajaran" :loading="props.loading.mapel"
-                    :disabled="props.loading.mapel" :error-messages="props.errors.mata_pelajaran_id" return-object />
+                    :disabled="props.loading.mapel || props.isKunci" :error-messages="props.errors.mata_pelajaran_id"
+                    return-object />
             </VCol>
         </VRow>
     </VCol>

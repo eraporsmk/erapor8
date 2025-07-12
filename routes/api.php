@@ -12,6 +12,7 @@ use App\Http\Controllers\PdController;
 use App\Http\Controllers\ReferensiController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\UkkController;
+use App\Http\Controllers\ProjekController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::get('semester', [AuthController::class, 'semester']);
@@ -135,5 +136,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/save', [UkkController::class, 'save']);
         Route::post('/hapus', [UkkController::class, 'hapus']);
         Route::post('/show', [UkkController::class, 'show']);
+    });
+    Route::group(['prefix' => 'projek'], function () {
+        Route::get('/', [ProjekController::class, 'index']);
+        Route::post('/save', [ProjekController::class, 'save']);
+        Route::post('/hapus', [ProjekController::class, 'hapus']);
+        Route::post('/show', [ProjekController::class, 'show']);
     });
 });

@@ -74,6 +74,6 @@ class Pembelajaran extends Model
 		return $this->hasOne(Ptk::class, 'guru_id', 'guru_pengajar_id');
 	}
 	public function induk(){
-		return $this->belongsTo(Pembelajaran::class, 'pembelajaran_id', 'induk_pembelajaran_id');
+		return $this->belongsTo(Pembelajaran::class, 'induk_pembelajaran_id', 'pembelajaran_id');
 	}
 }

@@ -33,6 +33,9 @@ class SettingController extends Controller
         $get_rombel_4_tahun = RombelEmpatTahun::with(['rombongan_belajar'])->where('sekolah_id', request()->sekolah_id)->where('semester_id', request()->semester_id)->get();
         $rombel_4_tahun = RombelEmpatTahun::where('sekolah_id', request()->sekolah_id)->where('semester_id', request()->semester_id)->get();
         $plucked = $rombel_4_tahun->pluck('rombongan_belajar_id');
+        $tendik = jenis_gtk('tendik')->all();
+        $guru = jenis_gtk('guru')->all();
+        $jenis_ptk = array_merge($tendik, $guru);
         $data = [
             'semester_id' => semester_id(),
             'semester' => Semester::whereHas('tahun_ajaran', function($query){
@@ -43,7 +46,10 @@ class SettingController extends Controller
             'kepala_sekolah' => ($sekolah->kepala_sekolah) ? $sekolah->kepala_sekolah->guru_id : $sekolah->guru_id,
             'jabatan' => get_setting('jabatan', request()->sekolah_id, request()->semester_id),
             'zona' => get_setting('zona', request()->sekolah_id),
-            'data_guru' => Ptk::where('sekolah_id', request()->sekolah_id)->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang')->get(),
+            'data_guru' => Ptk::where(function($query) use ($jenis_ptk){
+                $query->where('sekolah_id', request()->sekolah_id);
+                $query->whereIn('jenis_ptk_id', $jenis_ptk);
+            })->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang')->orderBy('nama')->get(),
             'data_rombel' => RombonganBelajar::where(function($query){
                 $query->where('jenis_rombel', 1);
                 $query->where('sekolah_id', request()->sekolah_id);

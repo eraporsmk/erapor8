@@ -117,6 +117,26 @@ class ReferensiController extends Controller
         ])->get();
         return response()->json($data);
     }
+    private function kondisiPembelajaranPenilaian(){
+        return function($query){
+            $query->where('guru_id', request()->guru_id);
+            if(request()->rombongan_belajar_id){
+                $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+            }
+            $query->whereNotNull('kelompok_id');
+            $query->whereNotNull('no_urut');
+            $query->where('mata_pelajaran_id', '<>', '800001000');
+            //$query->whereNull('induk_pembelajaran_id');
+            $query->orWhere('guru_pengajar_id', request()->guru_id);
+            if(request()->rombongan_belajar_id){
+                $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+            }
+            $query->whereNotNull('kelompok_id');
+            $query->whereNotNull('no_urut');
+            $query->where('mata_pelajaran_id', '<>', '800001000');
+            //$query->whereNull('induk_pembelajaran_id');
+        };
+    }
     private function kondisiPembelajaran($mata_pelajaran_id = NULL){
         return function($query) use ($mata_pelajaran_id){
             $query->where('sekolah_id', request()->sekolah_id);
@@ -301,26 +321,62 @@ class ReferensiController extends Controller
                 } else {
                     $query->whereIn('jenis_rombel', [1, 16]);   
                 }
-                if(request()->add_kd || request()->add_cp || request()->mapping || request()->nilai){
-                    $query->whereHas('pembelajaran', $this->kondisiPembelajaran($mata_pelajaran_id));
+                if(request()->aksi){
+                    if(request()->aksi == 'rencana-p5' || request()->aksi == 'nilai-p5'){
+                        $query->whereHas('pembelajaran', function($query){
+                            $query->whereHas('induk', function($query){
+                                $query->where('mata_pelajaran_id', 200040000);
+                                $query->where('guru_id', request()->guru_id);
+                            });
+                        });
+                    }
+                    if(request()->aksi == 'rencana-ukk'){
+                        $query->whereHas('jurusan_sp', function($query){
+                            $query->has('paket_ukk');
+                        });
+                    }
                 } else {
-                    $query->whereHas('pembelajaran', $this->cariPembelajaran());
+                    if(request()->add_kd || request()->add_cp || request()->mapping){
+                        $query->whereHas('pembelajaran', $this->kondisiPembelajaran($mata_pelajaran_id));
+                    } elseif(request()->nilai){
+                        $query->whereHas('pembelajaran', $this->kondisiPembelajaranPenilaian());
+                    } else {
+                        $query->whereHas('pembelajaran', $this->cariPembelajaran());
+                    }
                 }
             })->orderBy('nama')->get();
         }
         if(request()->data == 'mapel'){
             $rombel = RombonganBelajar::find(request()->rombongan_belajar_id);
             $merdeka = (merdeka($rombel->kurikulum->nama_kurikulum)) ? TRUE : FALSE;
-            if(request()->add_kd || request()->add_cp){
-                $data = [
-                    'mapel' => Pembelajaran::where($this->kondisiPembelajaran())->orderBy('nama_mata_pelajaran')->get(),
-                    'merdeka' => $merdeka,
-                ];
+            if(request()->aksi){
+                if(request()->aksi == 'tema'){
+                    $data = [
+                        'rombel' => $rombel,
+                        'mapel' => Pembelajaran::where(function($query){
+                            $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+                            $query->whereHas('induk', function($query){
+                                $query->where('mata_pelajaran_id', 200040000);
+                                $query->where('guru_id', request()->guru_id);
+                            });
+                        })->orderBy('nama_mata_pelajaran')->get(),
+                        'merdeka' => $merdeka,
+                    ];
+                }
             } else {
-                $data = [
-                    'mapel' => Pembelajaran::where($this->cariPembelajaran())->orderBy('nama_mata_pelajaran')->get(),
-                    'merdeka' => $merdeka,
-                ];
+                if(request()->add_kd || request()->add_cp){
+                    $data = [
+                        'rombel' => $rombel,
+                        'mapel' => Pembelajaran::where($this->kondisiPembelajaran())->orderBy('nama_mata_pelajaran')->get(),
+                        'merdeka' => $merdeka,
+                    ];
+                } else {
+                    $data = [
+                        'rombel' => $rombel,
+                        'mapel' => Pembelajaran::where($this->cariPembelajaran())->orderBy('nama_mata_pelajaran')->get(),
+                        'merdeka' => $merdeka,
+                    ];
+                }
             }
         }
         if(request()->data == 'cp_kd'){
@@ -525,6 +581,9 @@ class ReferensiController extends Controller
                     ]);
                 })->orderBy('nama')->get(),
             ];
+        }
+        if(request()->data == 'budaya-kerja'){
+            $data = BudayaKerja::with(['elemen_budaya_kerja'])->orderBy('budaya_kerja_id')->get();
         }
         return response()->json($data);
     }

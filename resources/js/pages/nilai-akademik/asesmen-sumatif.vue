@@ -123,6 +123,7 @@ const formReset = () => {
   };
   defaultForm.opsi = "";
 };
+const isKunciWalas = ref(false)
 const getData = async (postData) => {
   const mergedForm = { ...postData, ...defaultForm };
   await $api("/referensi/get-data", {
@@ -136,6 +137,7 @@ const getData = async (postData) => {
       if (postData.data == "mapel") {
         arrayData.value.mapel = getData.mapel;
         defaultForm.merdeka = getData.merdeka
+        isKunciWalas.value = getData.rombel.kunci_nilai ? true : false
       }
       if (postData.data == "teknik") {
         arrayData.value.teknik = getData;
@@ -315,8 +317,8 @@ const onFileChange = async (val) => {
       <VCardText>
         <VRow>
           <DefaultForm v-model:form="form" v-model:errors="errors" v-model:arrayData="arrayData"
-            v-model:loading="loading" v-model:resetForm="resetForm" @tingkat="changeTingkat"
-            @rombongan_belajar_id="changeRombel" @pembelajaran_id="changeMapel"></DefaultForm>
+            v-model:loading="loading" v-model:resetForm="resetForm" v-model:isKunci="isKunciWalas"
+            @tingkat="changeTingkat" @rombongan_belajar_id="changeRombel" @pembelajaran_id="changeMapel"></DefaultForm>
           <VCol cols="12">
             <VRow no-gutters>
               <VCol cols="12" md="3" class="d-flex align-items-center">
@@ -326,7 +328,7 @@ const onFileChange = async (val) => {
                 <AppSelect v-model="form.teknik_penilaian_id" placeholder="== Pilih Jenis Asesmen =="
                   :items="arrayData.teknik" clearable clear-icon="tabler-x" @update:model-value="changeTeknik"
                   item-value="teknik_penilaian_id" item-title="nama" :error-messages="errors.teknik_penilaian_id"
-                  :loading="loading.teknik_penilaian_id" :disabled="loading.teknik_penilaian_id" />
+                  :loading="loading.teknik_penilaian_id" :disabled="loading.teknik_penilaian_id || isKunciWalas" />
               </VCol>
             </VRow>
           </VCol>

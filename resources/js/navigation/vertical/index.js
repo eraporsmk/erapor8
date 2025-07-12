@@ -10,4 +10,4 @@ import ukk from './ukk'
 import wakakur from './wakakur'
 import walas from './walas'
 
-export default [...dashboard, ...sinkronisasi, ...settings, ...referensi, ...penilaian, ...ukk, ...walas, ...projek, ...pkl, ...wakakur, ...bottom]
+export default [...dashboard, ...sinkronisasi, ...settings, ...referensi, ...penilaian, ...ukk, ...projek, ...walas, ...pkl, ...wakakur, ...bottom]

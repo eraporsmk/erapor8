@@ -2,7 +2,8 @@
 definePage({
   meta: {
     action: 'read',
-    subject: 'Internal',
+    subject: 'Projek',
+    title: "Proses Penilaian P5",
   },
 })
 </script>
