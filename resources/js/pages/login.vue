@@ -170,7 +170,9 @@ const fetchData = async () => {
                   v-model="form.semester_id" placeholder="Select Item" />
                 <div class="d-flex align-center flex-wrap justify-space-between my-6">
                   <VCheckbox v-model="form.remember" label="Simpan Login" />
-                  <a class="text-primary" href="javascript:void(0)"> Lupa Password? </a>
+                  <RouterLink class="text-primary" :to="{ name: 'lupa-password' }">
+                    Lupa Password?
+                  </RouterLink>
                 </div>
 
                 <VBtn block type="submit" :loading="loadingButton" :disabled="loadingButton"> Login </VBtn>

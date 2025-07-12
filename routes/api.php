@@ -19,6 +19,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('/allow-register', [AuthController::class, 'allow_register']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('reset-password', [AuthController::class, 'reset_password']);
+    Route::post('get-email', [AuthController::class, 'get_email']); 
     Route::group(['middleware' => 'auth:sanctum'], function() {
         Route::get('logout', [AuthController::class, 'logout']);
         Route::get('user', [AuthController::class, 'user']);
@@ -58,6 +60,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('reset-bg', [SettingController::class, 'reset_bg']);
         Route::get('/unduhan', [SettingController::class, 'unduhan']);
         Route::get('/changelog', [SettingController::class, 'changelog']);
+        Route::get('/github', [SettingController::class, 'github']);
         Route::get('/check-update', [SettingController::class, 'check_update']);
         Route::post('/proses-update', [SettingController::class, 'proses_update']);
     });

@@ -50,10 +50,6 @@ const fetchData = async () => {
     loadingBody.value = false;
   }
 }
-const isConfirmDialogVisible = ref(false)
-const confirmationQquestion = ref('')
-const confirmationText = ref('')
-
 const isAlertDialogVisible = ref(false)
 const notif = ref({
   color: '',
@@ -104,43 +100,12 @@ const cekKoneksi = async () => {
         }
         isAlertDialogVisible.value = true
       }
-      /*isAlertDialogVisible.value = true
-      notif.value = {
-        color: 'success',
-        title: 'Berhasil',
-        text: 'Sinkronisasi Dapodik Berhasil',
-      }*/
     }
   })
-  /*
-  this.$http.post('/sinkronisasi/cek-koneksi', this.form).then(response => {
-        this.loading = false
-        let getData = response.data
-        if (getData.errors) {
-          this.url_dapodik_feedback = (getData.errors.url_dapodik) ? getData.errors.url_dapodik.join(', ') : ''
-          this.url_dapodik_state = (getData.errors.url_dapodik) ? false : null
-          this.token_dapodik_feedback = (getData.errors.token_dapodik) ? getData.errors.token_dapodik.join(', ') : ''
-          this.token_dapodik_state = (getData.errors.token_dapodik) ? false : null
-        } else {
-          this.$swal({
-            icon: getData.icon,
-            title: getData.title,
-            html: getData.text,
-            customClass: {
-              confirmButton: 'btn btn-success',
-            },
-          }).then(result => {
-            this.loadPostsData()
-          })
-        }
-      })
-  */
 }
 const confirmDialog = () => {
   isLoading.value = false
   fetchData()
-  //if (getData.color == 'success') {
-  //}
 }
 </script>
 <template>

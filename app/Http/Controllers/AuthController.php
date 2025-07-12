@@ -15,6 +15,10 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Ptk;
 use App\Models\PesertaDidik;
+use Carbon\Carbon;
+use Hash;
+use Mail;
+use DB; 
 
 class AuthController extends Controller
 {
@@ -558,6 +562,79 @@ class AuthController extends Controller
             'allowRegister' => config('app.registration'),
             'sekolah' => Sekolah::count(),
         ];
+        return response()->json($data);
+    }
+    public function reset_password(){
+        if(request()->token){
+            request()->validate(
+                [
+                    'email' => 'required|email|exists:users',
+                    'password' => 'required|string|min:6|confirmed',
+                    'password_confirmation' => 'required'
+                ],
+                [
+                    'email.required' => 'Email tidak boleh kosong',
+                    'email.email' => 'Email tidak valid',
+                    'email.exists' => 'Email tidak terdaftar',
+                    'password.required' => 'Password tidak boleh kosong',
+                    'password.min' => 'Password minimal 6 karakter',
+                    'password.confirmed' => 'Kombinasi password dan konfirmasi tidak sesuai',
+                    'password_confirmation.required' => 'Konfirmasi password tidak boleh kosong'
+                ]
+            );
+            $updatePassword = DB::table('password_resets')->where([
+                'email' => request()->email,
+                'token' => request()->token,
+            ])->first();
+            if(!$updatePassword){
+                $data = [
+                    'color' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Token invalid. Silahkan lakukan reset password lagi!',
+                    'error' => TRUE,
+                ];
+            } else {
+                $user = User::where('email', request()->email)->update(['password' => Hash::make(request()->password)]);
+                DB::table('password_resets')->where(['email'=> request()->email])->delete();
+                $data = [
+                    'color' => 'success',
+                    'title' => 'Berhasil!',
+                    'text' => 'Password berhasil diperbaharui',
+                    'error' => FALSE,
+                ];
+            }
+            return response()->json($data);
+        } else {
+            request()->validate(
+                [
+                    'email' => 'required|email|exists:users',
+                ],
+                [
+                    'email.required' => 'Email tidak boleh kosong',
+                    'email.email' => 'Email tidak valid',
+                    'email.exists' => 'Email tidak terdaftar',
+                ]
+            );
+            $token = Str::random(64);
+            DB::table('password_resets')->insert([
+                'email' => request()->email, 
+                'token' => $token, 
+                'created_at' => Carbon::now()
+            ]);
+            $mail = Mail::send('cetak.lupa-password', ['token' => $token], function($message){
+                $message->to(request()->email);
+                $message->subject('Reset Password');
+            });
+            $data = [
+                'email' => request()->email,
+                'token' => $token,
+                'mail' => $mail,
+            ];
+            return response()->json($data);
+        }
+    }
+    public function get_email(){
+        $data = DB::table('password_resets')->where('token', request()->token)->first();
         return response()->json($data);
     }
 }

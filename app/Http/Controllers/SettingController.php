@@ -550,6 +550,20 @@ class SettingController extends Controller
         ];
         return response()->json($data);
     }
+    public function github(){
+        $url = 'https://api.github.com/repos/eraporsmk/erapor8/commits';
+        $response = Http::withToken(config('app.github_token'))->get($url, [
+            'page' => request()->page,
+            'per_page' => request()->per_page,
+        ]);
+        $data = [
+            'data' => $response->json(),
+            'headers' => $response->headers(),
+            'activeTab' => request()->activeTab,
+            'url' => $url,
+        ];
+        return response()->json($data);
+    }
     public function check_update(){
         $response = Http::post('sync.erapor-smk.net/api/v8/version');
         $tersedia = FALSE;
