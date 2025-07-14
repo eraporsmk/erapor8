@@ -64,6 +64,8 @@ declare module 'vue' {
     ScrollToTop: typeof import('./resources/js/@core/components/ScrollToTop.vue')['default']
     ShareProjectDialog: typeof import('./resources/js/components/dialogs/ShareProjectDialog.vue')['default']
     Shortcuts: typeof import('./resources/js/@core/components/Shortcuts.vue')['default']
+    TableCatatanGuru: typeof import('./resources/js/components/TableCatatanGuru.vue')['default']
+    TableCatatanWalas: typeof import('./resources/js/components/TableCatatanWalas.vue')['default']
     TablePagination: typeof import('./resources/js/@core/components/TablePagination.vue')['default']
     ThemeSwitcher: typeof import('./resources/js/@core/components/ThemeSwitcher.vue')['default']
     TiptapEditor: typeof import('./resources/js/@core/components/TiptapEditor.vue')['default']

@@ -307,7 +307,7 @@ class DashboardController extends Controller
                $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
                }, 
             'pengajar' => function($query){
-               $query->select('guru_id', 'nama');
+               $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
             },
          ])->withCount([
             'anggota_rombel',
@@ -347,10 +347,10 @@ class DashboardController extends Controller
             });
          })->with([
             'guru' => function($query){
-               $query->select('guru_id', 'nama');
+               $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
                }, 
             'pengajar' => function($query){
-               $query->select('guru_id', 'nama');
+               $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
             },
             'rombongan_belajar' => function($query){
                $query->select('rombongan_belajar_id', 'nama');

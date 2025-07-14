@@ -35,7 +35,7 @@ export default [
         title: 'Kenaikan Kelas',
         to: 'walas-kenaikan-kelas',
         icon: { icon: 'tabler-hand-finger-right' },
-        resource: 'Kenaikan',
+        subject: 'Kenaikan',
         action: 'read',
       },
       {

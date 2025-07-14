@@ -13,6 +13,7 @@ use App\Http\Controllers\ReferensiController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\UkkController;
 use App\Http\Controllers\ProjekController;
+use App\Http\Controllers\WalasController;
 
 Route::group(['prefix' => 'auth'], function () {
     Route::get('semester', [AuthController::class, 'semester']);
@@ -145,5 +146,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/save', [ProjekController::class, 'save']);
         Route::post('/hapus', [ProjekController::class, 'hapus']);
         Route::post('/show', [ProjekController::class, 'show']);
+    });
+    Route::group(['prefix' => 'walas'], function () {
+        Route::get('/', [WalasController::class, 'index']);
+        Route::post('/save', [WalasController::class, 'save']);
+        Route::post('/get-data', [WalasController::class, 'get_data']);
+        Route::post('/hapus', [WalasController::class, 'hapus']);
     });
 });

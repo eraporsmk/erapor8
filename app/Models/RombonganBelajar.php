@@ -55,4 +55,15 @@ class RombonganBelajar extends Model
 	{
 		return $this->hasOne(Pembelajaran::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
 	}
+	public function rombel_empat_tahun()
+	{
+		return $this->hasOne(RombelEmpatTahun::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
+	}
+	public function kelas_ekskul(){
+		return $this->hasOne(Ekstrakurikuler::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
+	}
+	public function jurusan()
+	{
+		return $this->hasOne(Jurusan::class, 'jurusan_id', 'jurusan_id');
+	}
 }

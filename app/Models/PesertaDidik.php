@@ -151,4 +151,16 @@ class PesertaDidik extends Model
             'anggota_rombel_id'
         );
 	}
+    public function wilayah(){
+		return $this->hasOne(MstWilayah::class, 'kode_wilayah', 'kode_wilayah')->with(['parrentRecursive']);
+    }
+    public function sekolah(){
+		return $this->hasOne(Sekolah::class, 'sekolah_id', 'sekolah_id');
+	}
+    public function anggota_pilihan()
+	{
+		return $this->hasOne(AnggotaRombel::class, 'peserta_didik_id', 'peserta_didik_id')->whereHas('rombongan_belajar', function($query){
+			$query->where('jenis_rombel', 16);
+		});
+	}
 }

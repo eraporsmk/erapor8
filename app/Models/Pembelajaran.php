@@ -79,4 +79,22 @@ class Pembelajaran extends Model
 	public function rencana_projek(){
 		return $this->hasMany(RencanaBudayaKerja::class, 'pembelajaran_id', 'pembelajaran_id');
 	}
+	public function kelompok(){
+		return $this->hasOne(Kelompok::class, 'kelompok_id', 'kelompok_id');
+	}
+	public function nilai_akhir_pengetahuan(){
+		return $this->hasOne(NilaiAkhir::class, 'pembelajaran_id', 'pembelajaran_id')->where('kompetensi_id', 1);
+	}
+	public function nilai_akhir_keterampilan(){
+		return $this->hasOne(NilaiAkhir::class, 'pembelajaran_id', 'pembelajaran_id')->where('kompetensi_id', 2);
+	}
+	public function nilai_akhir_kurmer(){
+		return $this->hasOne(NilaiAkhir::class, 'pembelajaran_id', 'pembelajaran_id')->where('kompetensi_id', 4);
+	}
+	public function single_deskripsi_mata_pelajaran(){
+		return $this->hasOne(DeskripsiMataPelajaran::class, 'pembelajaran_id', 'pembelajaran_id');
+	}
+	public function all_nilai_akhir_keterampilan(){
+		return $this->hasMany(NilaiAkhir::class, 'pembelajaran_id', 'pembelajaran_id')->where('kompetensi_id', 2);
+	}
 }

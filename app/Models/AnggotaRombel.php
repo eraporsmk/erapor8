@@ -77,9 +77,39 @@ class AnggotaRombel extends Model
 		return $this->hasOne(NilaiUkk::class, 'anggota_rombel_id', 'anggota_rombel_id');
 	}
 	public function nilai_budaya_kerja(){
-		return $this->hasMany(NilaiBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id');
+		return $this->hasMany(NilaiBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id')->whereNull('guru_id');
+	}
+	public function nilai_budaya_kerja_guru(){
+		return $this->hasMany(NilaiBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id')->whereNotNull('guru_id');
 	}
 	public function catatan_budaya_kerja(){
 		return $this->hasOne(CatatanBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function all_catatan_budaya_kerja(){
+		return $this->hasMany(CatatanBudayaKerja::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function single_prakerin(){
+		return $this->hasOne(Prakerin::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function absensi(){
+		return $this->hasOne(Absensi::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function single_kenaikan_kelas(){
+		return $this->hasOne(KenaikanKelas::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function kehadiran(){
+		return $this->hasOne(Absensi::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function kenaikan(){
+		return $this->hasOne(KenaikanKelas::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function all_prakerin(){
+		return $this->hasMany(Prakerin::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function single_catatan_wali(){
+		return $this->hasOne(CatatanWali::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
+	public function prestasi(){
+		return $this->hasMany(Prestasi::class, 'anggota_rombel_id', 'anggota_rombel_id');
 	}
 }

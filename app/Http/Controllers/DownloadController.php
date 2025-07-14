@@ -14,6 +14,7 @@ use App\Exports\TemplateTp;
 use App\Exports\TemplateSumatifLingkupMateri;
 use App\Exports\TemplateSumatifAkhirSemester;
 use App\Exports\TemplateNilaiAkhir;
+use App\Exports\LeggerNilaiKurmerExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DownloadController extends Controller
@@ -165,4 +166,18 @@ class DownloadController extends Controller
 			echo 'Akses tidak sah!';
 		}
 	}
+	public function unduh_leger_nilai_kurmer(){
+        $rombongan_belajar = RombonganBelajar::find(request()->route('rombongan_belajar_id'));
+		$merdeka = merdeka($rombongan_belajar->kurikulum->nama_kurikulum);
+		$nama_file = 'Leger Nilai Akhir Kelas ' . $rombongan_belajar->nama;
+		$nama_file = clean($nama_file);
+		$nama_file = $nama_file . '.xlsx';
+		return (new LeggerNilaiKurmerExport)->query([
+			'rombongan_belajar' => $rombongan_belajar, 
+			'rombongan_belajar_id' => request()->route('rombongan_belajar_id'), 
+			'merdeka' => $merdeka,
+			'sekolah_id' => request()->route('sekolah_id'),
+			'semester_id' => request()->route('semester_id'),
+		])->download($nama_file);
+    }
 }
