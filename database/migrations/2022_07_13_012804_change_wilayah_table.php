@@ -14,7 +14,10 @@ class ChangeWilayahTable extends Migration
     public function up()
     {
         Schema::table('ref.mst_wilayah', function (Blueprint $table) {
-            $table->string('kode_dagri', 10)->nullable()->change();
+            $table->dropColumn('kode_dagri');
+        });
+        Schema::table('ref.mst_wilayah', function (Blueprint $table) {
+            $table->string('kode_dagri', 10)->nullable();
         });
     }
 

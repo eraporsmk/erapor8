@@ -14,7 +14,10 @@ class AddKdIdToTujuanPembelajaranTable extends Migration
     public function up()
     {
         Schema::table('tujuan_pembelajaran', function (Blueprint $table) {
-            $table->bigInteger('cp_id')->nullable()->change();
+            $table->dropColumn('cp_id');
+        });
+        Schema::table('tujuan_pembelajaran', function (Blueprint $table) {
+            $table->bigInteger('cp_id')->nullable();
             $table->uuid('kd_id')->nullable();
             $table->foreign('kd_id')->references('kompetensi_dasar_id')->on('ref.kompetensi_dasar')->onUpdate('CASCADE')->onDelete('CASCADE');
         });

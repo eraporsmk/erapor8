@@ -14,7 +14,10 @@ class ChangeDeskripsiInRencanaBudayaKerjaTable extends Migration
     public function up()
     {
         Schema::table('rencana_budaya_kerja', function (Blueprint $table) {
-            $table->text('deskripsi')->change();
+            $table->dropColumn('deskripsi');
+        });
+        Schema::table('rencana_budaya_kerja', function (Blueprint $table) {
+            $table->text('deskripsi');
         });
     }
 

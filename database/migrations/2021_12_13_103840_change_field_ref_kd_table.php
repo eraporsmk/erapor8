@@ -14,7 +14,10 @@ class ChangeFieldRefKdTable extends Migration
     public function up()
     {
         Schema::table('ref.kompetensi_dasar', function(Blueprint $table) {
-            $table->text('id_kompetensi')->change();
+            $table->dropColumn('id_kompetensi');;
+        });
+        Schema::table('ref.kompetensi_dasar', function(Blueprint $table) {
+            $table->text('id_kompetensi');
         });
     }
 

@@ -14,8 +14,11 @@ class ChangeFieldToDudiTable extends Migration
     public function up()
     {
         Schema::table('dudi', function (Blueprint $table) {
-            $table->decimal('lintang', 18,12)->change();
-			$table->decimal('bujur', 18,12)->change();
+            $table->dropColumn(['lintang', 'bujur']);
+        });
+        Schema::table('dudi', function (Blueprint $table) {
+            $table->decimal('lintang', 18,12);
+			$table->decimal('bujur', 18,12);
         });
     }
 
@@ -26,9 +29,6 @@ class ChangeFieldToDudiTable extends Migration
      */
     public function down()
     {
-        Schema::table('dudi', function (Blueprint $table) {
-            $table->decimal('lintang', 18,12)->change();
-			$table->decimal('bujur', 18,12)->change();
-        });
+       //
     }
 }

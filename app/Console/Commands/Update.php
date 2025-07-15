@@ -34,57 +34,7 @@ class Update extends Command
      */
     public function handle()
     {
-        $ajaran = [
-            [
-                'tahun_ajaran_id' => 2025,
-                'nama' => '2025/2026',
-                'periode_aktif' => 1,   
-                'semester' => [
-                    [
-                        'semester_id' => 20251,
-                        'nama' => '2025/2026 Ganjil',
-                        'semester' => 1,
-                        'periode_aktif' => 0,
-                    ],
-                    [
-                        'semester_id' => 20252,
-                        'nama' => '2025/2026 Genap',
-                        'semester' => 2,
-                        'periode_aktif' => 0,
-                    ]
-                ],
-            ]
-        ];
-        foreach($ajaran as $a){
-            TahunAjaran::updateOrCreate(
-                [
-                    'tahun_ajaran_id' => $a['tahun_ajaran_id'],
-                ],
-                [
-                    'nama' => $a['nama'],
-                    'periode_aktif' => $a['periode_aktif'],
-                    'tanggal_mulai' => '2020-07-20',
-                    'tanggal_selesai' => '2021-06-01',
-                    'last_sync' => now(),
-                ]
-            );
-            foreach($a['semester'] as $semester){
-                Semester::updateOrCreate(
-                    [
-                        'semester_id' => $semester['semester_id'],
-                    ],
-                    [
-                        'tahun_ajaran_id' => $a['tahun_ajaran_id'],
-                        'nama' => $semester['nama'],
-                        'semester' => $semester['semester'],
-                        'periode_aktif' => $semester['periode_aktif'],
-                        'tanggal_mulai' => '2020-07-01',
-                        'tanggal_selesai' => '2021-12-31',
-                        'last_sync' => now(),
-                    ]
-                );
-            }
-        }
+        $this->call('app:update-smt');
         $all_semester = Semester::whereHas('tahun_ajaran', function($query){
             $query->where('periode_aktif', 1);
         })->get();

@@ -40,11 +40,6 @@ class CreateKdNilaiTable extends Migration
      */
     public function down()
     {
-        Schema::table('kd_nilai', function (Blueprint $table) {
-			$table->dropForeign(['kompetensi_dasar_id']);
-            $table->dropForeign(['rencana_penilaian_id']);
-			$table->dropForeign(['sekolah_id']);
-        });
         Schema::dropIfExists('kd_nilai');
     }
 }

@@ -14,8 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::table('ref.capaian_pembelajaran', function (Blueprint $table) {
-            $table->integer('aktif')->default(1)->change();
-            $table->integer('is_dir')->nullable()->default(0)->change();
+            $table->dropColumn(['aktif', 'is_dir']);
+        });
+        Schema::table('ref.capaian_pembelajaran', function (Blueprint $table) {
+            $table->integer('aktif')->default(1);
+            $table->integer('is_dir')->nullable()->default(0);
         });
     }
 
@@ -26,9 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('ref.capaian_pembelajaran', function (Blueprint $table) {
-            $table->decimal('aktif', 1, 0)->default(1)->change();
-            $table->decimal('is_dir', 1, 0)->nullable()->default(0)->change();
-        });
+        //
     }
 };

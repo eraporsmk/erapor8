@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\Teknik_penilaian;
+use App\Models\TeknikPenilaian;
 
 class TeknikSeeder extends Seeder
 {
@@ -49,7 +49,7 @@ class TeknikSeeder extends Seeder
 				),
 			);
 			foreach($insert_teknik as $teknik){
-				Teknik_penilaian::create($teknik);
+				TeknikPenilaian::create($teknik);
 			}
     }
 }

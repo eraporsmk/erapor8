@@ -29,7 +29,7 @@ class AddIndexIntoKdNilaiTable extends Migration
     {
         Schema::table('kd_nilai', function (Blueprint $table) {
             $table->dropIndex(['sekolah_id']);
-			$table->dropIndex(['rencana_penilaian_id']);
+			//$table->dropIndex(['rencana_penilaian_id']);
 			$table->dropIndex(['kompetensi_dasar_id']);
         });
     }

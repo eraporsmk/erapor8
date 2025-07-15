@@ -14,7 +14,10 @@ class ChangePasswordDapoUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('password_dapo')->nullable()->change();
+            $table->dropColumn('password_dapo');
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('password_dapo')->nullable();
         });
     }
 

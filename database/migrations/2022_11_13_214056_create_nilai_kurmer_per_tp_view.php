@@ -13,7 +13,7 @@ class CreateNilaiKurmerPerTpView extends Migration
      */
     public function up()
     {
-        Artisan::call("view:CreateOrReplaceNilaiKurmerPerTpView");
+        DB::statement("CREATE OR REPLACE VIEW view_nilai_kurmer_pertp AS SELECT pembelajaran_id, anggota_rombel_id, tp_id, sum(nilai) AS nilai_tp FROM get_nilai_kurmer_siswa_by_kd GROUP BY pembelajaran_id, anggota_rombel_id, tp_id;");
     }
 
     /**
@@ -23,6 +23,6 @@ class CreateNilaiKurmerPerTpView extends Migration
      */
     public function down()
     {
-        DB::statement("DROP VIEW view_nilai_kurmer_pertp CASCADE");
+        DB::statement("DROP VIEW IF EXISTS view_nilai_kurmer_pertp CASCADE");
     }
 }

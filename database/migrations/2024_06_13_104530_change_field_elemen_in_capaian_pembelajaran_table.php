@@ -14,8 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::table('ref.capaian_pembelajaran', function (Blueprint $table) {
-            $table->longText('elemen')->change();
-            $table->longText('deskripsi')->change();
+            $table->dropColumn(['elemen', 'deskripsi']);
+        });
+        Schema::table('ref.capaian_pembelajaran', function (Blueprint $table) {
+            $table->longText('elemen');
+            $table->longText('deskripsi');
         });
     }
 

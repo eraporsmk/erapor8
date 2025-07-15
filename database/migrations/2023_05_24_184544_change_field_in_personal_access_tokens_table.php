@@ -13,16 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            if (Schema::hasColumn('personal_access_tokens', 'tokenable_id')) {
-                $table->dropColumn('tokenable_id');
-            }
-        });
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            if (!Schema::hasColumn('personal_access_tokens', 'tokenable_id')) {
+        if(!Schema::hasTable('personal_access_tokens')){
+            Schema::create('personal_access_tokens', function (Blueprint $table) {
+                $table->id();
                 $table->uuid('tokenable_id')->nullable();
-            }
-        });
+                $table->string('tokenable_type');
+                $table->string('name');
+                $table->string('token', 64)->unique();
+                $table->text('abilities')->nullable();
+                $table->timestamp('last_used_at')->nullable();
+                $table->timestamp('expires_at')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -32,10 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('personal_access_tokens', function (Blueprint $table) {
-            if (Schema::hasColumn('personal_access_tokens', 'tokenable_id')) {
-                $table->dropColumn('tokenable_id');
-            }
-        });
+        Schema::dropIfExists('personal_access_tokens');
     }
 };

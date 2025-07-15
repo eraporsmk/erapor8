@@ -14,7 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('rapor_pts', function (Blueprint $table) {
-            $table->uuid('rencana_penilaian_id')->nullable()->change();
+            $table->dropColumn('rencana_penilaian_id');
+        });
+        Schema::table('rapor_pts', function (Blueprint $table) {
+            $table->uuid('rencana_penilaian_id')->nullable();
         });
     }
 

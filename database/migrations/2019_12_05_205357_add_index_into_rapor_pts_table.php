@@ -31,7 +31,7 @@ class AddIndexIntoRaporPtsTable extends Migration
         Schema::table('rapor_pts', function (Blueprint $table) {
             $table->dropIndex(['sekolah_id']);
 			$table->dropIndex(['rombongan_belajar_id']);
-			$table->dropIndex(['rencana_penilaian_id']);
+			//$table->dropIndex(['rencana_penilaian_id']);
 			$table->dropIndex(['pembelajaran_id']);
         });
     }

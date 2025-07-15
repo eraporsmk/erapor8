@@ -13,7 +13,7 @@ class CreateNilaiAkhirKurmerView extends Migration
      */
     public function up()
     {
-        Artisan::call("view:CreateOrReplaceNilaiAkhirKurmerView");
+        DB::statement("CREATE OR REPLACE VIEW view_nilai_akhir_kurmer AS SELECT pembelajaran_id, anggota_rombel_id, round(avg(nilai_tp), 0) AS nilai_akhir FROM view_nilai_kurmer_pertp GROUP BY pembelajaran_id, anggota_rombel_id;");
     }
 
     /**
@@ -23,6 +23,6 @@ class CreateNilaiAkhirKurmerView extends Migration
      */
     public function down()
     {
-        DB::statement("DROP VIEW view_nilai_akhir_kurmer CASCADE");
+        DB::statement("DROP VIEW IF EXISTS view_nilai_akhir_kurmer CASCADE");
     }
 }

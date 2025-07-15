@@ -14,7 +14,10 @@ class ChangeFieldJurusanTable extends Migration
     public function up()
     {
         Schema::table('ref.jurusan', function(Blueprint $table) {
-            $table->decimal('jenjang_pendidikan_id', 2, 0)->nullable()->change();
+            $table->dropColumn('jenjang_pendidikan_id');
+        });
+        Schema::table('ref.jurusan', function(Blueprint $table) {
+            $table->decimal('jenjang_pendidikan_id', 2, 0)->nullable();
         });
     }
 
@@ -25,8 +28,6 @@ class ChangeFieldJurusanTable extends Migration
      */
     public function down()
     {
-        Schema::table('ref.jurusan', function(Blueprint $table) {
-            $table->decimal('jenjang_pendidikan_id', 2, 0)->nullable()->change();
-        });
+        //
     }
 }

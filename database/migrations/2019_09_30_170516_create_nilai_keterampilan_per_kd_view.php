@@ -13,7 +13,7 @@ class CreateNilaiKeterampilanPerKdView extends Migration
      */
     public function up()
     {
-        Artisan::call("view:CreateOrReplaceNilaiKeterampilanPerKdView");
+        DB::statement("CREATE OR REPLACE VIEW view_nilai_keterampilan_perkd AS SELECT kompetensi_id, anggota_rombel_id, pembelajaran_id, kompetensi_dasar_id, round(sum(nilai_kd_keterampilan) / sum(bobot)::numeric, 0) AS nilai_kd FROM get_nilai_keterampilan_siswa_by_kd GROUP BY kompetensi_id, anggota_rombel_id, pembelajaran_id, kompetensi_dasar_id;");
     }
 
     /**
@@ -23,6 +23,6 @@ class CreateNilaiKeterampilanPerKdView extends Migration
      */
     public function down()
     {
-		DB::statement("DROP VIEW view_nilai_keterampilan_perkd CASCADE");
+		DB::statement("DROP VIEW IF EXISTS view_nilai_keterampilan_perkd CASCADE");
     }
 }

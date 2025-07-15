@@ -32,7 +32,7 @@ const fetchData = async () => {
     if (getData.sekolah) {
       if (!getData.allowRegister) {
         await nextTick(() => {
-          //router.replace('/:404(.*)')
+          router.replace({ to: '$404' })
         });
       } else {
         loadingBody.value = false;

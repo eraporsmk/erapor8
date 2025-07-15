@@ -15,7 +15,10 @@ class ChangeFieldToSettingsTable extends Migration
     {
         if(Schema::hasTable('settings')){
             Schema::table('settings', function (Blueprint $table) {
-                $table->text('value')->change();
+                $table->dropColumn('value');
+            });
+            Schema::table('settings', function (Blueprint $table) {
+                $table->text('value');
             });
         }
     }
@@ -27,10 +30,6 @@ class ChangeFieldToSettingsTable extends Migration
      */
     public function down()
     {
-        if(Schema::hasTable('settings')){
-            Schema::table('settings', function (Blueprint $table) {
-                $table->string('value')->change();
-            });
-        }
+        //
     }
 }

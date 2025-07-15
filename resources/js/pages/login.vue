@@ -98,6 +98,7 @@ const onSubmit = () => {
   });
 };
 const allowRegister = ref(false)
+const sekolah = ref(0)
 const data_semester = ref([])
 const bgLogin = ref()
 onMounted(async () => {
@@ -110,6 +111,9 @@ const fetchData = async () => {
     data_semester.value = getData.semester
     form.value.semester_id = getData.semester_id
     allowRegister.value = getData.allowRegister
+    if (!getData.sekolah) {
+      allowRegister.value = true
+    }
     bgLogin.value = getData.bg_login
   } catch (error) {
     console.error(error);

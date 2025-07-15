@@ -14,8 +14,11 @@ class AddFieldToNilaiBudayaKerjaTable extends Migration
     public function up()
     {
         Schema::table('nilai_budaya_kerja', function (Blueprint $table) {
+            $table->dropColumn('aspek_budaya_kerja_id');
+        });
+        Schema::table('nilai_budaya_kerja', function (Blueprint $table) {
             $table->uuid('guru_id')->nullable();
-            $table->uuid('aspek_budaya_kerja_id')->nullable()->change();
+            $table->uuid('aspek_budaya_kerja_id')->nullable();
             $table->smallInteger('budaya_kerja_id')->nullable();
             $table->date('tanggal')->nullable();
             $table->text('deskripsi')->nullable();

@@ -41,12 +41,6 @@ class CreateRaporPtsTable extends Migration
      */
     public function down()
     {
-        Schema::table('rapor_pts', function (Blueprint $table) {
-            $table->dropForeign(['rencana_penilaian_id']);
-			$table->dropForeign(['pembelajaran_id']);
-			$table->dropForeign(['rombongan_belajar_id']);
-			$table->dropForeign(['sekolah_id']);
-        });
         Schema::dropIfExists('rapor_pts');
     }
 }
