@@ -359,12 +359,11 @@ function cekDiff($last, $head){
         'human' => NULL,
     ];
     if($last && $head){
-        $diff = Carbon::parse($last)->diff(Carbon::parse($head));
-        //$diff = Carbon::parse($last)->diff(now());
-        //$diff = Carbon::now()->diff(Carbon::parse($head));
+        $diff = Carbon::parse($head)->diff(Carbon::parse($last));
         $diff = [
             'invert' => $diff->invert,
-            'human' => Carbon::parse($last)->diffForHumans(Carbon::parse($head))
+            'human' => Carbon::parse($head)->diffForHumans(Carbon::parse($last)),
+            'second' => Carbon::parse($head)->diffInSeconds(Carbon::parse($last)),
         ];
     }
     return $diff;
