@@ -95,6 +95,11 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            'dump' => [  // Added
+                'dump_binary_path' => "C:\\eRaporSMK\\pgsql\\bin", 
+                'use_single_transaction',
+                'timeout' => 60 * 15, // 15 minute timeout
+            ]
         ],
 
         'sqlsrv' => [
