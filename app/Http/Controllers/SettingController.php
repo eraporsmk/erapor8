@@ -30,6 +30,9 @@ class SettingController extends Controller
     public function index(){
         if(request()->data == 'backup'){
             //$files = Storage::disk('local')->files(config('app.name'));
+            if(!Storage::disk('local')->exists(config('app.name'))){
+                Storage::disk('local')->makeDirectory(config('app.name'), 0777, true, true);
+            }
             $files = File::allFiles(storage_path('app/private/'.config('app.name')));
             $data = [];
             foreach($files as $file){
