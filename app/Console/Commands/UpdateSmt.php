@@ -119,7 +119,7 @@ class UpdateSmt extends Command
                         'semester_id' => 20242,
                         'nama' => '2024/2025 Genap',
                         'semester' => 2,
-                        'periode_aktif' => 1,
+                        'periode_aktif' => 0,
                     ]
                 ],
             ],
@@ -132,7 +132,7 @@ class UpdateSmt extends Command
                         'semester_id' => 20251,
                         'nama' => '2025/2026 Ganjil',
                         'semester' => 1,
-                        'periode_aktif' => 0,
+                        'periode_aktif' => 1,
                     ],
                     [
                         'semester_id' => 20252,

@@ -54,8 +54,8 @@ class Update extends Command
         }
         TahunAjaran::whereIn('tahun_ajaran_id', ['2025', '2024', '2023', '2022'])->update(['periode_aktif' => 1]);
         TahunAjaran::whereNotIn('tahun_ajaran_id', ['2025', '2024', '2023', '2022'])->update(['periode_aktif' => 0]);
-        Semester::where('semester_id', '<>', '20242')->update(['periode_aktif' => 0]);
-        Semester::where('semester_id', '20242')->update(['periode_aktif' => 1]);
+        Semester::where('semester_id', '<>', '20251')->update(['periode_aktif' => 0]);
+        Semester::where('semester_id', '20251')->update(['periode_aktif' => 1]);
         $version = File::get(base_path().'/app_version.txt');
         $db_version = File::get(base_path().'/db_version.txt');
         Role::updateOrCreate(
