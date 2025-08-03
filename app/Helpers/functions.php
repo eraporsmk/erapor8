@@ -386,3 +386,21 @@ function cekUpdate(){
 function mapel_agama(){
 	return ['100014000', '100014140', '100015000', '100015010', '100016000', '100016010', '109011000', '109011010', '100011000', '100011070', '100013000', '100013010', '100012000', '100012050'];
 }
+function filter_pembelajaran_agama($agama_siswa, $nama_agama){
+    $nama_agama = str_replace('Budha', 'Buddha', $nama_agama);
+	$nama_agama = str_replace('Pendidikan Agama', '', $nama_agama);
+	$nama_agama = str_replace('dan Budi Pekerti', '', $nama_agama);
+	$nama_agama = str_replace('Pendidikan Kepercayaan', '', $nama_agama);
+	$nama_agama = str_replace('terhadap', 'kpd', $nama_agama);
+	$nama_agama = str_replace('KongHuChu', 'Konghuchu', $nama_agama);
+	$nama_agama = str_replace('Kong Hu Chu', 'Konghuchu', $nama_agama);
+	$nama_agama = trim($nama_agama);
+	$agama_siswa = str_replace('KongHuChu', 'Konghuchu', $agama_siswa);
+	$agama_siswa = str_replace('Kong Hu Chu', 'Konghuchu', $agama_siswa);
+    $agama_siswa = str_replace('Kepercayaan ', '', $agama_siswa);
+    if ($agama_siswa == $nama_agama) {
+        return true;
+    } else {
+        return false;
+    }
+}
