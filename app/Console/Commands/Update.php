@@ -58,17 +58,29 @@ class Update extends Command
         Semester::where('semester_id', '20251')->update(['periode_aktif' => 1]);
         $version = File::get(base_path().'/app_version.txt');
         $db_version = File::get(base_path().'/db_version.txt');
-        Role::updateOrCreate(
+        $newRoles = [
             [
-                'name' => 'tu',
+                'name' => 'pembimbing',
+                'display_name' => 'Pembimbing PKL',
+				'description' => 'Guru Pembimbing PKL', 
             ],
             [
+                'name' => 'tu',
                 'display_name' => 'Tata Usaha',
-				'description' => 'Tata Usaha',
-				'created_at' => now(),
-				'updated_at' => now(),
+                'description' => 'Tata Usaha',
             ]
-        );
+        ];
+        foreach($newRoles as $roleData){
+            Role::updateOrCreate(
+                [
+                    'name' => $roleData['name'],
+                ],
+                [
+                    'display_name' => $roleData['display_name'],
+                    'description' => $roleData['description'], 
+                ],
+            );
+        }
         $roles = Role::get();
         foreach($roles as $role){
             $permissions = Permission::updateOrCreate(
