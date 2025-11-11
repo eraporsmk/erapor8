@@ -68,6 +68,11 @@ class Update extends Command
                 'name' => 'tu',
                 'display_name' => 'Tata Usaha',
                 'description' => 'Tata Usaha',
+            ],
+            [
+                'name' => 'pilihan',
+                'display_name' => 'Wali Kelas Matpel Pilihan',
+				'description' => 'Wali Kelas Matpel Pilihan',
             ]
         ];
         foreach($newRoles as $roleData){
