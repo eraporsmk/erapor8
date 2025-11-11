@@ -5,7 +5,7 @@ import { themeConfig } from '@themeConfig';
   <div class="h-100 d-flex align-center justify-md-space-between justify-center">
     <!-- 👉 Footer: left content -->
     <span class="d-flex align-center text-medium-emphasis">
-      Sistem Informasi Penilaian (SIPENA)
+      Sistem Informasi Penilaian SMK (SIPENA SMK)
       <!--Hak Cipta &copy;
       {{ new Date().getFullYear() }}
       <a href="https://smk.kemendikdasmen.go.id/" target="_blank" rel="noopener noreferrer"

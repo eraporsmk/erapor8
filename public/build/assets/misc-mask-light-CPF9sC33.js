@@ -1,1 +1,0 @@
-import{a0 as i,bf as o,Y as l}from"./main-BTK-NdR2.js";const c=(e,t,n,u,s=!1)=>{const a=i(),{global:r}=o();return l(()=>r.name.value==="light"?a.skin==="bordered"&&s?n:e:r.name.value==="dark"?a.skin==="bordered"&&s?u:t:e)},f="/build/assets/misc-mask-dark-D4eSvDKH.png",k="/build/assets/misc-mask-light-7GUBPWb3.png";export{f as a,k as b,c as u};
