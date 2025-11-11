@@ -221,7 +221,7 @@ class AuthController extends Controller
                 ],
             ];
         }
-        if($user->hasRole('guru-p5', $semester->nama)){ 
+        if($user->hasRole('guru-p5', $semester->nama && $semester->tahun_ajaran_id < '2025')){ 
             $projek = [
                 [
                     'action' => 'read',
