@@ -125,7 +125,7 @@ const hideTitleAndIcon = configStore.isVerticalNavMini(isHovered)
     font-weight: 700;
     letter-spacing: 0.25px;
     line-height: 1.5rem;
-    text-transform: capitalize;
+    text-transform: none;
   }
 }
 </style>
