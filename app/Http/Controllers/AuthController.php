@@ -334,13 +334,9 @@ class AuthController extends Controller
             ];
         }
         $userAbility = array_filter(array_merge($general, $admin, $tu, $guru, $waka, $wali, $pilihan, $kaprog, $projek, $internal, $pembina_ekskul, $pembimbing, $siswa));
-        if($user->allPermissions(['display_name'], $semester->nama)->count()){
-            $roles = $user->allPermissions(['display_name'], $semester->nama)->pluck('display_name')->toArray();
-        } else {
-            $roles = $user->roles->unique()->pluck('display_name')->toArray();
-        }
+        $roles = $user->roles->unique()->pluck('display_name')->toArray();
         $sekolah = $user->sekolah;
-        unset($user->sekolah);
+        unset($user->sekolah, $user->roles);
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->plainTextToken;
         $data = [
