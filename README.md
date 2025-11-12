@@ -90,9 +90,9 @@ php artisan db:seed
 
 ## Untuk pengguna windows
 
-- Untuk pengguna lama (Path Versi 8). Silahkan download [disini](#)
+- Untuk pengguna lama (Path Versi 8). Silahkan download [disini](https://sourceforge.net/projects/erapor8-patch/files/e-Rapor%20SMK%20v.8.0.0-patch.exe/download)
 
-- Untuk pengguna baru (Fresh Installer Versi 8). silahkan download [disini](#)
+- Untuk pengguna baru (Fresh Installer Versi 8). silahkan download [disini](https://sourceforge.net/projects/eraporv8/files/e-Rapor%20SMK%20v8.0.0.exe/download)
 
 ## Cara Install (Untuk Pengguna Lama)
 
