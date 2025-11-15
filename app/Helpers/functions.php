@@ -407,3 +407,15 @@ function filter_pembelajaran_agama($agama_siswa, $nama_agama){
         return false;
     }
 }
+function status_kenaikan($status){
+    if ($status == 1) {
+        $status_teks = 'Naik ke kelas';
+    } elseif ($status == 2) {
+        $status_teks = 'Tetap dikelas';
+    } elseif ($status == 3) {
+        $status_teks = 'Lulus';
+    } else {
+        $status_teks = 'Tidak Lulus';
+    }
+    return $status_teks;
+}
