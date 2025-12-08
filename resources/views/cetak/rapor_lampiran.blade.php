@@ -236,7 +236,7 @@
                 <br>
                 <br>
                 <br>
-                <p>...................................................................</p>
+                <p>..........................................</p>
             </td>
             <td style="width:5%"></td>
             <td style="width:55%; text-align: right;">
@@ -252,7 +252,7 @@
                             <br>
                             <p>
                                 <strong><u>{{ $get_siswa->rombongan_belajar->wali_kelas->nama_lengkap }}</u></strong><br />
-                                NIP. {{ $get_siswa->rombongan_belajar->wali_kelas->nip }}
+                                NIP. {{ $get_siswa->rombongan_belajar->wali_kelas->nip ?? '-' }}
                             </p>
                         </td>
                     </tr>
@@ -294,17 +294,21 @@
                             @endif
                         </u></strong>
                 </p>
+                <p style="margin-top: -5px">
+                    NIP.
+                @if ($get_siswa->peserta_didik->sekolah->kasek)
+                    {{ $get_siswa->peserta_didik->sekolah->kasek->nip ?? '-' }}
+                @elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
+                    {{ $get_siswa->peserta_didik->sekolah->kepala_sekolah?->nip  ?? '-' }}
+                @else -
+                @endif
+                </p>
             </td>
         </tr>
         <tr>
             <td style="width:40%;"></td>
             <td style="width:60%;" class="nip">
-                NIP.
-                @if ($get_siswa->peserta_didik->sekolah->kasek)
-                    {{ $get_siswa->peserta_didik->sekolah->kasek->nip }}
-                @elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
-                    {{ $get_siswa->peserta_didik->sekolah->kepala_sekolah?->nip }}
-                @endif
+                
             </td>
         </tr>
     </table>
