@@ -4,7 +4,7 @@
         <br>
         <br>
         <br>
-        <img src="{{ $get_siswa->rombongan_belajar->sekolah && $get_siswa->rombongan_belajar->sekolah->logo_sekolah ? public_path('./storage' . config('erapor.storage') . '/images/' . $get_siswa->rombongan_belajar->sekolah->logo_sekolah) : public_path('./images/tutwuri.png') }}"
+        <img src="{{ $get_siswa->rombongan_belajar->sekolah && $get_siswa->rombongan_belajar->sekolah->logo_sekolah ? public_path('./storage' . config('erapor.storage') . '/images/' . $get_siswa->rombongan_belajar->sekolah->logo_sekolah) : public_path('./images/logo/tutwuri.png') }}"
             style="max-height: 200px" />
         <br>
         <br>

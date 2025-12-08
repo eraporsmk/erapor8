@@ -146,7 +146,7 @@ const onConfirmation = () => {
         <DialogCloseBtn @click="updateModelValue(false)" v-if="!uploading" />
         <VCard>
             <VCardItem class="pb-5">
-                <VCardTitle>{{ cardTitle }} - {{ isDialogPtk }}</VCardTitle>
+                <VCardTitle>{{ cardTitle }}</VCardTitle>
             </VCardItem>
             <VDivider />
             <VCardText>
@@ -157,7 +157,8 @@ const onConfirmation = () => {
                                 <label class="v-label text-body-2 text-high-emphasis">Unduh Template</label>
                             </VCol>
                             <VCol cols="12" md="9">
-                                <VBtn block color="warning" href="/excel/format_excel_instruktur.xlsx" target="_blank">
+                                <VBtn block color="warning" :href="`/excel/format_excel_${props.jenisGtk}.xlsx`"
+                                    target="_blank">
                                     Unduh Template</VBtn>
                             </VCol>
                         </VRow>

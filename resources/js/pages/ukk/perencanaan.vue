@@ -265,7 +265,7 @@ const saveData = async (val) => {
 const changeFormTingkat = async (val) => {
   if (val) {
     loadingRombel.value = true
-    const newForm = { data: 'rombel', mapping: 1 };
+    const newForm = { data: 'rombel', 'aksi': 'rencana-ukk', jenis_rombel: 1 };
     const mergedForm = { ...newForm, ...defaultForm, ...form.value };
     await $api('/referensi/get-data', {
       method: 'POST',

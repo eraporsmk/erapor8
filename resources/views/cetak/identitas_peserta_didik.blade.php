@@ -193,9 +193,10 @@
             <td style="width: 50%;padding:5px;">
                 @if (get_setting('ttd_kepsek', $get_siswa->sekolah_id, $get_siswa->semester_id))
                     <div>
-                        <img src="{{ get_setting('ttd_kepsek', $get_siswa->sekolah_id, $get_siswa->semester_id) . '?date=' . time() }}"
+                        <img src="{{ get_setting('ttd_kepsek', $get_siswa->sekolah_id, $get_siswa->semester_id) }}"
                             height="{{ get_setting('ttd_tinggi', $get_siswa->sekolah_id, $get_siswa->semester_id) . ' px' }}"
-                            width="{{ get_setting('ttd_lebar', $get_siswa->sekolah_id, $get_siswa->semester_id) . 'px' }}">
+                            width="{{ get_setting('ttd_lebar', $get_siswa->sekolah_id, $get_siswa->semester_id) . 'px' }}"
+                            style="margin-top:-25px; margin-left:-15px;">
                     </div>
                 @else
                     &nbsp;

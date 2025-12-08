@@ -111,8 +111,8 @@ class SettingController extends Controller
                 'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
                 'bg_login' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
                 'ttd_kepsek' => 'nullable|image|mimes:jpg,jpeg,png|max:1024',
-                'ttd_tinggi' => 'numeric',
-                'ttd_lebar' => 'numeric',
+                'ttd_tinggi' => 'nullable|numeric',
+                'ttd_lebar' => 'nullable|numeric',
             ],
             [
                 'semester_id.required' => 'Periode Aktif tidak boleh kosong.',
@@ -727,7 +727,7 @@ class SettingController extends Controller
         Artisan::call('backup:restore', $options);
     }
     public function hapus_file(){
-        if(Storage::disk('local')->delete($this->folder.'/'.request()->zip_file)){
+        if(Storage::disk('local')->delete(request()->zip_file)){
             $data = [
                 'color' => 'success',
                 'title' => 'Berhasil!',

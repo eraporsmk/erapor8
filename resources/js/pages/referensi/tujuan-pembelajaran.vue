@@ -194,7 +194,7 @@ const form = ref({
   rombongan_belajar_id: [],
   mata_pelajaran_id: null,
   cp_id: null,
-  kd_id: null,
+  kompetensi_dasar_id: null,
   template_excel: null,
   deskripsi: null,
   merdeka: false,
@@ -204,7 +204,7 @@ const errors = ref({
   rombongan_belajar_id: null,
   mata_pelajaran_id: null,
   cp_id: null,
-  kd_id: null,
+  kompetensi_dasar_id: null,
   template_excel: null,
   deskripsi: null,
 })
@@ -262,7 +262,7 @@ const postData = async () => {
   dataForm.append('semester_id', mergedForm.semester_id);
   dataForm.append('user_id', mergedForm.user_id);
   dataForm.append('cp_id', (mergedForm.cp_id) ? mergedForm.cp_id : '');
-  dataForm.append('kd_id', (mergedForm.kd_id) ? mergedForm.kd_id : '');
+  dataForm.append('kompetensi_dasar_id', (mergedForm.kompetensi_dasar_id) ? mergedForm.kompetensi_dasar_id : '');
   dataForm.append('deskripsi', (mergedForm.deskripsi) ? mergedForm.deskripsi : '');
   dataForm.append('mata_pelajaran_id', (mergedForm.mata_pelajaran_id) ? mergedForm.mata_pelajaran_id : '');
   dataForm.append('pembelajaran_id', pembelajaranId.value);
@@ -292,7 +292,7 @@ const postData = async () => {
           rombongan_belajar_id: [],
           mata_pelajaran_id: null,
           cp_id: null,
-          kd_id: null,
+          kompetensi_dasar_id: null,
           template_excel: null,
           deskripsi: null,
           merdeka: false,
@@ -302,7 +302,7 @@ const postData = async () => {
           rombongan_belajar_id: null,
           mata_pelajaran_id: null,
           cp_id: null,
-          kd_id: null,
+          kompetensi_dasar_id: null,
           template_excel: null,
           deskripsi: null,
         }
@@ -319,8 +319,9 @@ const saveData = async (val) => {
       tingkat: null,
       rombongan_belajar_id: [],
       mata_pelajaran_id: null,
+      pembelajaran_id: null,
       cp_id: null,
-      kd_id: null,
+      kompetensi_dasar_id: null,
       template_excel: null,
       deskripsi: null,
       merdeka: false,
@@ -329,8 +330,9 @@ const saveData = async (val) => {
       tingkat: null,
       rombongan_belajar_id: null,
       mata_pelajaran_id: null,
+      pembelajaran_id: null,
       cp_id: null,
-      kd_id: null,
+      kompetensi_dasar_id: null,
       template_excel: null,
       deskripsi: null,
     }
@@ -385,6 +387,7 @@ const changeFormMapel = async (val) => {
         dataCp.value = getData.cp
         dataKd.value = getData.kd
         pembelajaranId.value = getData.pembelajaran_id
+        form.value.mata_pelajaran_id = getData.mata_pelajaran_id
         if (getData.cp.length) {
           showCp.value = true
         }
@@ -403,7 +406,7 @@ const changeCp = () => {
 }
 const changeKd = () => {
   showUpload.value = true
-  linkTemplateTp.value = '/downloads/template-tp/' + form.value.kd_id + '/' + form.value.rombongan_belajar_id + '/' + pembelajaranId.value
+  linkTemplateTp.value = '/downloads/template-tp/' + form.value.kompetensi_dasar_id + '/' + form.value.rombongan_belajar_id + '/' + pembelajaranId.value
 }
 const getRombel = (tp_mapel) => {
   let rombel = tp_mapel.map(x => x.rombongan_belajar.nama);//.join(", ");
@@ -589,10 +592,10 @@ const getRombel = (tp_mapel) => {
                     <label class="v-label text-body-2 text-high-emphasis" for="mata_pelajaran_id">Mata Pelajaran</label>
                   </VCol>
                   <VCol cols="12" md="9">
-                    <AppSelect v-model="form.mata_pelajaran_id" placeholder="== Pilih Mata Pelajaran =="
+                    <AppSelect v-model="form.pembelajaran_id" placeholder="== Pilih Mata Pelajaran =="
                       :items="dataMapel" clearable clear-icon="tabler-x" @update:model-value="changeFormMapel"
-                      item-value="mata_pelajaran_id" item-title="nama_mata_pelajaran" :loading="loadingMapel"
-                      :disabled="loadingMapel" :error-messages="errors.mata_pelajaran_id" />
+                      item-value="pembelajaran_id" item-title="nama_mata_pelajaran" :loading="loadingMapel"
+                      :disabled="loadingMapel" :error-messages="errors.pembelajaran_id" />
                   </VCol>
                 </VRow>
               </VCol>
@@ -612,13 +615,14 @@ const getRombel = (tp_mapel) => {
               <VCol cols="12" v-if="showKd">
                 <VRow no-gutters>
                   <VCol cols="12" md="3" class="d-flex align-items-center">
-                    <label class="v-label text-body-2 text-high-emphasis" for="kd_id">Kompetensi Dasar (KD)</label>
+                    <label class="v-label text-body-2 text-high-emphasis" for="kompetensi_dasar_id">Kompetensi Dasar
+                      (KD)</label>
                   </VCol>
                   <VCol cols="12" md="9">
-                    <AppSelect v-model="form.kd_id" placeholder="== Pilih Capaian Pembelajaran (CP) ==" :items="dataKd"
-                      clearable clear-icon="tabler-x" @update:model-value="changeKd" item-value="kd_id"
-                      item-title="kompetensi_dasar" :loading="loadingKd" :disabled="loadingKd"
-                      :error-messages="errors.kd_id" />
+                    <AppSelect v-model="form.kompetensi_dasar_id" placeholder="== Pilih Kompetensi Dasar (KD) =="
+                      :items="dataKd" clearable clear-icon="tabler-x" @update:model-value="changeKd"
+                      item-value="kompetensi_dasar_id" item-title="kompetensi_dasar" :loading="loadingKd"
+                      :disabled="loadingKd" :error-messages="errors.kompetensi_dasar_id" />
                   </VCol>
                 </VRow>
               </VCol>
