@@ -17,7 +17,7 @@
             <td>{{ $get_siswa->rombongan_belajar->nama }}</td>
         </tr>
         <tr>
-            <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Pelajaran</td>
+            <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Ajaran</td>
             <td class="text-center">:</td>
             <td>
                 {{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id }}/{{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id + 1 }}
@@ -154,15 +154,15 @@
                 <table class="table table-bordered">
                     <tr>
                         <td>Sakit</td>
-                        <td> : {{ $get_siswa->kehadiran ? $get_siswa->kehadiran->sakit ?? 0 : 0 }} hari</td>
+                        <td> : {{ $get_siswa->kehadiran ? ($get_siswa->kehadiran->sakit??0 == 0 ? '-' : $get_siswa->kehadiran->sakit) : '-' }} hari</td>
                     </tr>
                     <tr>
                         <td>Izin</td>
-                        <td> : {{ $get_siswa->kehadiran ? $get_siswa->kehadiran->izin ?? 0 : 0 }} hari</td>
+                        <td> : {{ $get_siswa->kehadiran ? ($get_siswa->kehadiran->izin??0 == 0 ? '-' : $get_siswa->kehadiran->izin) : '-' }} hari</td>
                     </tr>
                     <tr>
                         <td>Tanpa Keterangan</td>
-                        <td> : {{ $get_siswa->kehadiran ? $get_siswa->kehadiran->alpa ?? 0 : 0 }} hari</td>
+                        <td> : {{ $get_siswa->kehadiran ? ($get_siswa->kehadiran->alpa??0 == 0 ? '-' : $get_siswa->kehadiran->alpa) : '-' }} hari</td>
                     </tr>
                 </table>
             </td>
@@ -285,7 +285,7 @@
                     <img src="{{ get_setting('ttd_kepsek', $get_siswa->sekolah_id, $get_siswa->semester_id) }}"
                         height="{{ get_setting('ttd_tinggi', $get_siswa->sekolah_id, $get_siswa->semester_id) . ' px' }}"
                         width="{{ get_setting('ttd_lebar', $get_siswa->sekolah_id, $get_siswa->semester_id) . 'px' }}"
-                        style="margin-top:-25px; margin-left:-15px;">
+                        style="margin-left:-15px;">
                 @else
                     <br>
                     <br>

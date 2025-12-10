@@ -17,7 +17,7 @@
             <tr>
                 <td style="padding:0px;">Sekolah</td>
                 <td>: {{ $get_siswa->rombongan_belajar->sekolah->nama }}</td>
-                <td style="padding:0px;">Tahun Pelajaran</td>
+                <td style="padding:0px;">Tahun Ajaran</td>
                 <td>:
                     {{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id }}/{{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id + 1 }}
                     {{-- str_replace('/','-',substr($get_siswa->rombongan_belajar->semester->nama,0,9)) --}}
@@ -55,7 +55,7 @@
             <tr>
                 <td style="padding:0px;">Alamat</td>
                 <td>: {{ $get_siswa->rombongan_belajar->sekolah->alamat }}</td>
-                <td style="padding:0px;">Tahun Pelajaran</td>
+                <td style="padding:0px;">Tahun Ajaran</td>
                 <td>:
                     {{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id }}/{{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id + 1 }}
                     {{-- str_replace('/','-',substr($get_siswa->rombongan_belajar->semester->nama,0,9)) --}}

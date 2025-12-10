@@ -87,7 +87,7 @@ ol.kosong{margin-left:0px;}
 				<p>Masuk di Sekolah ini:</p><br />
 				<p>a. Tanggal</p><br />
 				<p>b. Di Kelas</p><br />
-				<p>Tahun Pelajaran</p><br />
+				<p>Tahun Ajaran</p><br />
 			</td>
 			<td>
 				<p>______________________________________</p><br />

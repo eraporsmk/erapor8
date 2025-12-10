@@ -76,15 +76,15 @@
     </tr>
     <tr>
       <td>Sakit </td>
-      <td>: {{ ($pd->absensi_pkl) ? $pd->absensi_pkl->sakit??0 : 0 }} hari</td>
+      <td>: {{ ($pd->absensi_pkl) ? ($pd->absensi_pkl->sakit == 0 ? '-' : $pd->absensi_pkl->sakit) : '-' }} hari</td>
     </tr>
     <tr>
       <td>Ijin </td>
-      <td>: {{ ($pd->absensi_pkl) ? $pd->absensi_pkl->izin??0 : 0 }} hari</td>
+      <td>: {{ ($pd->absensi_pkl) ? ($pd->absensi_pkl->izin == 0 ? '-' : $pd->absensi_pkl->izin) : '-' }} hari</td>
     </tr>
     <tr>
       <td>Tanpa Keterangan </td>
-      <td>: {{ ($pd->absensi_pkl) ? $pd->absensi_pkl->alpa??0 : 0 }} hari</td>
+      <td>: {{ ($pd->absensi_pkl) ? ($pd->absensi_pkl->alpa == 0 ? '-' : $pd->absensi_pkl->alpa) : '-' }} hari</td>
     </tr>
   </table>
   <table width="100%">
@@ -103,7 +103,7 @@
     </p>
     </td>
       <td style="width:20%"></td>
-      <td style="width:40%"><p>{{str_replace('Kab. ','',$pd->sekolah->kabupaten)}}, {{$pd->pd_pkl->praktik_kerja_lapangan->tanggal_selesai_str}}<br>Pembimbing Dunia Kerja</p><br>
+      <td style="width:40%"><p>{{str_replace('Kab. ','',$pd->sekolah->kabupaten)}}, 19 Desember 2025 <!-- {{$pd->pd_pkl->praktik_kerja_lapangan->tanggal_selesai_str}} --><br>Pembimbing Dunia Kerja</p><br>
     <br>
     <br>
     <br>

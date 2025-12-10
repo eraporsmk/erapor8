@@ -17,7 +17,7 @@
 		<td>{{$get_siswa->rombongan_belajar->nama}}</td>
 	</tr>
 	<tr>
-		<td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Pelajaran</td>
+		<td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Ajaran</td>
 		<td class="text-center">:</td>
 		<td>
 			{{$get_siswa->rombongan_belajar->semester->tahun_ajaran_id}}/{{$get_siswa->rombongan_belajar->semester->tahun_ajaran_id + 1}}
