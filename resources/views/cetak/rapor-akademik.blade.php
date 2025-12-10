@@ -17,7 +17,7 @@
             <tr>
                 <td style="padding:0px;">Sekolah</td>
                 <td>: {{ $pd->kelas->sekolah->nama }}</td>
-                <td style="padding:0px;">Tahun Pelajaran</td>
+                <td style="padding:0px;">Tahun Ajaran</td>
                 <td>:
                     {{ $pd->kelas->semester->tahun_ajaran_id }}/{{ $pd->kelas->semester->tahun_ajaran_id + 1 }}
                     {{-- str_replace('/','-',substr($pd->kelas->semester->nama,0,9)) --}}
@@ -55,7 +55,7 @@
             <tr>
                 <td style="padding:0px;">Alamat</td>
                 <td>: {{ $pd->kelas->sekolah->alamat }}</td>
-                <td style="padding:0px;">Tahun Pelajaran</td>
+                <td style="padding:0px;">Tahun Ajaran</td>
                 <td>:
                     {{ $pd->kelas->semester->tahun_ajaran_id }}/{{ $pd->kelas->semester->tahun_ajaran_id + 1 }}
                     {{-- str_replace('/','-',substr($pd->kelas->semester->nama,0,9)) --}}
