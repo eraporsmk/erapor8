@@ -1,5 +1,38 @@
 <div class="changelog">
     <legend>
+        <h3>Versi 8.0.2</h3>
+    </legend>
+    <ol>
+        <li><b class="text-success">[Pembaharuan]</b> Penambahan kelompok Mata Pelajaran Pilihan di Mapping Pembelajaran
+        </li>
+        <li><b class="text-success">[Pembaharuan]</b> Menampilkan kelompok Muatan Lokal di Mapping Pembelajaran</li>
+        <li><b class="text-success">[Pembaharuan]</b> Menghapus huruf A. B. di kelompok Mata Pelajaran</li>
+        <li><b class="text-success">[Pembaharuan]</b> Menambah form Minus Margin Atas dan Minus Margin Kiri Scan TTD
+            Kepala Sekolah di Pengaturan Umum</li>
+        <li><b class="text-error">[Perbaikan]</b> Menampilkan notifikasi Capaian Kompetensi kosong saat menambah Tujuan
+            Pembelajaran</li>
+    </ol>
+    <legend>
+        <h3>Versi 8.0.1</h3>
+    </legend>
+    <ol>
+        <li><b class="text-success">[Pembaharuan]</b> Fitur synchronizer</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan mapping TP multi mapel</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan input nilai ekstrakurikuler</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan hapus rencana penilaian PKL</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan kunci penilaian</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan edit TP Mapel</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan Filter Mapel ref TP</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan get rombel akses wakakur</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan google smtp app password</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan format tanggal lahir PD</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan horizontal menu</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan cetak rapor via login wakakur</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan cetak rapor akademik 24/25</li>
+        <li><b class="text-error">[Perbaikan]</b> Perbaikan menu cetak rapor &amp; legger wali kelas</li>
+        </li>
+    </ol>
+    <legend>
         <h3>Versi 8.0.0</h3>
     </legend>
     <ol>

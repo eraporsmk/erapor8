@@ -29,23 +29,23 @@ onMounted(async () => {
 });
 const linkTemplateTp = ref('')
 const form = ref({
-  tingkat: null,
-  rombongan_belajar_id: null,
-  pembelajaran_id: null,
-  mata_pelajaran_id: null,
-  bentuk_penilaian: null,
-  template_excel: null,
+  tingkat: undefined,
+  rombongan_belajar_id: undefined,
+  pembelajaran_id: undefined,
+  mata_pelajaran_id: undefined,
+  bentuk_penilaian: undefined,
+  template_excel: undefined,
 });
 const nilai = ref({
   akhir: {},
   kompeten: {},
 });
 const errors = ref({
-  tingkat: null,
-  rombongan_belajar_id: null,
-  pembelajaran_id: null,
-  bentuk_penilaian: null,
-  template_excel: null,
+  tingkat: undefined,
+  rombongan_belajar_id: undefined,
+  pembelajaran_id: undefined,
+  bentuk_penilaian: undefined,
+  template_excel: undefined,
 });
 const arrayData = ref({
   rombel: [],
@@ -79,6 +79,7 @@ const onSubmit = async () => {
     onResponse({ response }) {
       let getData = response._data;
       confirmed.value = false;
+      formReset();
       if (getData.errors) {
         errors.value = getData.errors;
       } else {
@@ -100,23 +101,23 @@ const resetForm = ref(false)
 const formReset = () => {
   resetForm.value = true
   form.value = {
-    tingkat: null,
-    rombongan_belajar_id: null,
-    pembelajaran_id: null,
-    mata_pelajaran_id: null,
-    bentuk_penilaian: null,
-    template_excel: null,
+    tingkat: undefined,
+    rombongan_belajar_id: undefined,
+    pembelajaran_id: undefined,
+    mata_pelajaran_id: undefined,
+    bentuk_penilaian: undefined,
+    template_excel: undefined,
   }
   nilai.value = {
     akhir: {},
     kompeten: {}
   }
   errors.value = {
-    tingkat: null,
-    rombongan_belajar_id: null,
-    pembelajaran_id: null,
-    bentuk_penilaian: null,
-    template_excel: null,
+    tingkat: undefined,
+    rombongan_belajar_id: undefined,
+    pembelajaran_id: undefined,
+    bentuk_penilaian: undefined,
+    template_excel: undefined,
   }
   arrayData.value = {
     rombel: [],
@@ -137,9 +138,9 @@ const formReset = () => {
   isNotifVisible.value = false;
   confirmationText.value = ""
   notif.value = {
-    color: "",
-    title: "",
-    text: "",
+    color: undefined,
+    title: undefined,
+    text: undefined,
   }
 };
 const isKunciWalas = ref(false)

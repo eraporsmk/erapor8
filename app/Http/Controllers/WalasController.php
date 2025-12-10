@@ -218,21 +218,23 @@ class WalasController extends Controller
         );
         $dudi = Dudi::find(request()->dudi_id);
         foreach(request()->lokasi_prakerin as $anggota_rombel_id => $lokasi_prakerin){
-            $insert++;
-            Prakerin::UpdateOrCreate(
-                [
-                    'anggota_rombel_id' => $anggota_rombel_id,
-                    'sekolah_id' => request()->sekolah_id,
-                    'mitra_prakerin' => $dudi->nama,
-                ],
-                [
-                    'lokasi_prakerin' => $lokasi_prakerin,
-                    'lama_prakerin' => request()->lama_prakerin[$anggota_rombel_id],
-                    'skala' => request()->skala[$anggota_rombel_id],
-                    'keterangan_prakerin' => request()->keterangan_prakerin[$anggota_rombel_id],
-                    'last_sync'	=> now(),
-                ]
-            );
+            if(isset(request()->lama_prakerin[$anggota_rombel_id]) && isset(request()->lama_prakerin[$anggota_rombel_id]) && isset(request()->keterangan_prakerin[$anggota_rombel_id])){
+                $insert++;
+                Prakerin::UpdateOrCreate(
+                    [
+                        'anggota_rombel_id' => $anggota_rombel_id,
+                        'sekolah_id' => request()->sekolah_id,
+                        'mitra_prakerin' => $dudi->nama,
+                    ],
+                    [
+                        'lokasi_prakerin' => $lokasi_prakerin,
+                        'lama_prakerin' => request()->lama_prakerin[$anggota_rombel_id],
+                        'skala' => request()->skala[$anggota_rombel_id],
+                        'keterangan_prakerin' => request()->keterangan_prakerin[$anggota_rombel_id],
+                        'last_sync'	=> now(),
+                    ]
+                );
+            }
         }
         if($insert){
             $data = [

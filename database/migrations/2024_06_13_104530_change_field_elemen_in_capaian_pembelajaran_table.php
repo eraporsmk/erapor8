@@ -17,8 +17,8 @@ return new class extends Migration
             $table->dropColumn(['elemen', 'deskripsi']);
         });
         Schema::table('ref.capaian_pembelajaran', function (Blueprint $table) {
-            $table->longText('elemen');
-            $table->longText('deskripsi');
+            $table->longText('elemen')->nullable();
+            $table->longText('deskripsi')->nullable();
         });
     }
 

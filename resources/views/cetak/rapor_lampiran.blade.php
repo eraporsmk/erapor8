@@ -4,41 +4,41 @@
         <tr>
             <td style="width: 25%;padding-top:5px; padding-bottom:5px; padding-left:0px;">Nama Peserta Didik</td>
             <td style="width: 1%;" class="text-center">:</td>
-            <td style="width: 74%">{{ strtoupper($get_siswa->peserta_didik->nama) }}</td>
+            <td style="width: 74%">{{ strtoupper($pd->nama) }}</td>
         </tr>
         <tr>
             <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Nomor Induk/NISN</td>
             <td class="text-center">:</td>
-            <td>{{ $get_siswa->peserta_didik->no_induk . ' / ' . $get_siswa->peserta_didik->nisn }}</td>
+            <td>{{ $pd->no_induk . ' / ' . $pd->nisn }}</td>
         </tr>
         <tr>
             <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Kelas</td>
             <td class="text-center">:</td>
-            <td>{{ $get_siswa->rombongan_belajar->nama }}</td>
+            <td>{{ $pd->kelas->nama }}</td>
         </tr>
         <tr>
             <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Ajaran</td>
             <td class="text-center">:</td>
             <td>
-                {{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id }}/{{ $get_siswa->rombongan_belajar->semester->tahun_ajaran_id + 1 }}
-                {{-- str_replace('/','-',substr($get_siswa->rombongan_belajar->semester->nama,0,9)) --}}
+                {{ $pd->kelas->semester->tahun_ajaran_id }}/{{ $pd->kelas->semester->tahun_ajaran_id + 1 }}
+                {{-- str_replace('/','-',substr($pd->kelas->semester->nama,0,9)) --}}
             </td>
         </tr>
         <tr>
             <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Semester</td>
             <td class="text-center">:</td>
-            <td>{{ substr($get_siswa->rombongan_belajar->semester->nama, 10) }}</td>
+            <td>{{ substr($pd->kelas->semester->nama, 10) }}</td>
         </tr>
     </table>
     <br />
     <?php
-    if ($get_siswa->rombongan_belajar->tingkat == 10) {
-        if (merdeka($get_siswa->rombongan_belajar->kurikulum->nama_kurikulum)) {
+    if ($pd->kelas->tingkat == 10) {
+        if (merdeka($pd->kelas->kurikulum->nama_kurikulum)) {
             $huruf_ekskul = 'B';
             $huruf_absen = 'C';
             $huruf_kenaikan = 'D';
         } else {
-            if ($get_siswa->all_prakerin->count()) {
+            if ($pd->prakerin->count()) {
                 $huruf_ekskul = 'D';
                 $huruf_absen = 'E';
                 $huruf_kenaikan = 'F';
@@ -49,13 +49,13 @@
             }
         }
     } else {
-        if (merdeka($get_siswa->rombongan_belajar->kurikulum->nama_kurikulum)) {
-            if ($get_siswa->all_prakerin->count()) {
+        if (merdeka($pd->kelas->kurikulum->nama_kurikulum)) {
+            if ($pd->prakerin->count()) {
                 $huruf_ekskul = 'D';
                 $huruf_absen = 'E';
                 $huruf_kenaikan = 'F';
             } else {
-                if ($get_siswa->peserta_didik->pd_pkl) {
+                if ($pd->pd_pkl) {
                     $huruf_ekskul = 'B';
                     $huruf_absen = 'C';
                     $huruf_kenaikan = 'D';
@@ -66,7 +66,7 @@
                 }
             }
         } else {
-            if ($get_siswa->all_prakerin->count()) {
+            if ($pd->prakerin->count()) {
                 $huruf_ekskul = 'D';
                 $huruf_absen = 'E';
                 $huruf_kenaikan = 'F';
@@ -78,7 +78,7 @@
         }
     }
     ?>
-    @if ($get_siswa->rombongan_belajar->tingkat != 10 && $get_siswa->all_prakerin->count())
+    @if ($pd->kelas->tingkat != 10 && $pd->prakerin->count())
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -90,8 +90,8 @@
                 </tr>
             </thead>
             <tbody>
-                @if ($get_siswa->all_prakerin->count())
-                    @foreach ($get_siswa->all_prakerin as $prakerin)
+                @if ($pd->prakerin->count())
+                    @foreach ($pd->prakerin as $prakerin)
                         <tr>
                             <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
                             <td>{{ $prakerin->mitra_prakerin }}</td>
@@ -109,20 +109,22 @@
         </table>
         <br />
     @endif
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th class="text-center">Kokurikuler</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    {{ $get_siswa->kokurikuler?->uraian_deskripsi }}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    @if ($pd->kelas->semester->tahun_ajaran_id >= 2025)
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">Kokurikuler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {{ $pd->kokurikuler?->uraian_deskripsi }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    @endif
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -132,12 +134,12 @@
             </tr>
         </thead>
         <tbody>
-            @if ($get_siswa->anggota_ekskul->count())
-                @foreach ($get_siswa->anggota_ekskul as $nilai_ekskul)
+            @if ($pd->ekskul->count())
+                @foreach ($pd->ekskul as $ekskul)
                     <tr>
                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
-                        <td>{{ strtoupper($nilai_ekskul->rombongan_belajar->nama) }}</td>
-                        <td>{{ $nilai_ekskul->single_nilai_ekstrakurikuler->deskripsi_ekskul }}</td>
+                        <td>{{ strtoupper($ekskul->rombongan_belajar?->nama) }}</td>
+                        <td>{{ $ekskul->single_nilai_ekstrakurikuler?->deskripsi_ekskul }}</td>
                     </tr>
                 @endforeach
             @else
@@ -154,15 +156,15 @@
                 <table class="table table-bordered">
                     <tr>
                         <td>Sakit</td>
-                        <td> : {{ $get_siswa->kehadiran ? ($get_siswa->kehadiran->sakit??0 == 0 ? '-' : $get_siswa->kehadiran->sakit) : '-' }} hari</td>
+                        <td> : {{ $pd->kehadiran ? ($pd->kehadiran->sakit??0 == 0 ? '-' : $pd->kehadiran->sakit) : '-' }} hari</td>
                     </tr>
                     <tr>
                         <td>Izin</td>
-                        <td> : {{ $get_siswa->kehadiran ? ($get_siswa->kehadiran->izin??0 == 0 ? '-' : $get_siswa->kehadiran->izin) : '-' }} hari</td>
+                        <td> : {{ $pd->kehadiran ? ($pd->kehadiran->izin??0 == 0 ? '-' : $pd->kehadiran->izin) : '-' }} hari</td>
                     </tr>
                     <tr>
                         <td>Tanpa Keterangan</td>
-                        <td> : {{ $get_siswa->kehadiran ? ($get_siswa->kehadiran->alpa??0 == 0 ? '-' : $get_siswa->kehadiran->alpa) : '-' }} hari</td>
+                        <td> : {{ $pd->kehadiran ? ($pd->kehadiran->alpa??0 == 0 ? '-' : $pd->kehadiran->alpa) : '-' }} hari</td>
                     </tr>
                 </table>
             </td>
@@ -177,7 +179,7 @@
                     <tbody>
                         <tr>
                             <td>
-                                {{ $get_siswa->catatan_walas?->uraian_deskripsi }}
+                                {{ $pd->catatan_walas?->uraian_deskripsi }}
                             </td>
                         </tr>
                     </tbody>
@@ -187,7 +189,7 @@
     </table>
     <br />
     <?php
-    if ($get_siswa->rombongan_belajar->semester->semester == 2) {
+    if ($pd->kelas->semester->semester == 2) {
         if ($opsi == 'lulus') {
             $text_status = 'Status Kelulusan';
             $not_yet = 'Belum dilakukan kelulusan';
@@ -195,18 +197,6 @@
             $text_status = 'Kenaikan Kelas';
             $not_yet = 'Belum dilakukan kenaikan kelas';
         }
-        /*
-	if($get_siswa->rombongan_belajar->rombel_empat_tahun){
-		$text_status = 'Kenaikan Kelas';
-		$not_yet = 'Belum dilakukan kenaikan kelas';
-	} elseif($get_siswa->rombongan_belajar->tingkat >= 12 ){
-		$text_status = 'Status Kelulusan';
-		$not_yet = 'Belum dilakukan kelulusan';
-	} else {
-		$text_status = 'Kenaikan Kelas';
-		$not_yet = 'Belum dilakukan kenaikan kelas';
-	}
-	*/
     } else {
         $text_status = '';
         $not_yet = '';
@@ -243,7 +233,7 @@
                 <table width="auto">
                     <tr>
                         <td style="text-align: left;">
-                            <p>{{ str_replace('Kab. ', '', $get_siswa->peserta_didik->sekolah->kabupaten) }},
+                            <p>{{ str_replace('Kab. ', '', $pd->sekolah->kabupaten) }},
                                 {{ $tanggal_rapor }}<br>Wali Kelas</p><br>
                             <br>
                             <br>
@@ -251,8 +241,13 @@
                             <br>
                             <br>
                             <p>
+<<<<<<< HEAD
                                 <strong><u>{{ $get_siswa->rombongan_belajar->wali_kelas->nama_lengkap }}</u></strong><br />
                                 NIP. {{ $get_siswa->rombongan_belajar->wali_kelas->nip ?? '-' }}
+=======
+                                <strong><u>{{ $pd->kelas->wali_kelas->nama_lengkap }}</u></strong><br />
+                                NIP. {{ $pd->kelas->wali_kelas->nip }}
+>>>>>>> origin/main
                             </p>
                         </td>
                     </tr>
@@ -261,7 +256,7 @@
         </tr>
     </table>
     <?php
-    $ks = get_setting('jabatan', $get_siswa->sekolah_id, $get_siswa->semester_id);
+    $ks = get_setting('jabatan', $pd->sekolah_id, $pd->semester_id);
     $jabatan = str_replace('Plh. ', '', $ks);
     $jabatan = str_replace('Plt. ', '', $jabatan);
     $extend = str_replace('Kepala Sekolah', '', $ks);
@@ -294,10 +289,10 @@
                 <br>
                 <p class="nama_ttd">
                     <strong><u>
-                            @if ($get_siswa->peserta_didik->sekolah->kasek)
-                                {{ $get_siswa->peserta_didik->sekolah->kasek->nama_lengkap }}
-                            @elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
-                                {{ $get_siswa->peserta_didik->sekolah->kepala_sekolah?->nama_lengkap }}
+                            @if ($pd->sekolah->kasek)
+                                {{ $pd->sekolah->kasek->nama_lengkap }}
+                            @elseif($pd->sekolah->kepala_sekolah)
+                                {{ $pd->sekolah->kepala_sekolah?->nama_lengkap }}
                             @endif
                         </u></strong>
                 </p>
@@ -315,7 +310,16 @@
         <tr>
             <td style="width:40%;"></td>
             <td style="width:60%;" class="nip">
+<<<<<<< HEAD
                 
+=======
+                NIP.
+                @if ($pd->sekolah->kasek)
+                    {{ $pd->sekolah->kasek->nip }}
+                @elseif($pd->sekolah->kepala_sekolah)
+                    {{ $pd->sekolah->kepala_sekolah?->nip }}
+                @endif
+>>>>>>> origin/main
             </td>
         </tr>
     </table>

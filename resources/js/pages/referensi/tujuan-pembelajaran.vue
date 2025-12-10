@@ -283,6 +283,8 @@ const postData = async () => {
       } else {
         pembelajaranId.value = null
         showUpload.value = false
+        showCp.value = false
+        showKd.value = false
         isDialogVisible.value = false
         isNotifVisible.value = true
         notif.value = getData
@@ -339,6 +341,18 @@ const saveData = async (val) => {
   }
 }
 const changeFormTingkat = async (val) => {
+  showUpload.value = false
+  dataRombel.value = []
+  form.value.rombongan_belajar_id = undefined
+  showCp.value = false
+  showKd.value = false
+  dataCp.value = []
+  dataKd.value = []
+  form.value.cp_id = undefined
+  form.value.kompetensi_dasar_id = undefined
+  form.value.mata_pelajaran_id = undefined
+  form.value.pembelajaran_id = undefined
+  dataMapel.value = []
   if (val) {
     loadingRombel.value = true
     const newForm = { data: 'rombel', mapping: 1 };
@@ -355,6 +369,16 @@ const changeFormTingkat = async (val) => {
   }
 }
 const changeFormRombel = async (val) => {
+  showUpload.value = false
+  showCp.value = false
+  showKd.value = false
+  dataCp.value = []
+  dataKd.value = []
+  form.value.cp_id = undefined
+  form.value.kompetensi_dasar_id = undefined
+  form.value.mata_pelajaran_id = undefined
+  form.value.pembelajaran_id = undefined
+  dataMapel.value = []
   if (val) {
     loadingMapel.value = true
     const newForm = { data: 'mapel' };
@@ -372,8 +396,13 @@ const changeFormRombel = async (val) => {
   }
 }
 const changeFormMapel = async (val) => {
+  showUpload.value = false
   showCp.value = false
   showKd.value = false
+  dataCp.value = []
+  dataKd.value = []
+  form.value.cp_id = undefined
+  form.value.kompetensi_dasar_id = undefined
   if (val) {
     loadingCp.value = true
     loadingKd.value = true
@@ -388,10 +417,9 @@ const changeFormMapel = async (val) => {
         dataKd.value = getData.kd
         pembelajaranId.value = getData.pembelajaran_id
         form.value.mata_pelajaran_id = getData.mata_pelajaran_id
-        if (getData.cp.length) {
+        if(form.value.merdeka){
           showCp.value = true
-        }
-        if (getData.kd.length) {
+        } else {
           showKd.value = true
         }
         loadingKd.value = false
@@ -599,7 +627,7 @@ const getRombel = (tp_mapel) => {
                   </VCol>
                 </VRow>
               </VCol>
-              <VCol cols="12" v-if="showCp">
+              <VCol cols="12" v-if="showCp && dataCp.length">
                 <VRow no-gutters>
                   <VCol cols="12" md="3" class="d-flex align-items-center">
                     <label class="v-label text-body-2 text-high-emphasis" for="cp_id">Capaian Pembelajaran (CP)</label>
@@ -612,7 +640,7 @@ const getRombel = (tp_mapel) => {
                   </VCol>
                 </VRow>
               </VCol>
-              <VCol cols="12" v-if="showKd">
+              <VCol cols="12" v-if="showKd && dataKd.length">
                 <VRow no-gutters>
                   <VCol cols="12" md="3" class="d-flex align-items-center">
                     <label class="v-label text-body-2 text-high-emphasis" for="kompetensi_dasar_id">Kompetensi Dasar
@@ -666,6 +694,22 @@ const getRombel = (tp_mapel) => {
               </VCol>
             </template>
           </template>
+          <VCol cols="12" v-if="showCp && !dataCp.length">
+            <VAlert type="error" title="Capaian Pembelajaran belum tersedia!" variant="tonal" class="mb-6">
+              <template #text>
+                Silahkan tambah Referensi Capaian Pembelajaran terlebih dahulu <RouterLink
+                  :to="{ name: 'referensi-capaian-pembelajaran' }">disini</RouterLink>
+              </template>
+            </VAlert>
+          </VCol>
+          <VCol cols="12" v-if="showKd && !dataKd.length">
+            <VAlert type="error" title="Kompetensi Dasar belum tersedia!" variant="tonal" class="mb-6">
+              <template #text>
+                Silahkan tambah Referensi Kompetensi Dasar terlebih dahulu <RouterLink
+                  :to="{ name: 'referensi-capaian-pembelajaran' }">disini</RouterLink>
+              </template>
+            </VAlert>
+          </VCol>
         </VRow>
       </template>
     </DefaultDialog>

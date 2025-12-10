@@ -138,7 +138,7 @@ class PdController extends Controller
         $pd->kerja_wali = request()->kerja_wali;
         $photo_user = NULL;
         if(request()->photo){
-            $photo = request()->photo->store('profile-photos');
+            $photo = request()->photo->store('profile-photos', 'public');
             $pd->photo = $photo_user = 'profile-photos/'.basename($photo);
         }
         if($pd->save()){

@@ -9,20 +9,22 @@ definePage({
 })
 const refVForm = ref();
 const form = ref({
-  semester_id: null,
-  tanggal_rapor: null,
-  tanggal_rapor_kelas_akhir: null,
-  zona: null,
-  kepala_sekolah: null,
-  jabatan: null,
+  semester_id: undefined,
+  tanggal_rapor: undefined,
+  tanggal_rapor_kelas_akhir: undefined,
+  zona: undefined,
+  kepala_sekolah: undefined,
+  jabatan: undefined,
   rombel_4_tahun: [],
-  url_dapodik: null,
-  token_dapodik: null,
-  photo: null,
-  bg_login: null,
-  ttd_kepsek: null,
-  ttd_tinggi: null,
-  ttd_lebar: null,
+  url_dapodik: undefined,
+  token_dapodik: undefined,
+  photo: undefined,
+  bg_login: undefined,
+  ttd_kepsek: undefined,
+  ttd_tinggi: undefined,
+  ttd_lebar: undefined,
+  ttd_top: undefined,
+  ttd_left: undefined,
 })
 onMounted(async () => {
   await fetchData();
@@ -64,6 +66,8 @@ const fetchData = async () => {
     form.value.token_dapodik = getData.token_dapodik
     form.value.ttd_tinggi = getData.ttd_tinggi
     form.value.ttd_lebar = getData.ttd_lebar
+    form.value.ttd_top = getData.ttd_top
+    form.value.ttd_left = getData.ttd_left
     if (getData.logo_sekolah) {
       logo_sekolah.value = getData.logo_sekolah
     }
@@ -100,6 +104,8 @@ const errors = ref({
   ttd_kepsek: undefined,
   ttd_lebar: undefined,
   ttd_tinggi: undefined,
+  ttd_top: undefined,
+  ttd_left: undefined,
 })
 const submitForm = async () => {
   const dataForm = new FormData();
@@ -108,6 +114,8 @@ const submitForm = async () => {
   dataForm.append('ttd_kepsek', (form.value.ttd_kepsek) ? form.value.ttd_kepsek : '');
   dataForm.append('ttd_lebar', (form.value.ttd_lebar) ? form.value.ttd_lebar : '');
   dataForm.append('ttd_tinggi', (form.value.ttd_tinggi) ? form.value.ttd_tinggi : '');
+  dataForm.append('ttd_top', (form.value.ttd_top) ? form.value.ttd_top : '');
+  dataForm.append('ttd_left', (form.value.ttd_left) ? form.value.ttd_left : '');
   dataForm.append('semester_id', form.value.semester_id);
   dataForm.append('sekolah_id', $user.sekolah_id);
   dataForm.append('semester_aktif', $semester.semester_id);
@@ -172,44 +180,71 @@ const resetSetting = async (data) => {
           <VRow>
             <VCol cols="7">
               <VRow>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppSelect v-model="form.semester_id" :items="data_semester" :rules="[requiredValidator]"
                     placeholder="== Pilih Semester ==" label="Periode Aktif" name="semester_id" item-title="nama"
                     item-value="semester_id" require />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppDateTimePicker v-model="form.tanggal_rapor" label="Tanggal Rapor Semester"
                     placeholder="== Pilih Tanggal Rapor Semester ==" :config="dateConfig" />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppDateTimePicker v-model="form.tanggal_rapor_kelas_akhir" label="Tanggal Rapor Kelas Akhir"
                     placeholder="== Pilih Tanggal Rapor Kelas Akhir ==" :config="dateConfig" />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppSelect v-model="form.zona" :items="data_zona" :rules="[requiredValidator]"
-                    placeholder="== Pilih Zona Waktu ==" label="Zona Waktu" name="semester_id" require />
+                    placeholder="== Pilih Zona Waktu ==" label="Zona Waktu" name="zona" require />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppSelect v-model="form.kepala_sekolah" :items="data_guru" :rules="[requiredValidator]"
-                    placeholder="== Pilih Kepala Sekolah ==" label="Kepala Sekolah" name="semester_id"
+                    placeholder="== Pilih Kepala Sekolah ==" label="Kepala Sekolah" name="kepala_sekolah"
                     item-title="nama_lengkap" item-value="guru_id" require />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppSelect v-model="form.jabatan" :items="jabatan" :rules="[requiredValidator]"
                     placeholder="== Pilih Semester ==" label="Jabatan Kepala Sekolah" name="jabatan" require />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppSelect v-model="form.rombel_4_tahun" chips multiple closable-chips :items="data_rombel"
                     placeholder="== Pilih Rombel 4 Tahun ==" label="Rombel 4 Tahun" name="rombel_4_tahun"
                     item-title="nama" item-value="rombongan_belajar_id" require />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppTextField v-model="form.url_dapodik" label="URL Dapodik"
                     placeholder="Contoh: http://localhost:5774 (tanpa garis miring di akhir!)" />
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="12" md="6">
                   <AppTextField v-model="form.token_dapodik" label="Token Web Services Dapodik"
                     placeholder="Token Web Services Dapodik" />
+                </VCol>
+                <VCol cols="12" md="6">
+                  <label class="v-label text-body-2 text-high-emphasis" for="ttd_kepsek">Scan TTD Kepala Sekolah</label>
+                  <VFileInput id="ttd_kepsek" v-model="form.ttd_kepsek" :error-messages="errors.ttd_kepsek"
+                    accept="image/*" label="Unggah Scan TTD Kepala Sekolah" v-if="tddKepsek">
+                    <template v-slot:append>
+                      <VIcon icon="tabler-trash" color="error" size="26" @click="resetSetting('ttd_kepsek')" />
+                    </template>
+                  </VFileInput>
+                  <VFileInput id="ttd_kepsek" v-model="form.ttd_kepsek" :error-messages="errors.ttd_kepsek"
+                    accept="image/*" label="Unggah Scan TTD Kepala Sekolah" v-else />
+                </VCol>
+                <VCol cols="12" md="6">
+                  <AppTextField v-model="form.ttd_tinggi" label="Ukuran Tinggi Scan TTD Kepala Sekolah"
+                    placeholder="Ukuran Tinggi Scan TTD Kepala Sekolah" :error-messages="errors.ttd_tinggi" />
+                </VCol>
+                <VCol cols="12" md="6">
+                  <AppTextField v-model="form.ttd_lebar" label="Ukuran Lebar Scan TTD Kepala Sekolah"
+                    placeholder="Ukuran Lebar Scan TTD Kepala Sekolah" :error-messages="errors.ttd_lebar" />
+                </VCol>
+                <VCol cols="12" md="6">
+                  <AppTextField v-model="form.ttd_top" label="Minus Margin Atas Scan TTD Kepala Sekolah"
+                    placeholder="Minus Margin Atas Scan TTD Kepala Sekolah" :error-messages="errors.ttd_top" />
+                </VCol>
+                <VCol cols="12" md="6">
+                  <AppTextField v-model="form.ttd_left" label="Minus Margin Kiri Scan TTD Kepala Sekolah"
+                    placeholder="Minus Margin Kiri Scan TTD Kepala Sekolah" :error-messages="errors.ttd_left" />
                 </VCol>
                 <VCol cols="12" class="d-flex gap-4">
                   <VBtn type="submit">
@@ -221,42 +256,23 @@ const resetSetting = async (data) => {
             <VCol cols="5">
               <VRow>
                 <VCol cols="12">
-                  <VImg alt="Logo Sekolah" :src="logo_sekolah" cover class="w-100 mx-auto mb-10" />
+                  <VImg alt="Logo Sekolah" :src="logo_sekolah" cover class="w-80 mx-auto mb-10" />
                   <VFileInput v-model="form.photo" :error-messages="errors.photo" accept="image/*"
                     label="Unggah Logo Sekolah" />
                 </VCol>
+                <VCol cols="12">
+                  <label class="v-label text-body-2 text-high-emphasis" for="bg_login">Kustom Background (Laman Login
+                    &amp; Register)</label>
+                  <VFileInput id="bg_login" v-model="form.bg_login" :error-messages="errors.bg_login" accept="image/*"
+                    label="Unggah Kustom Background" v-if="bgLogin">
+                    <template v-slot:append>
+                      <VIcon icon="tabler-trash" color="error" size="26" @click="resetSetting('bg_login')" />
+                    </template>
+                  </VFileInput>
+                  <VFileInput id="bg_login" v-model="form.bg_login" :error-messages="errors.bg_login" accept="image/*"
+                    label="Unggah Kustom Background" v-else />
+                </VCol>
               </VRow>
-              <VCol cols="12">
-                <label class="v-label text-body-2 text-high-emphasis" for="bg_login">Kustom Background (Laman Login
-                  &amp; Register)</label>
-                <VFileInput id="bg_login" v-model="form.bg_login" :error-messages="errors.bg_login" accept="image/*"
-                  label="Unggah Kustom Background" v-if="bgLogin">
-                  <template v-slot:append>
-                    <VIcon icon="tabler-trash" color="error" size="26" @click="resetSetting('bg_login')" />
-                  </template>
-                </VFileInput>
-                <VFileInput id="bg_login" v-model="form.bg_login" :error-messages="errors.bg_login" accept="image/*"
-                  label="Unggah Kustom Background" v-else />
-              </VCol>
-              <VCol cols="12">
-                <label class="v-label text-body-2 text-high-emphasis" for="ttd_kepsek">Scan TTD Kepala Sekolah</label>
-                <VFileInput id="ttd_kepsek" v-model="form.ttd_kepsek" :error-messages="errors.ttd_kepsek"
-                  accept="image/*" label="Unggah Scan TTD Kepala Sekolah" v-if="tddKepsek">
-                  <template v-slot:append>
-                    <VIcon icon="tabler-trash" color="error" size="26" @click="resetSetting('ttd_kepsek')" />
-                  </template>
-                </VFileInput>
-                <VFileInput id="ttd_kepsek" v-model="form.ttd_kepsek" :error-messages="errors.ttd_kepsek"
-                  accept="image/*" label="Unggah Scan TTD Kepala Sekolah" v-else />
-              </VCol>
-              <VCol cols="12">
-                <AppTextField v-model="form.ttd_tinggi" label="Ukuran Tinggi Scan TTD Kepala Sekolah"
-                  placeholder="Ukuran Tinggi Scan TTD Kepala Sekolah" :error-messages="errors.ttd_tinggi" />
-              </VCol>
-              <VCol cols="12">
-                <AppTextField v-model="form.ttd_lebar" label="Ukuran Lebar Scan TTD Kepala Sekolah"
-                  placeholder="Ukuran Lebar Scan TTD Kepala Sekolah" :error-messages="errors.ttd_lebar" />
-              </VCol>
             </VCol>
           </VRow>
         </VForm>

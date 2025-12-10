@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class PesertaDidik extends Model
 {
@@ -184,5 +186,54 @@ class PesertaDidik extends Model
     public function all_pd_pkl()
 	{
 		return $this->hasMany(PdPkl::class, 'peserta_didik_id', 'peserta_didik_id');
+	}
+    public function prakerin(){
+		return $this->HasManyThrough(
+            //Prakerin::class, 'anggota_rombel_id', 'anggota_rombel_id'
+            Prakerin::class,
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'anggota_rombel_id',
+            'peserta_didik_id',
+            'anggota_rombel_id'
+        );
+	}
+    public function ekskul(){
+        return $this->HasMany(AnggotaRombel::class, 'peserta_didik_id', 'peserta_didik_id')->whereHas('rombongan_belajar', function($query){
+			$query->where('jenis_rombel', 51);
+		});
+	}
+    public function kehadiran(): HasOneThrough
+    {
+		return $this->hasOneThrough(
+            Absensi::class, 
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'anggota_rombel_id', 
+            'peserta_didik_id',
+            'anggota_rombel_id'
+        );
+	}
+    public function kokurikuler(): HasOneThrough
+    {
+		return $this->hasOneThrough(
+            CatatanWali::class, 
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'anggota_rombel_id', 
+            'peserta_didik_id',
+            'anggota_rombel_id'
+        )->where('type', 'kokurikuler');
+	}
+    public function catatan_walas(): HasOneThrough
+    {
+		return $this->hasOneThrough(
+            CatatanWali::class, 
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'anggota_rombel_id', 
+            'peserta_didik_id',
+            'anggota_rombel_id'
+        )->where('type', 'catatan_walas');
 	}
 }

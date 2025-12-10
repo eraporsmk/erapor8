@@ -395,7 +395,7 @@ class ReferensiController extends Controller
                 } else {
                     $data = [
                         'rombel' => $rombel,
-                        'mapel' => Pembelajaran::where($this->cariPembelajaran())->orderBy('nama_mata_pelajaran')->get(),
+                        'mapel' => Pembelajaran::where($this->cariPembelajaran())->orderBy('kelompok_id')->orderBy('no_urut')->orderBy('nama_mata_pelajaran')->get(),
                         'merdeka' => $merdeka,
                     ];
                 }

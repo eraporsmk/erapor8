@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('sekolah', function (Blueprint $table) {
-            $table->unsignedSmallInteger('bentuk_pendidikan_id')->nullable();
+            if (!Schema::hasColumn('sekolah', 'bentuk_pendidikan_id')) {
+                $table->unsignedSmallInteger('bentuk_pendidikan_id')->nullable();
+            }
         });
     }
 
@@ -26,7 +28,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('sekolah', function (Blueprint $table) {
-            $table->dropColumn('bentuk_pendidikan_id');
+            if (Schema::hasColumn('sekolah', 'bentuk_pendidikan_id')) {
+                $table->dropColumn('bentuk_pendidikan_id');
+            }
         });
     }
 };

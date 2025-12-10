@@ -11,6 +11,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Team;
 use App\Models\Permission;
+use App\Models\Kelompok;
 use File;
 
 class Update extends Command
@@ -133,6 +134,17 @@ class Update extends Command
         } catch (\Throwable $th) {
             $this->call('storage:link');
         }
+        Kelompok::updateOrCreate(
+            [
+                'kelompok_id' => 18,
+            ],
+            [
+                'nama_kelompok' => 'Mata Pelajaran Pilihan',
+                'kurikulum' => 2022,
+                'kkm' => NULL,
+                'last_sync' => now(),
+            ]
+        );
         $this->info('Berhasil memperbaharui aplikasi e-Rapor SMK ke versi '.$version);
     }
 }

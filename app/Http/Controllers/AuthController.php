@@ -389,7 +389,7 @@ class AuthController extends Controller
                 $user->password = bcrypt(request()->password);
             }
             if(request()->photo){
-                $photo = request()->photo->store('profile-photos');
+                $photo = request()->photo->store('profile-photos', 'public');
                 $user->profile_photo_path = 'profile-photos/'.basename($photo);
                 $ptk = Ptk::find($user->guru_id);
                 if($ptk){

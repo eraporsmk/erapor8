@@ -63,7 +63,7 @@ class RombelController extends Controller
         }
         $data = Pembelajaran::with(['guru', 'pengajar'])->where(function($query){
             $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
-        })->orderBy('mata_pelajaran_id')->get();
+        })->orderBy('kelompok_id')->orderBy('no_urut')->orderBy('mata_pelajaran_id')->get();
         return response()->json([
             'data' => $data,
             'guru' => Ptk::where(function($query){
@@ -75,9 +75,9 @@ class RombelController extends Controller
             })->orderBy('nama')->get(),
             'kelompok' => Kelompok::where(function($query) use ($kurikulum){
                 $query->where('kurikulum', $kurikulum);
-                if($kurikulum != 2022){
+                //if($kurikulum != 2022){
                     $query->orWhere('kurikulum', 0);
-                }
+                //}
             })->orderBy('kelompok_id')->get(),
             'rombel' => $rombel,
         ]);
