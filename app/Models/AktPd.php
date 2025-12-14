@@ -37,4 +37,14 @@ class AktPd extends Model
 	{
 		return $this->hasMany(PraktikKerjaLapangan::class, 'akt_pd_id', 'akt_pd_id');
 	}
+	public function pembimbing(){
+		return $this->hasManyThrough(
+            Ptk::class,
+            BimbingPd::class,
+            'akt_pd_id', // Foreign key on users table...
+            'guru_id', // Foreign key on history table...
+            'akt_pd_id', // Local key on suppliers table...
+            'guru_id' // Local key on users table...
+        );
+	}
 }

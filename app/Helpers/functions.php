@@ -276,6 +276,11 @@ function clean($string){
     $string = preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     return preg_replace('/-+/', '-', $string); // Replaces multiple hyphens with single one.
 }
+function clearing($string){
+    $string = str_replace(' ', '', $string); // Replaces all spaces with hyphens.
+    $string = preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+    return preg_replace('/-+/', '', $string); // Replaces multiple hyphens with single one.
+}
 function filter_agama_siswa($pembelajaran_id, $rombongan_belajar_id){
     $ref_agama = Agama::all();
 	$agama_id = [];

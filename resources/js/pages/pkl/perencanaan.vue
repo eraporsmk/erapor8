@@ -358,6 +358,9 @@ const confirmClose = async () => {
     formReset()
   });
 }
+const getPembimbing = (pembimbing) => {
+  return pembimbing.map(p => p.nama_lengkap).join('<br>')
+}
 </script>
 <template>
   <VCard class="mb-6">
@@ -492,7 +495,16 @@ const confirmClose = async () => {
               <AppAutocomplete v-model="form.akt_pd_id" placeholder="== Pilih Perjanjian Kerja Sama (PKS) == "
                 :items="arrayData.akt_pd" clearable clear-icon="tabler-x" @update:model-value="changeAktPd"
                 item-value="akt_pd_id" item-title="judul_akt_pd" :loading="loading.akt_pd"
-                :disabled="loading.akt_pd || form.aksi == 'detil'" :error-messages="errors.akt_pd_id" />
+                :disabled="loading.akt_pd || form.aksi == 'detil'" :error-messages="errors.akt_pd_id">
+                <template #item="{ props: listItemProp, item }">
+                  <VListItem v-bind="listItemProp">
+                    <template #subtitle="{ subtitle }">
+                      Pembimbing:<br>
+                    </template>
+                    <span v-html="getPembimbing(item?.raw?.pembimbing)"></span>
+                  </VListItem>
+                </template>
+              </AppAutocomplete>
             </VCol>
           </VRow>
         </VCol>

@@ -36,7 +36,7 @@ const notif = ref({
 })
 const fetchData = async () => {
   try {
-    const response = await $api(props.cardUrl, {
+    await $api(props.cardUrl, {
       method: 'POST',
       body: {
         guru_id: $user.guru_id,

@@ -44,7 +44,7 @@ class PenilaianController extends Controller
                 if($get_mapel_agama){
                     $query->where('agama_id', $get_mapel_agama);
                 }
-            })->orderBy('nama')->get(),
+            })->orderByRaw('LOWER(nama) ASC')->get(),
             'data_tp' => $show_cp ? TujuanPembelajaran::where(function($query){
                 $query->whereHas('tp_mapel', function($query){
                     $query->where('tp_mapel.pembelajaran_id', request()->pembelajaran_id);
@@ -382,10 +382,14 @@ class PenilaianController extends Controller
                     $this->wherehas($query);
                 },
                 'tp_kompeten' => function($query){
-                    $this->wherehas($query);
+                    $query->whereHas('tp_mapel', function($query){
+                        $query->where('pembelajaran_id', request()->pembelajaran_id);
+                    });
                 },
                 'tp_inkompeten' => function($query){
-                    $this->wherehas($query);
+                    $query->whereHas('tp_mapel', function($query){
+                        $query->where('pembelajaran_id', request()->pembelajaran_id);
+                    });
                 },
                 'nilai_tp' => function($query){
                     $query->where('pembelajaran_id', request()->pembelajaran_id);
@@ -409,7 +413,7 @@ class PenilaianController extends Controller
             $query->withAvg(['nilai_tp' => function($query){
                 $query->where('pembelajaran_id', request()->pembelajaran_id);
             }], 'nilai');
-        })->orderBy('nama')->get();
+        })->orderByRaw('LOWER(nama) ASC')->get();
         $bobot_sumatif_materi = $pembelajaran->bobot_sumatif_materi;
         $bobot_sumatif_akhir = $pembelajaran->bobot_sumatif_akhir;
         $total_bobot = $bobot_sumatif_materi + $bobot_sumatif_akhir;
@@ -482,11 +486,15 @@ class PenilaianController extends Controller
                     $query->where('pembelajaran_id', request()->pembelajaran_id);
                 },
                 'tp_kompeten' => function($query){
-                    $this->wherehas($query);
+                    $query->whereHas('tp_mapel', function($query){
+                        $query->where('pembelajaran_id', request()->pembelajaran_id);
+                    });
                     $query->withWhereHas('tp');
                 },
                 'tp_inkompeten' => function($query){
-                    $this->wherehas($query);
+                    $query->whereHas('tp_mapel', function($query){
+                        $query->where('pembelajaran_id', request()->pembelajaran_id);
+                    });
                     $query->withWhereHas('tp');
                 },
             ]);
@@ -499,7 +507,7 @@ class PenilaianController extends Controller
                 if($get_mapel_agama){
                     $query->where('agama_id', $get_mapel_agama);
                 }
-            })->with(['anggota_rombel' => $callback])->orderBy('nama')->get();
+            })->with(['anggota_rombel' => $callback])->orderByRaw('LOWER(nama) ASC')->get();
         }
         $data = [
             'data_siswa' => $data_siswa,

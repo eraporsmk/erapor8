@@ -19,22 +19,27 @@ const notif = ref({
 })
 const fetchData = async () => {
   try {
-    const response = await useApi(createUrl('/dashboard', {
-      query: {
+    await $api('/dashboard', {
+      method: 'POST',
+      body: {
         periode_aktif: $semester.nama,
         sekolah_id: $user.sekolah_id,
         semester_id: $semester.semester_id,
       },
-    }))
-    let getData = response.data
-    status_penilaian.value = getData.value.app.status_penilaian
-    rekap.value = getData.value.rekap
-    sekolah.value = getData.value.sekolah
-    app.value = getData.value.app
-    helpdesk.value = getData.value.helpdesk
-    text_wa.value = getData.value.text_wa
+      onResponse({ request, response, options }) {
+        let getData = response._data
+        if(getData && getData.app){
+          status_penilaian.value = getData.app.status_penilaian
+          rekap.value = getData.rekap
+          sekolah.value = getData.sekolah
+          app.value = getData.app
+          helpdesk.value = getData.helpdesk
+          text_wa.value = getData.text_wa
+        }
+      },
+    })
   } catch (error) {
-    console.error(error);
+    console.error('fetchData', error);
   } finally {
     loadingBody.value = false;
   }

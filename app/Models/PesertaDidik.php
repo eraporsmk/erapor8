@@ -56,6 +56,16 @@ class PesertaDidik extends Model
 	{
 		return $this->hasOne(PdKeluar::class, 'peserta_didik_id', 'peserta_didik_id');
 	}
+    public function nilai_akhir(){
+		return $this->hasOneThrough(
+            NilaiAkhir::class,
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'anggota_rombel_id',
+            'peserta_didik_id',
+            'anggota_rombel_id'
+        );
+	}
 	public function nilai_akhir_kurmer(){
 		return $this->hasOneThrough(
             NilaiAkhir::class,

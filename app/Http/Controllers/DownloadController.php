@@ -56,7 +56,7 @@ class DownloadController extends Controller
 			$query->with(['nilai_tp' => function($query) use ($pembelajaran){
 				$query->where('pembelajaran_id', $pembelajaran->pembelajaran_id);
 			}]);
-		})->orderBy('nama')->get();
+		})->orderByRaw('LOWER(nama) ASC')->get();
 		$data_tp = TujuanPembelajaran::where(function($query) use ($pembelajaran){
 			$query->whereHas('tp_mapel', function($query) use ($pembelajaran){
 				$query->where('tp_mapel.pembelajaran_id', $pembelajaran->pembelajaran_id);
@@ -83,7 +83,7 @@ class DownloadController extends Controller
 			$query->with(['nilai_sumatif' => function($query) use ($pembelajaran){
 				$query->where('pembelajaran_id', $pembelajaran->pembelajaran_id);
 			}]);
-		})->orderBy('nama')->get();
+		})->orderByRaw('LOWER(nama) ASC')->get();
 		$file = clean('template-nilai-sumatif-akhir-semester-'.$pembelajaran->nama_mata_pelajaran.'-kelas-'.$pembelajaran->rombongan_belajar->nama);
 		$data = [
 			'pembelajaran' => $pembelajaran,
@@ -151,7 +151,7 @@ class DownloadController extends Controller
 						$this->wherehas($query, $merdeka);
 					}
 				]);
-			})->orderBy('nama')->get();
+			})->orderByRaw('LOWER(nama) ASC')->get();
 			$data_tp = TujuanPembelajaran::where(function($query){
 				$query->whereHas('tp_mapel', function($query){
 					$query->where('tp_mapel.pembelajaran_id', request()->route('pembelajaran_id'));

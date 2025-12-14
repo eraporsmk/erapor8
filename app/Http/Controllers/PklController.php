@@ -140,6 +140,9 @@ class PklController extends Controller
                 $query->where('guru_id', request()->guru_id);
                 $query->where('mata_pelajaran_id', 800001000);
                 $query->where('semester_id', request()->semester_id);
+                $query->orWhere('guru_pengajar_id', request()->guru_id);
+                $query->where('mata_pelajaran_id', 800001000);
+                $query->where('semester_id', request()->semester_id);
             });
         })->orderBy('nama')->get();
         return $data;
@@ -171,7 +174,10 @@ class PklController extends Controller
                     $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
                 });
             });
-        })->orderBy('judul_akt_pd')->get();
+            $query->whereHas('bimbing_pd', function($query){
+                $query->where('guru_id', request()->guru_id);
+            });
+        })->with(['pembimbing'])->orderBy('judul_akt_pd')->get();
         return $data;
     }
     private function get_tp(){
@@ -217,14 +223,14 @@ class PklController extends Controller
             }
         } elseif(request()->aksi == 'absen'){
             $text = 'Absensi PKL';
-            foreach(request()->sakit as $peserta_didik_id => $sakit){
+            foreach(request()->peserta_didik_id as $peserta_didik_id){
                 AbsensiPkl::updateOrCreate(
                     [
                         'peserta_didik_id' => $peserta_didik_id,
                         'pkl_id' => request()->pkl_id,
                     ],
                     [
-                        'sakit' => $sakit,
+                        'sakit' => request()->sakit[$peserta_didik_id],
                         'izin' => request()->izin[$peserta_didik_id],
                         'alpa' => request()->alpa[$peserta_didik_id],
                     ]
@@ -326,6 +332,18 @@ class PklController extends Controller
                 $insert++;
             }
             TpPkl::where('pkl_id', request()->pkl_id)->whereNotIn('tp_id', request()->tp_id)->delete();
+            $anggota_akt_pd = AnggotaAktPd::whereHas('anggota_rombel', function($query){
+                $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+            })->where('akt_pd_id', request()->akt_pd_id)->get();
+            $peserta_didik_id = [];
+            foreach($anggota_akt_pd as $anggota){
+                $peserta_didik_id[] = $anggota->peserta_didik_id;
+                PdPkl::updateOrCreate([
+                    'peserta_didik_id' => $anggota->peserta_didik_id,
+                    'pkl_id' => $pkl->pkl_id,
+                ]);
+            }
+            PdPkl::where('pkl_id', request()->pkl_id)->whereNotIn('peserta_didik_id', $peserta_didik_id)->delete();
         }
         if($insert){
             $data = [
@@ -362,7 +380,7 @@ class PklController extends Controller
                 'absensi_pkl' => function($query){
                     $query->where('pkl_id', request()->pkl_id);
                 }
-            ])->orderBy('nama')->get(),
+            ])->orderByRaw('LOWER(nama) ASC')->get(),
             'tp' => TujuanPembelajaran::withWhereHas('tp_pkl', function($query){
                 $query->where('pkl_id', request()->pkl_id);
             })->orderBy('deskripsi')->get(),
@@ -391,7 +409,7 @@ class PklController extends Controller
                 $query->where('jenis_rombel', 1);
                 $query->where('rombongan_belajar.semester_id', request()->semester_id);
             },
-        ])->orderBy('nama')->get();
+        ])->orderByRaw('LOWER(nama) ASC')->get();
         return $data;
     }
 }

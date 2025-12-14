@@ -54,7 +54,11 @@ class CetakController extends Controller
 			'kelas' => function($query){
 				$query->where('rombongan_belajar.semester_id', request()->route('semester_id'));
 				$query->where('jenis_rombel', 1);
-				$query->with(['sekolah', 'kurikulum', 'wali_kelas']);
+				$query->with(['sekolah' => function($query){
+					$query->with(['kepala_sekolah' => function($query){
+						$query->where('semester_id', semester_id());
+					}]);
+				}, 'kurikulum', 'wali_kelas']);
 			},
 			'prakerin' => function($query){
 				$query->where('semester_id', request()->route('semester_id'));
@@ -443,7 +447,11 @@ class CetakController extends Controller
 			'kelas' => function($query){
 				$query->where('rombongan_belajar.semester_id', request()->route('semester_id'));
 				$query->where('jenis_rombel', 1);
-				$query->with(['sekolah', 'kurikulum', 'wali_kelas']);
+				$query->with(['sekolah' => function($query){
+					$query->with(['kepala_sekolah' => function($query){
+						$query->where('semester_id', request()->route('semester_id'));
+					}]);
+				}, 'kurikulum', 'wali_kelas']);
 			},
 			'prakerin' => function($query){
 				$query->where('semester_id', request()->route('semester_id'));

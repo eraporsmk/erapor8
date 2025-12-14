@@ -111,10 +111,12 @@ const getData = async (postData) => {
   })
 }
 const changeDudi = async (val) => {
+  form.value.prakerin_id = {}
   form.value.lokasi_prakerin = {}
   form.value.skala = {}
   form.value.lama_prakerin = {}
   form.value.keterangan_prakerin = {}
+  arrayData.value.siswa = []
   if (val) {
     loading.value.table = true
     await getData({ data: 'anggota-pkl' })

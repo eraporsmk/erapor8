@@ -36,7 +36,7 @@ class LeggerNilaiKurmerExport implements FromView, ShouldAutoSize
             'anggota_pilihan' => function($query){
                 $query->where('semester_id', $this->semester_id);
             }
-        ])->orderBy('nama')->get();
+        ])->orderByRaw('LOWER(nama) ASC')->get();
 		$all_pembelajaran = Pembelajaran::with(['rombongan_belajar'])->where(function($query){
             $query->whereHas('rombongan_belajar', function($query){
                 $query->where('sekolah_id', $this->sekolah_id);

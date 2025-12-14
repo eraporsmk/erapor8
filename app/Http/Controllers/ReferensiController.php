@@ -116,7 +116,7 @@ class ReferensiController extends Controller
                 $query->where('jenis_rombel', 1);
                 $query->where('rombongan_belajar.semester_id', request()->semester_id);
             }
-        ])->get();
+        ])->orderByRaw('LOWER(nama) ASC')->get();
         return response()->json($data);
     }
     private function kondisiPembelajaranPenilaian(){
@@ -465,7 +465,7 @@ class ReferensiController extends Controller
         if(request()->data == 'siswa'){
             $siswa = PesertaDidik::withWhereHas('anggota_rombel', function($query){
                 $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
-            })->orderBy('nama')->get();
+            })->orderByRaw('LOWER(nama) ASC')->get();
             $merdeka = FALSE;
             $rombel = NULL;
             if(request()->aksi == 'cetak-rapor'){
@@ -556,7 +556,7 @@ class ReferensiController extends Controller
                         $query->where('rombongan_belajar.semester_id', request()->semester_id);
                         $query->where('jenis_rombel', 1);
                     },
-                ])->orderBy('nama')->get(),
+                ])->orderByRaw('LOWER(nama) ASC')->get(),
             ];
         }
         if(request()->data == 'penguji-ukk'){
@@ -610,7 +610,7 @@ class ReferensiController extends Controller
                             }
                         }
                     ]);
-                })->orderBy('nama')->get(),
+                })->orderByRaw('LOWER(nama) ASC')->get(),
             ];
         }
         if(request()->data == 'budaya-kerja'){
@@ -642,7 +642,7 @@ class ReferensiController extends Controller
                             $query->where('rencana_budaya_kerja_id', request()->rencana_budaya_kerja_id);
                         }
                     ]);
-                })->orderBy('nama')->get(),
+                })->orderByRaw('LOWER(nama) ASC')->get(),
             ];
         }
         return response()->json($data);

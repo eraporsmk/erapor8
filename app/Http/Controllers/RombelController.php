@@ -115,7 +115,7 @@ class RombelController extends Controller
         return response()->json([
             'data' => PesertaDidik::with(['agama'])->withWhereHas('anggota_rombel', function($query){
                 $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
-            })->orderBy('nama')->get(),
+            })->orderByRaw('LOWER(nama) ASC')->get(),
             'rombel' => RombonganBelajar::find(request()->rombongan_belajar_id),
         ]);
     }

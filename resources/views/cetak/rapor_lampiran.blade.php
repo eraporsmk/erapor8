@@ -251,7 +251,7 @@
         </tr>
     </table>
     <?php
-    $ks = get_setting('jabatan', $pd->sekolah_id, $pd->semester_id);
+    $ks = get_setting('jabatan', $pd->sekolah_id, $pd->kelas->semester_id);
     $jabatan = str_replace('Plh. ', '', $ks);
     $jabatan = str_replace('Plt. ', '', $jabatan);
     $extend = str_replace('Kepala Sekolah', '', $ks);
@@ -260,8 +260,7 @@
     <table width="100%" style="margin-top:10px;">
         <tr>
             <td style="width:40%;padding-right:0px;" class="text-right">
-                <p><br>{{ $extend }}</p>
-                <br>
+                <p>{{ $extend }}</p>
                 <br>
                 <br>
                 <br>
@@ -271,11 +270,11 @@
             <td style="width:60%;">
                 <p>Mengetahui,<br>{{ $jabatan }}</p>
                 <br>
-                @if (get_setting('ttd_kepsek', $pd->sekolah_id, $pd->semester_id))
-                    <img src="{{ get_setting('ttd_kepsek', $pd->sekolah_id, $pd->semester_id) }}"
-                        height="{{ get_setting('ttd_tinggi', $pd->sekolah_id, $pd->semester_id) . ' px' }}"
-                        width="{{ get_setting('ttd_lebar', $pd->sekolah_id, $pd->semester_id) . 'px' }}"
-                        style="margin-left:-15px;">
+                @if (get_setting('ttd_kepsek', $pd->sekolah_id, $pd->kelas->semester_id))
+                    <img src="{{ public_path('.' . get_setting('ttd_kepsek', $pd->sekolah_id, $pd->kelas->semester_id)) }}"
+                        height="{{ get_setting('ttd_tinggi', $pd->sekolah_id, $pd->kelas->semester_id) . 'px' }}"
+                        width="{{ get_setting('ttd_lebar', $pd->sekolah_id, $pd->kelas->semester_id) . 'px' }}"
+                        class="ttd_kepsek">
                 @else
                     <br>
                     <br>
@@ -284,28 +283,24 @@
                 <br>
                 <p class="nama_ttd">
                     <strong><u>
-                            @if ($pd->sekolah->kasek)
-                                {{ $pd->sekolah->kasek->nama_lengkap }}
-                            @elseif($pd->sekolah->kepala_sekolah)
-                                {{ $pd->sekolah->kepala_sekolah?->nama_lengkap }}
+                            @if ($pd->kelas->sekolah->kasek)
+                                {{ $pd->kelas->sekolah->kasek->nama_lengkap }}
+                            @elseif($pd->kelas->sekolah->kepala_sekolah)
+                                {{ $pd->kelas->sekolah->kepala_sekolah?->nama_lengkap }}
                             @endif
                         </u></strong>
-                </p>
-                <p style="margin-top: -5px">
-                    NIP.
-                @if ($pd->sekolah->kasek)
-                    {{ $pd->sekolah->kasek->nip ?? '-' }}
-                @elseif($pd->sekolah->kepala_sekolah)
-                    {{ $pd->sekolah->kepala_sekolah?->nip  ?? '-' }}
-                @else -
-                @endif
                 </p>
             </td>
         </tr>
         <tr>
             <td style="width:40%;"></td>
             <td style="width:60%;" class="nip">
-                
+                NIP.
+                @if ($pd->kelas->sekolah->kasek)
+                    {{ $pd->kelas->sekolah->kasek->nip }}
+                @elseif($pd->kelas->sekolah->kepala_sekolah)
+                    {{ $pd->kelas->sekolah->kepala_sekolah?->nip }}
+                @endif
             </td>
         </tr>
     </table>

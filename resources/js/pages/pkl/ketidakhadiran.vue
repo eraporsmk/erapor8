@@ -23,15 +23,16 @@ const defaultForm = ref({
 })
 const form = ref({
   aksi: 'absen',
-  rombongan_belajar_id: null,
-  pkl_id: null,
+  rombongan_belajar_id: undefined,
+  pkl_id: undefined,
+  peserta_didik_id: {},
   sakit: {},
   izin: {},
   alpa: {},
 })
 const errors = ref({
-  rombongan_belajar_id: null,
-  pkl_id: null,
+  rombongan_belajar_id: undefined,
+  pkl_id: undefined,
 })
 const arrayData = ref({
   rombel: [],
@@ -60,6 +61,7 @@ const getData = async (postData) => {
         arrayData.value.siswa = getData.siswa
         arrayData.value.tp = getData.tp
         getData.siswa.forEach(siswa => {
+          form.value.peserta_didik_id[siswa.peserta_didik_id] = siswa.peserta_didik_id
           form.value.sakit[siswa.peserta_didik_id] = siswa.absensi_pkl?.sakit ?? null
           form.value.izin[siswa.peserta_didik_id] = siswa.absensi_pkl?.izin ?? null
           form.value.alpa[siswa.peserta_didik_id] = siswa.absensi_pkl?.alpa ?? null
@@ -97,9 +99,9 @@ const confirmed = ref(false)
 const isNotifVisible = ref(false)
 const isConfirmDialogVisible = ref(false)
 const notif = ref({
-  color: null,
-  title: null,
-  text: null,
+  color: undefined,
+  title: undefined,
+  text: undefined,
 })
 const onFormSubmit = async () => {
   refVForm.value?.validate().then(({ valid: isValid }) => {
@@ -127,16 +129,17 @@ const saveData = async () => {
 }
 const formReset = async () => {
   form.value = {
-    aksi: 'nilai',
-    rombongan_belajar_id: null,
-    pkl_id: null,
+    aksi: 'absen',
+    rombongan_belajar_id: undefined,
+    pkl_id: undefined,
+    peserta_didik_id: {},
     sakit: {},
     izin: {},
     alpa: {},
   }
   errors.value = {
-    rombongan_belajar_id: null,
-    pkl_id: null,
+    rombongan_belajar_id: undefined,
+    pkl_id: undefined,
   }
   arrayData.value = {
     rombel: [],

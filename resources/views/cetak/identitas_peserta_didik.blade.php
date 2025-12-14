@@ -177,25 +177,34 @@
                 {{ $pd->nama_wali ? $pd->pekerjaan_wali->nama : '-' }}</td>
         </tr>
     </table>
+    <?php
+    $ks = get_setting('jabatan', $pd->sekolah_id, $pd->kelas->semester_id);
+    $jabatan = str_replace('Plh. ', '', $ks);
+    $jabatan = str_replace('Plt. ', '', $jabatan);
+    $extend = str_replace('Kepala Sekolah', '', $ks);
+    $extend = str_replace(' ', '', $extend);
+    ?>
     <table width="100%" style="margin-top:50px;">
         <tr>
             <td style="width: 15%;padding:5px;" rowspan="5"></td>
             <td style="width: 15%;padding:5px; border:1px solid #000000;" rowspan="5" align="center">
                 Pas Foto<br>3 x 4
             </td>
-            <td style="width: 15%;padding:5px;" rowspan="5">&nbsp;</td>
+            <td style="width: 15%;padding-right:0px; vertical-align:top;" rowspan="5" class="text-right">
+                <br>{{ $extend }}
+            </td>
             <td style="width: 50%;padding:5px;">
                 {{ str_replace('Kab. ', '', $pd->sekolah->kabupaten) }},
-                {{ $pd->diterima }}<br />{{ get_setting('jabatan', $pd->sekolah_id, $pd->kelas->semester_id) }}
+                {{ $pd->diterima }}<br />{{ $jabatan }}
             </td>
         </tr>
         <tr>
             <td style="width: 50%;padding:5px;">
                 @if (get_setting('ttd_kepsek', $pd->sekolah_id, $pd->kelas->semester_id))
                     <div>
-                        <img src="{{ get_setting('ttd_kepsek', $pd->sekolah_id, $pd->semester_id) }}"
-                            height="{{ get_setting('ttd_tinggi', $pd->sekolah_id, $pd->semester_id) . 'px' }}"
-                            width="{{ get_setting('ttd_lebar', $pd->sekolah_id, $pd->semester_id) . 'px' }}"
+                        <img src="{{ public_path('.' . get_setting('ttd_kepsek', $pd->sekolah_id, $pd->kelas->semester_id)) }}"
+                            height="{{ get_setting('ttd_tinggi', $pd->sekolah_id, $pd->kelas->semester_id) . 'px' }}"
+                            width="{{ get_setting('ttd_lebar', $pd->sekolah_id, $pd->kelas->semester_id) . 'px' }}"
                             class="ttd_kepsek">
                     </div>
                 @else
@@ -214,8 +223,19 @@
         @endif
         <tr>
             <td style="width: 50%;padding:5px;">
-                {{ $pd->sekolah->kasek ? $pd->sekolah->kasek->nama_lengkap : $pd->sekolah->kepala_sekolah?->nama_lengkap }}<br />NIP.
-                {{ $pd->sekolah->kasek ? $pd->sekolah->kasek->nip : $pd->sekolah->kepala_sekolah?->nip }}
+                <strong><u>
+                        @if ($pd->kelas->sekolah->kasek)
+                            {{ $pd->kelas->sekolah->kasek->nama_lengkap }}
+                        @elseif($pd->kelas->sekolah->kepala_sekolah)
+                            {{ $pd->kelas->sekolah->kepala_sekolah?->nama_lengkap }}
+                        @endif
+                    </u></strong>
+                <br>NIP.
+                @if ($pd->kelas->sekolah->kasek)
+                    {{ $pd->kelas->sekolah->kasek->nip }}
+                @elseif($pd->kelas->sekolah->kepala_sekolah)
+                    {{ $pd->kelas->sekolah->kepala_sekolah?->nip }}
+                @endif
             </td>
         </tr>
     </table>

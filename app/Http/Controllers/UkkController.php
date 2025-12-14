@@ -30,14 +30,14 @@ class UkkController extends Controller
                     'rencana_ukk' => $rencana_ukk,
                     'data_siswa' => (request()->rencana_ukk_id) ? PesertaDidik::withWhereHas('nilai_ukk', function($query){
                         $query->where('rencana_ukk_id', request()->rencana_ukk_id);
-                    })->orderBy('nama')->get() : [],
+                    })->orderByRaw('LOWER(nama) ASC')->get() : [],
                 ];
             }
             if(request()->data == 'siswa'){
                 $data = [
                     'data_siswa' => PesertaDidik::withWhereHas('nilai_ukk', function($query){
                         $query->where('rencana_ukk_id', request()->rencana_ukk_id);
-                    })->orderBy('nama')->get(),
+                    })->orderByRaw('LOWER(nama) ASC')->get(),
                 ];
             }
             return response()->json($data);
@@ -191,7 +191,7 @@ class UkkController extends Controller
             }])->find(request()->rencana_ukk_id),
             'data_siswa' => PesertaDidik::withWhereHas('nilai_ukk', function($query){
                 $query->where('rencana_ukk_id', request()->rencana_ukk_id);
-            })->orderBy('nama')->get(),
+            })->orderByRaw('LOWER(nama) ASC')->get(),
         ];
         return response()->json($data);
     }

@@ -78,6 +78,9 @@ class SettingController extends Controller
                 'data_guru' => Ptk::where(function($query) use ($jenis_ptk){
                     $query->where('sekolah_id', request()->sekolah_id);
                     $query->whereIn('jenis_ptk_id', $jenis_ptk);
+                    $query->whereDoesntHave('ptk_keluar', function($query){
+                        $query->where('semester_id', request()->semester_id);
+                    });
                 })->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang')->orderBy('nama')->get(),
                 'data_rombel' => RombonganBelajar::where(function($query){
                     $query->where('jenis_rombel', 1);

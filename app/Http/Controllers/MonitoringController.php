@@ -212,7 +212,7 @@ class MonitoringController extends Controller
     private function get_siswa(){
         $data = PesertaDidik::withWhereHas('anggota_rombel', function($query){
             $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
-        })->orderBy('nama')->get();
+        })->orderByRaw('LOWER(nama) ASC')->get();
         //if(request()->aksi == 'cetak-rapor'){
         $rombel = RombonganBelajar::find(request()->rombongan_belajar_id);
         $merdeka = Str::of($rombel->kurikulum->nama_kurikulum)->contains('Merdeka');
@@ -235,7 +235,7 @@ class MonitoringController extends Controller
             $query->whereHas('rombongan_belajar', function($query) use ($rombel){
                 $query->where('jurusan_id', $rombel->jurusan_id);
             });
-        }])->orderBy('nama')->get();
+        }])->orderByRaw('LOWER(nama) ASC')->get();
         $pembelajaran = Pembelajaran::withWhereHas('rombongan_belajar', function($query) use ($rombel){
             $query->where('semester_id', request()->semester_id);
             $query->where('sekolah_id', request()->sekolah_id);

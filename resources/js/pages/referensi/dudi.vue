@@ -141,7 +141,7 @@ const reFectDetil = async () => [
     <!-- 👉 Widgets -->
     <VCard class="mb-6">
       <VCardItem class="pb-4">
-        <VCardTitle>Data Ekstrakurikuler</VCardTitle>
+        <VCardTitle>Data Dunia Usaha dan Industri</VCardTitle>
       </VCardItem>
       <VDivider />
       <VCardText>
