@@ -241,13 +241,8 @@
                             <br>
                             <br>
                             <p>
-<<<<<<< HEAD
-                                <strong><u>{{ $get_siswa->rombongan_belajar->wali_kelas->nama_lengkap }}</u></strong><br />
-                                NIP. {{ $get_siswa->rombongan_belajar->wali_kelas->nip ?? '-' }}
-=======
                                 <strong><u>{{ $pd->kelas->wali_kelas->nama_lengkap }}</u></strong><br />
                                 NIP. {{ $pd->kelas->wali_kelas->nip }}
->>>>>>> origin/main
                             </p>
                         </td>
                     </tr>
@@ -276,10 +271,10 @@
             <td style="width:60%;">
                 <p>Mengetahui,<br>{{ $jabatan }}</p>
                 <br>
-                @if (get_setting('ttd_kepsek', $get_siswa->sekolah_id, $get_siswa->semester_id))
-                    <img src="{{ get_setting('ttd_kepsek', $get_siswa->sekolah_id, $get_siswa->semester_id) }}"
-                        height="{{ get_setting('ttd_tinggi', $get_siswa->sekolah_id, $get_siswa->semester_id) . ' px' }}"
-                        width="{{ get_setting('ttd_lebar', $get_siswa->sekolah_id, $get_siswa->semester_id) . 'px' }}"
+                @if (get_setting('ttd_kepsek', $pd->sekolah_id, $pd->semester_id))
+                    <img src="{{ get_setting('ttd_kepsek', $pd->sekolah_id, $pd->semester_id) }}"
+                        height="{{ get_setting('ttd_tinggi', $pd->sekolah_id, $pd->semester_id) . ' px' }}"
+                        width="{{ get_setting('ttd_lebar', $pd->sekolah_id, $pd->semester_id) . 'px' }}"
                         style="margin-left:-15px;">
                 @else
                     <br>
@@ -298,10 +293,10 @@
                 </p>
                 <p style="margin-top: -5px">
                     NIP.
-                @if ($get_siswa->peserta_didik->sekolah->kasek)
-                    {{ $get_siswa->peserta_didik->sekolah->kasek->nip ?? '-' }}
-                @elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
-                    {{ $get_siswa->peserta_didik->sekolah->kepala_sekolah?->nip  ?? '-' }}
+                @if ($pd->sekolah->kasek)
+                    {{ $pd->sekolah->kasek->nip ?? '-' }}
+                @elseif($pd->sekolah->kepala_sekolah)
+                    {{ $pd->sekolah->kepala_sekolah?->nip  ?? '-' }}
                 @else -
                 @endif
                 </p>
@@ -310,16 +305,7 @@
         <tr>
             <td style="width:40%;"></td>
             <td style="width:60%;" class="nip">
-<<<<<<< HEAD
                 
-=======
-                NIP.
-                @if ($pd->sekolah->kasek)
-                    {{ $pd->sekolah->kasek->nip }}
-                @elseif($pd->sekolah->kepala_sekolah)
-                    {{ $pd->sekolah->kepala_sekolah?->nip }}
-                @endif
->>>>>>> origin/main
             </td>
         </tr>
     </table>
