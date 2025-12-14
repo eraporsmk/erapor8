@@ -156,15 +156,15 @@
                 <table class="table table-bordered">
                     <tr>
                         <td>Sakit</td>
-                        <td> : {{ $pd->kehadiran ? ($pd->kehadiran->sakit??0 == 0 ? '-' : $pd->kehadiran->sakit) : '-' }} hari</td>
+                        <td> : {{ ($pd->kehadiran->sakit??0) == 0 ? '-' : $pd->kehadiran->sakit }} hari</td>
                     </tr>
                     <tr>
                         <td>Izin</td>
-                        <td> : {{ $pd->kehadiran ? ($pd->kehadiran->izin??0 == 0 ? '-' : $pd->kehadiran->izin) : '-' }} hari</td>
+                        <td> : {{ ($pd->kehadiran->izin??0) == 0 ? '-' : $pd->kehadiran->izin }} hari</td>
                     </tr>
                     <tr>
                         <td>Tanpa Keterangan</td>
-                        <td> : {{ $pd->kehadiran ? ($pd->kehadiran->alpa??0 == 0 ? '-' : $pd->kehadiran->alpa) : '-' }} hari</td>
+                        <td> : {{ ($pd->kehadiran->alpa??0) == 0 ? '-' : $pd->kehadiran->alpa }} hari</td>
                     </tr>
                 </table>
             </td>
@@ -288,19 +288,14 @@
                             @elseif($pd->kelas->sekolah->kepala_sekolah)
                                 {{ $pd->kelas->sekolah->kepala_sekolah?->nama_lengkap }}
                             @endif
-                        </u></strong>
+                        </u></strong><br/>
+                        NIP.
+                        @if ($pd->kelas->sekolah->kasek)
+                            {{ $pd->kelas->sekolah->kasek->nip }}
+                        @elseif($pd->kelas->sekolah->kepala_sekolah)
+                            {{ $pd->kelas->sekolah->kepala_sekolah?->nip }}
+                        @endif
                 </p>
-            </td>
-        </tr>
-        <tr>
-            <td style="width:40%;"></td>
-            <td style="width:60%;" class="nip">
-                NIP.
-                @if ($pd->kelas->sekolah->kasek)
-                    {{ $pd->kelas->sekolah->kasek->nip }}
-                @elseif($pd->kelas->sekolah->kepala_sekolah)
-                    {{ $pd->kelas->sekolah->kepala_sekolah?->nip }}
-                @endif
             </td>
         </tr>
     </table>
