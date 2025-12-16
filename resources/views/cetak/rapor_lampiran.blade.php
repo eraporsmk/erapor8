@@ -30,7 +30,7 @@
             <td>{{ substr($pd->kelas->semester->nama, 10) }}</td>
         </tr>
     </table>
-    <br />
+    
     <?php
     if ($pd->kelas->tingkat == 10) {
         if (merdeka($pd->kelas->kurikulum->nama_kurikulum)) {
@@ -107,7 +107,7 @@
                 @endif
             </tbody>
         </table>
-        <br />
+        
     @endif
     @if ($pd->kelas->semester->tahun_ajaran_id >= 2025)
         <table class="table table-bordered">
@@ -118,17 +118,17 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>
+                    <td style="text-align: justify;">
                         {{ $pd->kokurikuler?->uraian_deskripsi }}
                     </td>
                 </tr>
             </tbody>
         </table>
     @endif
-    <table class="table table-bordered">
+    <table class="table table-bordered" style="">
         <thead>
             <tr>
-                <th style="width: 5%;" style="vertical-align: middle;">No</th>
+                <th style="width: 5%;" style="vertical-align: middle; text-align: center;">No</th>
                 <th style="width: 35%;" style="vertical-align: middle;">Ekstrakurikuler</th>
                 <th style="width: 60%;" style="vertical-align: middle;">Keterangan</th>
             </tr>
@@ -139,7 +139,7 @@
                     <tr>
                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
                         <td>{{ strtoupper($ekskul->rombongan_belajar?->nama) }}</td>
-                        <td>{{ $ekskul->single_nilai_ekstrakurikuler?->deskripsi_ekskul }}</td>
+                        <td style="text-align: justify;">{{ $ekskul->single_nilai_ekstrakurikuler?->deskripsi_ekskul }}</td>
                     </tr>
                 @endforeach
             @else
@@ -149,10 +149,10 @@
             @endif
         </tbody>
     </table>
-    <br />
+    
     <table style="width: 100%">
         <tr>
-            <td style="width: 45%; vertical-align: top;">
+            <td style="width: 40%; vertical-align: top;">
                 <table class="table table-bordered">
                     <tr>
                         <td>Sakit</td>
@@ -168,8 +168,8 @@
                     </tr>
                 </table>
             </td>
-            <td style="width: 10%">&nbsp;</td>
-            <td style="width: 45%; vertical-align: top;">
+            <td style="width: 1%">&nbsp;</td>
+            <td style="width: 59%; vertical-align: top;">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -178,7 +178,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>
+                            <td style="text-align: justify;">
                                 {{ $pd->catatan_walas?->uraian_deskripsi }}
                             </td>
                         </tr>
@@ -187,7 +187,7 @@
             </td>
         </tr>
     </table>
-    <br />
+    
     <?php
     if ($pd->kelas->semester->semester == 2) {
         if ($opsi == 'lulus') {
@@ -216,7 +216,6 @@
             </tr>
         </tbody>
     </table>
-    <br>
     <table width="100%">
         <tr>
             <td style="width:30%">
@@ -257,7 +256,7 @@
     $extend = str_replace('Kepala Sekolah', '', $ks);
     $extend = str_replace(' ', '', $extend);
     ?>
-    <table width="100%" style="margin-top:10px;">
+    <table width="100%">
         <tr>
             <td style="width:40%;padding-right:0px;" class="text-right">
                 <p>{{ $extend }}</p>
@@ -267,7 +266,7 @@
                 <br>
                 <p>&nbsp;</p>
             </td>
-            <td style="width:60%;">
+            <td>
                 <p>Mengetahui,<br>{{ $jabatan }}</p>
                 <br>
                 @if (get_setting('ttd_kepsek', $pd->sekolah_id, $pd->kelas->semester_id))

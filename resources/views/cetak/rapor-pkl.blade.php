@@ -99,7 +99,7 @@
     <br>
     <p>
       <u>{{$pd->pd_pkl->praktik_kerja_lapangan->guru->nama_lengkap }}</u><br />
-      NIP. {{$pd->pd_pkl->praktik_kerja_lapangan->guru->nip}}
+      NIP. {{$pd->pd_pkl->praktik_kerja_lapangan->guru->nip ?? '-'}}
     </p>
     </td>
       <td style="width:20%"></td>
@@ -112,7 +112,7 @@
     <p>
       <u>{{$pd->pd_pkl->praktik_kerja_lapangan->instruktur}}</u>
       <br />
-      NIP. {{$pd->pd_pkl->praktik_kerja_lapangan->nip}}
+      NIP. {{$pd->pd_pkl->praktik_kerja_lapangan->nip ?? '-'}}
     </p>
     </td>
     </tr>
