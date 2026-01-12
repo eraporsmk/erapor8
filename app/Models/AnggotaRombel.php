@@ -57,6 +57,9 @@ class AnggotaRombel extends Model
 	public function single_deskripsi_mata_pelajaran(){
 		return $this->hasOne(DeskripsiMataPelajaran::class, 'anggota_rombel_id', 'anggota_rombel_id');
 	}
+	public function deskripsi_mata_pelajaran(){
+		return $this->hasOne(DeskripsiMataPelajaran::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
 	public function anggota_ekskul(){
 		return $this->hasManyThrough(
             AnggotaRombel::class,

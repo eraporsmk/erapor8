@@ -683,12 +683,24 @@ class SettingController extends Controller
         return $user->email;
     }
     public function unduhan(){
-        $data = ['data' => view('unduhan')->render()];
+        $data = [
+            'data' => view('unduhan')->render(),
+        ];
         return response()->json($data);
+    }
+    private function getLastPulldate(){
+        $gitPath = base_path('.git/FETCH_HEAD');
+        $lastPullDate = NULL;
+        if (file_exists($gitPath)) {
+            $lastPullTimestamp = filemtime($gitPath);
+            $lastPullDate = date("d/m/Y H:i:s", $lastPullTimestamp);
+        }
+        return $lastPullDate;
     }
     public function changelog(){
         $data = [
             'data' => view('changelog')->render(),
+            'lastPullDate' => $this->getLastPulldate(),
         ];
         return response()->json($data);
     }
@@ -706,6 +718,7 @@ class SettingController extends Controller
                 'headers' => $response->headers(),
                 'activeTab' => request()->activeTab,
                 'url' => $url,
+                'lastPullDate' => $this->getLastPulldate(),
             ];
         } catch (\Throwable $th) {
             $data = [

@@ -113,6 +113,12 @@ const onSubmit = async () => {
     onResponse({ response }) {
       let getData = response._data;
       confirmed.value = false;
+      arrayData.value = {
+        ekstrakurikuler: [],
+        rombel: [],
+        siswa: [],
+        data_nilai: [],
+      }
       if (getData.errors) {
         errors.value = getData.errors;
       } else {

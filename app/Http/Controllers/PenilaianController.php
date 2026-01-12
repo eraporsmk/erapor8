@@ -121,7 +121,9 @@ class PenilaianController extends Controller
                     $kompetensi_id = 99;
                 }
             }
+            $anggota_id = [];
             foreach(request()->akhir as $anggota_rombel_id => $nilai_akhir){
+                $anggota_id[] = $anggota_rombel_id;
                 $insert++;
                 if($nilai_akhir >= 0 && $nilai_akhir <= 100){
                     NilaiAkhir::updateOrCreate(
@@ -140,6 +142,8 @@ class PenilaianController extends Controller
                     NilaiAkhir::where('anggota_rombel_id', $anggota_rombel_id)->where('pembelajaran_id', request()->pembelajaran_id)->where('kompetensi_id', $kompetensi_id)->delete();
                 }
             }
+            //
+            NilaiAkhir::whereNotIn('anggota_rombel_id', $anggota_id)->where('pembelajaran_id', request()->pembelajaran_id)->where('kompetensi_id', $kompetensi_id)->delete();
             $first = [];
             $last = [];
             foreach(request()->kompeten as $uuid => $kompeten){
@@ -293,6 +297,11 @@ class PenilaianController extends Controller
             $text = 'Nilai Ekstrakurikuler';
             $deleted = NilaiEkstrakurikuler::where(function($query){
                 $query->where('ekstrakurikuler_id', request()->ekstrakurikuler_id);
+                $query->whereHas('peserta_didik', function($query){
+                    $query->whereHas('anggota_rombel', function($query){
+                        $query->where('rombongan_belajar_id', request()->rombongan_belajar_id);
+                    });
+                });
                 if(request()->rombel_id_reguler){
                     $query->whereHas('peserta_didik', function($query){
                         $query->whereHas('anggota_rombel', function($query){
@@ -484,6 +493,11 @@ class PenilaianController extends Controller
                 },
                 'single_deskripsi_mata_pelajaran' => function($query){
                     $query->where('pembelajaran_id', request()->pembelajaran_id);
+                    $query->where('asal', 0);
+                },
+                'deskripsi_mata_pelajaran' => function($query){
+                    $query->where('pembelajaran_id', request()->pembelajaran_id);
+                    $query->where('asal', 1);
                 },
                 'tp_kompeten' => function($query){
                     $query->whereHas('tp_mapel', function($query){
@@ -512,6 +526,7 @@ class PenilaianController extends Controller
         $data = [
             'data_siswa' => $data_siswa,
             'show_reset' => DeskripsiMataPelajaran::where('pembelajaran_id', request()->pembelajaran_id)->count(),
+            'sub_mapel' => Pembelajaran::where('induk_pembelajaran_id', request()->pembelajaran_id)->count(),
         ];
         return response()->json($data);
     }

@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get('/', [DashboardController::class, 'index']);
         Route::post('/', [DashboardController::class, 'index']);
         Route::post('/wali', [DashboardController::class, 'wali']);
+        Route::post('/wali-matpil', [DashboardController::class, 'wali_matpil']);
         Route::post('/status-penilaian', [DashboardController::class, 'status_penilaian']);
         Route::post('/detil-penilaian', [DashboardController::class, 'detil_penilaian']);
         Route::post('/generate-nilai', [DashboardController::class, 'generate_nilai']);
@@ -121,6 +122,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
             Route::get('/', [ReferensiController::class, 'tujuan_pembelajaran']);
             Route::post('/delete', [ReferensiController::class, 'hapus_tp']);
             Route::post('/save', [ReferensiController::class, 'save_tp']);
+            Route::post('/cek-tp', [ReferensiController::class, 'cek_tp']);
         });
         Route::group(['prefix' => 'bobot-penilaian'], function () {
             Route::get('/', [ReferensiController::class, 'bobot_penilaian']);

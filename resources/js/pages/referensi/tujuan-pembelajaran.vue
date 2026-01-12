@@ -210,6 +210,11 @@ const errors = ref({
 })
 const getAksi = ref()
 const confirmationText = ref()
+const isCekTpDialogVisible = ref(false)
+const nilaiTp = ref(0)
+const tpNilai = ref(0)
+const tpMapel = ref(0)
+const tpPkl = ref(0)
 const aksi = async (aksi, item) => {
   form.value.tp_id = item.tp_id
   getAksi.value = aksi
@@ -234,21 +239,39 @@ const addNewData = () => {
   isDialogVisible.value = true
   dialogTitle.value = 'Tambah Data Tujuan Pembelajaran'
 }
+const confirmTpDialog = async () => {
+  await $api('/referensi/tujuan-pembelajaran/delete', {
+    method: 'POST',
+    body: form.value,
+    onResponse({ response }) {
+      let getData = response._data
+      isDialogVisible.value = false
+      isNotifVisible.value = true
+      notif.value = getData
+    },
+  })
+}
 const confirmDelete = async (val) => {
   if (val) {
-    await $api('/referensi/tujuan-pembelajaran/delete', {
+    await $api('/referensi/tujuan-pembelajaran/cek-tp', {
       method: 'POST',
-      body: form.value,
+      body: {
+        tp_id: form.value.tp_id
+      },
       onResponse({ response }) {
         let getData = response._data
-        isDialogVisible.value = false
-        isNotifVisible.value = true
-        notif.value = getData
+        isCekTpDialogVisible.value = true
+        tpNilai.value = getData.nilai_tp
+        nilaiTp.value = getData.tp_nilai
+        tpMapel.value = getData.tp_mapel
+        tpPkl.value = getData.tp_pkl
       },
     })
   }
 }
+const closeLoading = ref(false)
 const confirmClose = async () => {
+  closeLoading.value = true
   await fetchData();
 }
 const pembelajaranId = ref()
@@ -714,8 +737,11 @@ const getRombel = (tp_mapel) => {
       </template>
     </DefaultDialog>
     <ConfirmDialog v-model:isDialogVisible="isConfirmDialogVisible" v-model:isNotifVisible="isNotifVisible"
-      confirmation-question="Apakah Anda yakin?" :confirmation-text="confirmationText" :confirm-color="notif.color"
-      :confirm-title="notif.title" :confirm-msg="notif.text" @confirm="confirmDelete" @close="confirmClose" />
+      v-model:closeLoading="closeLoading" confirmation-question="Apakah Anda yakin?"
+      :confirmation-text="confirmationText" :confirm-color="notif.color" :confirm-title="notif.title"
+      :confirm-msg="notif.text" @confirm="confirmDelete" @close="confirmClose" />
+    <CekTpDialog v-model:isDialogVisible="isCekTpDialogVisible" v-model:nilaiTp="nilaiTp" v-model:tpNilai="tpNilai"
+      v-model:tpMapel="tpMapel" v-model:tpPkl="tpPkl" @delete=confirmTpDialog @close="confirmClose" />
   </section>
 </template>
 <style lang="scss">

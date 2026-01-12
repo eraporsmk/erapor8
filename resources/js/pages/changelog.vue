@@ -17,6 +17,7 @@ const options = ref({
   page: 1,
   perPage: 10,
 })
+const lastPullDate = ref()
 const fetchData = async () => {
   loadingBody.value = true;
   try {
@@ -27,6 +28,7 @@ const fetchData = async () => {
       }
     }));
     let getData = response.data.value
+    lastPullDate.value = getData?.lastPullDate
     if (currentTab.value == 'changelog') {
       data.value = getData.data
     } else {
@@ -78,6 +80,9 @@ const aksi = async (aksi) => {
     <VCard>
       <VCardItem class="pb-4">
         <VCardTitle>Daftar Perubahan Aplikasi</VCardTitle>
+        <template #append v-if="lastPullDate">
+          <span class="text-disabled text-subtitle-2">Git Pull terakhir: {{ lastPullDate }}</span>
+        </template>
       </VCardItem>
       <VDivider />
       <VTabs v-model="currentTab" grow stacked @update:model-value="changeTab">

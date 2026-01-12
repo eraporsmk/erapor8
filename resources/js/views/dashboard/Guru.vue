@@ -11,6 +11,9 @@ import CardPembelajaran from './CardPembelajaran.vue';
       <VCol cols="12" v-if="$can('read', 'Wali')">
         <CardPembelajaran card-url="/dashboard/wali" :cardSubTitle="true"></CardPembelajaran>
       </VCol>
+      <VCol cols="12" v-if="$can('read', 'Pilihan')">
+        <CardPembelajaran card-url="/dashboard/wali-matpil" :cardSubTitle="true"></CardPembelajaran>
+      </VCol>
     </VRow>
   </div>
 </template>

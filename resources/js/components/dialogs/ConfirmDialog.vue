@@ -28,6 +28,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  closeLoading: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
@@ -60,6 +65,11 @@ const closeConfirm = () => {
   confirmed.value = false
   emit('close', true)
 }
+watch(props, () => {
+  if (props.closeLoading) {
+    confirmed.value = false
+  }
+})
 </script>
 
 <template>

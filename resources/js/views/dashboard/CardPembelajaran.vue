@@ -47,7 +47,15 @@ const fetchData = async () => {
       onResponse({ request, response, options }) {
         let getData = response._data
         rombel.value = getData.rombel
-        cardTitleAlt.value = cardTitleAlt.value ?? `Anda adalah Wali Kelas Rombongan Belajar ${rombel.value.nama}`
+        if(getData.rombel){
+          if(getData.rombel.jenis_rombel == 1){
+            cardTitleAlt.value = `Anda adalah Wali Kelas Rombongan Belajar ${rombel.value.nama}`
+          } else {
+            cardTitleAlt.value = `Anda adalah Wali Kelas Rombongan Belajar (Matpel Pilihan) ${rombel.value.nama}`
+          }
+        } else {
+          cardTitleAlt.value = cardTitleAlt.value
+        }
         status_penilaian.value = rombel.value?.kunci_nilai ? false : true
         rombel_pilihan.value = getData.rombel_pilihan
         pembelajaran.value = getData.pembelajaran

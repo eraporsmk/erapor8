@@ -746,11 +746,13 @@ class SinkronisasiController extends Controller
     public function synchronizer(){
         $items = json_decode(prepare_receive(request()->json));
         $function = 'simpan_'.str_replace('-', '_', request()->table);
+        $result = [];
         foreach($items as $k => $item){
-            $function($item);
+            $result[] = $function($item);
         }
         $data = [
             'json' => $items,
+			//'result' => $result,
         ];
         return response()->json($data);
     }

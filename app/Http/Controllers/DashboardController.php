@@ -282,7 +282,65 @@ class DashboardController extends Controller
         $data = [];
         return response()->json($data);
     }
-    public function wali(){
+   public function wali_matpil(){
+      $rombel = RombonganBelajar::withCount('anggota_rombel')->where(function($query){
+         $query->where('jenis_rombel', 16);
+         $query->where('guru_id', request()->guru_id);
+         $query->where('semester_id', request()->semester_id);
+         $query->where('sekolah_id', request()->sekolah_id);
+      })->first();
+      $result = [];
+      if($rombel){
+         $pembelajaran = Pembelajaran::where(function($query) use ($rombel){
+            $query->whereNotNull('kelompok_id');
+            $query->whereNotNull('no_urut');
+            $query->where('rombongan_belajar_id', $rombel->rombongan_belajar_id);
+            /*$query->whereHas('rombongan_belajar', function($query){
+               $query->where('jenis_rombel', 1);
+               $query->where('guru_id', request()->guru_id);
+               $query->where('semester_id', request()->semester_id);
+               $query->where('sekolah_id', request()->sekolah_id);
+            });*/
+         })->with([
+            'guru' => function($query){
+               $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
+               }, 
+            'pengajar' => function($query){
+               $query->select('guru_id', 'nama', 'gelar_depan', 'gelar_belakang');
+            },
+         ])->withCount([
+            'pd_pkl',
+            'pd_pkl as pd_pkl_dinilai' => function($query){
+               $query->has('nilai_pkl');
+            }
+          ])->orderBy('mata_pelajaran_id')->get();
+         $no = 1;
+         $result = [];
+         foreach($pembelajaran as $item){
+            $result[] = [
+               'no' => $no++,
+               'pembelajaran_id' => $item->pembelajaran_id,
+               'mata_pelajaran_id' => $item->mata_pelajaran_id,
+               'induk_pembelajaran_id' => $item->induk_pembelajaran_id,
+               'rombongan_belajar_id' => $item->rombongan_belajar_id,
+               'nama_mata_pelajaran' => $item->nama_mata_pelajaran,
+               'guru' => ($item->pengajar) ? $item->pengajar->nama_lengkap : $item->guru->nama_lengkap,
+               'pd' => $rombel->anggota_rombel_count,
+               'pd_dinilai' => $this->anggota_dinilai($item->pembelajaran_id, $item->rombongan_belajar_id),
+               'kkm' => $item->kkm,
+               'kelompok_id' => $item->kelompok_id,
+               'semester_id' => $item->semester_id,
+               'pd_pkl_count' => $item->pd_pkl_count,
+               'pd_pkl_dinilai' => $item->pd_pkl_dinilai,
+            ];
+         }
+         return response()->json([
+         'pembelajaran' => $result, 
+         'rombel' => $rombel,
+      ]);
+      }
+   }
+   public function wali(){
       $rombel = RombonganBelajar::withCount('anggota_rombel')->where(function($query){
          $query->where('jenis_rombel', 1);
          $query->where('guru_id', request()->guru_id);
@@ -336,7 +394,7 @@ class DashboardController extends Controller
                'pd_pkl_dinilai' => $item->pd_pkl_dinilai,
             ];
          }
-         $pembelajaran_pilihan = Pembelajaran::where(function($query){
+         /*$pembelajaran_pilihan = Pembelajaran::where(function($query){
             $query->whereNotNull('kelompok_id');
             $query->whereNotNull('no_urut');
             $query->whereHas('rombongan_belajar', function($query){
@@ -377,13 +435,13 @@ class DashboardController extends Controller
                'semester_id' => $item_pilihan->semester_id,
             ];
             $rombel_pilihan = $item_pilihan->rombongan_belajar;
-         }
+         }*/
       }
       return response()->json([
          'pembelajaran' => $result, 
          'rombel' => $rombel,
-         'pembelajaran_pilihan' => $result_pilihan,
-         'rombel_pilihan' => $rombel_pilihan,
+         //'pembelajaran_pilihan' => $result_pilihan,
+         //'rombel_pilihan' => $rombel_pilihan,
       ]);
    }
    public function anggota_dinilai($pembelajaran_id, $rombongan_belajar_id){

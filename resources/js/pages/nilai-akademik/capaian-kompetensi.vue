@@ -28,10 +28,10 @@ onMounted(async () => {
   await fetchData();
 });
 const form = ref({
-  tingkat: null,
-  rombongan_belajar_id: null,
-  pembelajaran_id: null,
-  mata_pelajaran_id: null,
+  tingkat: undefined,
+  rombongan_belajar_id: undefined,
+  pembelajaran_id: undefined,
+  mata_pelajaran_id: undefined,
 })
 const errors = ref({
   tingkat: null,
@@ -147,7 +147,10 @@ const changeMapel = async (val) => {
         loading.value.body = false
         getData.data_siswa.forEach((siswa) => {
           nilai.value.angka[siswa.anggota_rombel.anggota_rombel_id] = (siswa.anggota_rombel.nilai_akhir_mapel) ? siswa.anggota_rombel.nilai_akhir_mapel.nilai : ''
-          if (siswa.anggota_rombel.single_deskripsi_mata_pelajaran) {
+          if (siswa.anggota_rombel.deskripsi_mata_pelajaran) {
+            nilai.value.kompeten[siswa.anggota_rombel.anggota_rombel_id] = siswa.anggota_rombel.deskripsi_mata_pelajaran.deskripsi_pengetahuan
+            nilai.value.inkompeten[siswa.anggota_rombel.anggota_rombel_id] = siswa.anggota_rombel.deskripsi_mata_pelajaran.deskripsi_keterampilan
+          } else if (siswa.anggota_rombel.single_deskripsi_mata_pelajaran) {
             nilai.value.kompeten[siswa.anggota_rombel.anggota_rombel_id] = siswa.anggota_rombel.single_deskripsi_mata_pelajaran.deskripsi_pengetahuan
             nilai.value.inkompeten[siswa.anggota_rombel.anggota_rombel_id] = siswa.anggota_rombel.single_deskripsi_mata_pelajaran.deskripsi_keterampilan
           } else {

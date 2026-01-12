@@ -27,6 +27,9 @@ use App\Models\ElemenBudayaKerja;
 use App\Models\OpsiBudayaKerja;
 use App\Models\Ptk;
 use App\Models\RencanaBudayaKerja;
+use App\Models\NilaiTp;
+use App\Models\TpNilai;
+use App\Models\TpPkl;
 use App\Imports\TemplateTp;
 use Storage;
 
@@ -1274,6 +1277,15 @@ class ReferensiController extends Controller
             'nilai_budaya_kerja' => NilaiBudayaKerja::with(['anggota_rombel' => function($query){
                 $query->with(['rombongan_belajar', 'peserta_didik']);
             }])->find(request()->nilai_budaya_kerja_id),
+        ];
+        return response()->json($data);
+    }
+    public function cek_tp(){
+        $data = [
+            'nilai_tp' => NilaiTp::where('tp_id', request()->tp_id)->count(),
+            'tp_nilai' => TpNilai::where('tp_id', request()->tp_id)->count(),
+            'tp_mapel' => TpMapel::where('tp_id', request()->tp_id)->count(),
+            'tp_pkl' => TpPkl::where('tp_id', request()->tp_id)->count(),
         ];
         return response()->json($data);
     }
