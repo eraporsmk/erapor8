@@ -93,7 +93,7 @@ class CetakController extends Controller
 		]);
 		$pdf->getMpdf()->defaultfooterfontsize=7;
 		$pdf->getMpdf()->defaultfooterline=0;
-		$general_title = clean(strtoupper($pd->nama).' - '.$pd->kelas->nama);
+		$general_title = strtoupper($pd->nama).' - '.$pd->kelas->nama;
 		$pdf->getMpdf()->SetFooter($general_title.'|{PAGENO}|Dicetak dari '.config('app.name').' v.'.get_setting('app_version'));
 		$rapor_top = view('cetak.rapor_cover', $params);
 		$identitas_sekolah = view('cetak.identitas_sekolah', $params);
@@ -102,7 +102,7 @@ class CetakController extends Controller
 		$pdf->getMpdf()->WriteHTML($identitas_sekolah);
 		$pdf->getMpdf()->WriteHTML('<pagebreak />');
 		$pdf->getMpdf()->WriteHTML($identitas_peserta_didik);
-		return $pdf->stream($general_title.'-IDENTITAS.pdf');
+		return $pdf->stream(clean($general_title).'-IDENTITAS.pdf');
 	}
 	public function rapor_coverOld(Request $request){
 		if($request->route('rombongan_belajar_id')){
@@ -527,7 +527,7 @@ class CetakController extends Controller
 		]);
 		$pdf->getMpdf()->defaultfooterfontsize=7;
 		$pdf->getMpdf()->defaultfooterline=0;
-		$general_title = clean(strtoupper($pd->nama).' - '.$pd->kelas->nama);
+		$general_title = strtoupper($pd->nama).' - '.$pd->kelas->nama;
 		$pdf->getMpdf()->SetFooter($general_title.'|{PAGENO}|Dicetak dari '.config('app.name').' v.'.get_setting('app_version'));
 		$rapor_akademik = view('cetak.rapor-akademik', $params);
 		$pdf->getMpdf()->WriteHTML($rapor_akademik);
@@ -535,7 +535,7 @@ class CetakController extends Controller
 		$rapor_catatan = view('cetak.rapor_lampiran', $params);
 		$pdf->getMpdf()->WriteHTML($rapor_catatan);
 		$pdf->getMpdf()->allow_charset_conversion = true;
-		return $pdf->stream($general_title.'-RAPOR-AKADEMIK.pdf');
+		return $pdf->stream(clean($general_title).'-RAPOR-AKADEMIK.pdf');
 	}
 	public function rapor_akademik_old(Request $request){
 		//header("Content-Type: application/pdf");

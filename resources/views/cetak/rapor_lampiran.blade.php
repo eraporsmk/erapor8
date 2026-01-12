@@ -1,6 +1,6 @@
 @extends('layouts.cetak')
 @section('content')
-    <table border="0" width="100%">
+    <table border="0" width="100%" style="margin-bottom: 0px;">
         <tr>
             <td style="width: 25%;padding-top:5px; padding-bottom:5px; padding-left:0px;">Nama Peserta Didik</td>
             <td style="width: 1%;" class="text-center">:</td>
@@ -79,7 +79,7 @@
     }
     ?>
     @if ($pd->kelas->tingkat != 10 && $pd->prakerin->count())
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="margin-bottom: 10px;">
             <thead>
                 <tr>
                     <th style="width: 2px;" style="vertical-align: middle;">No</th>
@@ -110,7 +110,7 @@
         
     @endif
     @if ($pd->kelas->semester->tahun_ajaran_id >= 2025)
-        <table class="table table-bordered">
+        <table class="table table-bordered" style="margin-bottom: 10px;">
             <thead>
                 <tr>
                     <th class="text-center">Kokurikuler</th>
@@ -149,28 +149,34 @@
             @endif
         </tbody>
     </table>
-    
-    <table style="width: 100%">
+    <table style="width: 100%; margin-left:-2px; margin-right:-2px;margin-bottom: 8px;">
         <tr>
-            <td style="width: 40%; vertical-align: top;">
-                <table class="table table-bordered">
-                    <tr>
-                        <td>Sakit</td>
-                        <td> : {{ ($pd->kehadiran->sakit??0) == 0 ? '-' : $pd->kehadiran->sakit }} hari</td>
-                    </tr>
-                    <tr>
-                        <td>Izin</td>
-                        <td> : {{ ($pd->kehadiran->izin??0) == 0 ? '-' : $pd->kehadiran->izin }} hari</td>
-                    </tr>
-                    <tr>
-                        <td>Tanpa Keterangan</td>
-                        <td> : {{ ($pd->kehadiran->alpa??0) == 0 ? '-' : $pd->kehadiran->alpa }} hari</td>
-                    </tr>
+            <td style="width: 47%; vertical-align: top; padding:0px;">
+                <table class="table table-bordered" style="margin-bottom: 0px;">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="vertical-align: middle;" colspan="2">Ketidakhadiran</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sakit</td>
+                            <td> : {{ $pd->kehadiran ? $pd->kehadiran->sakit ?? 0 : 0 }} hari</td>
+                        </tr>
+                        <tr>
+                            <td>Izin</td>
+                            <td> : {{ $pd->kehadiran ? $pd->kehadiran->izin ?? 0 : 0 }} hari</td>
+                        </tr>
+                        <tr>
+                            <td>Tanpa Keterangan</td>
+                            <td> : {{ $pd->kehadiran ? $pd->kehadiran->alpa ?? 0 : 0 }} hari</td>
+                        </tr>
+                    </tbody>
                 </table>
             </td>
-            <td style="width: 1%">&nbsp;</td>
-            <td style="width: 59%; vertical-align: top;">
-                <table class="table table-bordered">
+            <td style="width: 4%">&nbsp;</td>
+            <td style="width: 47%; vertical-align: top; padding:0px;">
+                <table class="table table-bordered" style="margin-bottom: 0px;">
                     <thead>
                         <tr>
                             <th class="text-center">Catatan Wali Kelas</th>
@@ -202,7 +208,7 @@
         $not_yet = '';
     }
     ?>
-    <table class="table table-bordered">
+    <table class="table table-bordered" style="margin-bottom: 0px;">
         <thead>
             <tr>
                 <th class="text-center">Tanggapan Orang Tua/Wali Murid</th>
@@ -211,12 +217,12 @@
         <tbody>
             <tr>
                 <td>
-                    <br><br><br><br><br><br>
+                    <br><br><br><br><br>
                 </td>
             </tr>
         </tbody>
     </table>
-    <table width="100%">
+    <table width="100%" style="margin-bottom: 0px;">
         <tr>
             <td style="width:30%">
                 <p>Orang Tua/Wali</p><br>
@@ -238,7 +244,6 @@
                             <br>
                             <br>
                             <br>
-                            <br>
                             <p>
                                 <strong><u>{{ $pd->kelas->wali_kelas->nama_lengkap }}</u></strong><br />
                                 NIP. {{ $pd->kelas->wali_kelas->nip }}
@@ -256,11 +261,10 @@
     $extend = str_replace('Kepala Sekolah', '', $ks);
     $extend = str_replace(' ', '', $extend);
     ?>
-    <table width="100%">
+    <table width="100%" style="margin-bottom:0px;">
         <tr>
             <td style="width:40%;padding-right:0px;" class="text-right">
                 <p>{{ $extend }}</p>
-                <br>
                 <br>
                 <br>
                 <br>
@@ -275,7 +279,6 @@
                         width="{{ get_setting('ttd_lebar', $pd->sekolah_id, $pd->kelas->semester_id) . 'px' }}"
                         class="ttd_kepsek">
                 @else
-                    <br>
                     <br>
                     <br>
                 @endif
