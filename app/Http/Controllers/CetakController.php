@@ -471,6 +471,9 @@ class CetakController extends Controller
 			'catatan_walas' => function($query){
 				$query->where('semester_id', request()->route('semester_id'));
 			},
+			'kenaikan' => function($query){
+				$query->where('semester_id', request()->route('semester_id'));
+			},
 		])->find(request()->route('peserta_didik_id'));
 		$pembelajaran = Pembelajaran::where(function($query){
 			$query->whereNull('induk_pembelajaran_id');
@@ -511,10 +514,27 @@ class CetakController extends Controller
         } else {
             $tanggal_rapor = Carbon::now()->translatedFormat('d F Y');
         }
+		$rombel_4_tahun = RombelEmpatTahun::with(['rombongan_belajar'])->where(function($query){
+			$query->where('sekolah_id', request()->route('sekolah_id'));
+			$query->where('semester_id', request()->route('semester_id'));
+		})->get();
+		$jurusan_sp_id = [];
+		foreach($rombel_4_tahun as $r4){
+            $jurusan_sp_id[] = $r4->rombongan_belajar->jurusan_sp_id;
+        }
+        $opsi = 'naik';
+		$rombel = $pd->kelas;
+		if($rombel->tingkat >= 12 || $rombel->tingkat == 12 && !$rombel->rombel_empat_tahun){
+            $opsi = 'lulus';
+        }
+        if($rombel->tingkat == 12 && in_array($rombel->jurusan_sp_id, $jurusan_sp_id)){
+            $opsi = 'naik';
+        }
 		$params = array(
 			'pd'	=> $pd,
 			'set_pembelajaran' => $pembelajaran,
 			'tanggal_rapor' => $tanggal_rapor,
+			'opsi' => $opsi,
 		);
 		$pdf = PDF::loadView('cetak.blank', $params, [], [
 			'format' => 'A4',

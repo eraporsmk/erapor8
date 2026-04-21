@@ -179,112 +179,116 @@ if($get_siswa->rombongan_belajar->semester->semester == 2){
 		$not_yet = 'Belum dilakukan kenaikan kelas';
 	}
 	*/
-} else {
-	$text_status = '';
-	$not_yet = '';
-}
-?>
-@if($get_siswa->rombongan_belajar->semester->semester == 2)
-@if($get_siswa->rombongan_belajar->tingkat >= 12)
-<div class="strong"><strong>{{$huruf_kenaikan}}.&nbsp;&nbsp;{{$text_status}}</strong></div>
-@else
-<div class="strong"><strong>{{$huruf_kenaikan}}.&nbsp;&nbsp;{{$text_status}}</strong></div>
-@endif
-@endif
-@if($get_siswa->rombongan_belajar->semester->semester == 2)
-<table width="100%" class="table table-bordered">
-	<tr>
-		<td style="padding:10px;">
-			@if($get_siswa->kenaikan)
-			@if($get_siswa->kenaikan->status == 3)
-			LULUS
-			@else
-			{{status_kenaikan($get_siswa->kenaikan->status)}} {{$get_siswa->kenaikan->nama_kelas}}
-			@endif
-			@else
-			{{$not_yet}}
-			@endif
-		</td>
-	</tr>
-</table>
-<br>
-@endif
-<br>
-<table width="100%">
-	<tr>
-		<td style="width:30%">
-			<p>Orang Tua/Wali</p><br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<p>...................................................................</p>
-		</td>
-		<td style="width:5%"></td>
-		<td style="width:55%; text-align: right;">
-			<table width="auto">
-				<tr><td style="text-align: left;">
-					<p>{{str_replace('Kab. ','',$get_siswa->peserta_didik->sekolah->kabupaten)}},
-						{{$tanggal_rapor}}<br>Wali Kelas</p><br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<p>
-						<strong><u>{{$get_siswa->rombongan_belajar->wali_kelas->nama_lengkap}}</u></strong><br />
-						NIP. {{$get_siswa->rombongan_belajar->wali_kelas->nip}}</p>
-				</td></tr>
-			</table>
-		</td>
-	</tr>
-</table>
-<?php
-$ks = get_setting('jabatan', $get_siswa->sekolah_id, $get_siswa->semester_id);
-$jabatan = str_replace('Plh. ', '', $ks);
-$jabatan = str_replace('Plt. ', '', $jabatan);
-$extend = str_replace('Kepala Sekolah', '', $ks);
-$extend = str_replace(' ', '', $extend);
-?>
-<table width="100%" style="margin-top:10px;">
-	<tr>
-		<td style="width:40%;padding-right:0px;" class="text-right">
-			<p><br>{{ $extend }}</p>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<p>&nbsp;</p>
-		</td>
-		<td style="width:60%;">
-			<p>Mengetahui,<br>{{ $jabatan }}</p>
-			<br>
-			<br>
-			<br>
-			<br>
-			<br>
-			<p class="nama_ttd">
-				<strong><u>
-				@if ($get_siswa->peserta_didik->sekolah->kasek)
-					{{$get_siswa->peserta_didik->sekolah->kasek->nama_lengkap}}
-				@elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
-					{{$get_siswa->peserta_didik->sekolah->kepala_sekolah?->nama_lengkap}}
-				@endif
-				</u></strong></p>
-		</td>
-	</tr>
-	<tr>
-		<td style="width:40%;"></td>
-		<td style="width:60%;" class="nip">
-			NIP. 
-			@if ($get_siswa->peserta_didik->sekolah->kasek)
-				{{$get_siswa->peserta_didik->sekolah->kasek->nip}}
-			@elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
-				{{$get_siswa->peserta_didik->sekolah->kepala_sekolah?->nip}}
-			@endif
-		</td>
-	</tr>
-</table>
+    } else {
+        $text_status = '';
+        $not_yet = '';
+    }
+    ?>
+    @if ($get_siswa->rombongan_belajar->semester->semester == 2)
+        @if ($get_siswa->rombongan_belajar->tingkat >= 12)
+            <div class="strong"><strong>{{ $huruf_kenaikan }}.&nbsp;&nbsp;{{ $text_status }}</strong></div>
+        @else
+            <div class="strong"><strong>{{ $huruf_kenaikan }}.&nbsp;&nbsp;{{ $text_status }}</strong></div>
+        @endif
+    @endif
+    @if ($get_siswa->rombongan_belajar->semester->semester == 2)
+        <table width="100%" class="table table-bordered">
+            <tr>
+                <td style="padding:10px;">
+                    @if ($get_siswa->kenaikan)
+                        @if ($get_siswa->kenaikan->status == 3)
+                            LULUS
+                        @else
+                            {{ status_kenaikan($get_siswa->kenaikan->status) }} {{ $get_siswa->kenaikan->nama_kelas }}
+                        @endif
+                    @else
+                        {{ $not_yet }}
+                    @endif
+                </td>
+            </tr>
+        </table>
+        <br>
+    @endif
+    <br>
+    <table width="100%">
+        <tr>
+            <td style="width:30%">
+                <p>Orang Tua/Wali</p><br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <p>...................................................................</p>
+            </td>
+            <td style="width:5%"></td>
+            <td style="width:55%; text-align: right;">
+                <table width="auto">
+                    <tr>
+                        <td style="text-align: left;">
+                            <p>{{ str_replace('Kab. ', '', $get_siswa->peserta_didik->sekolah->kabupaten) }},
+                                {{ $tanggal_rapor }}<br>Wali Kelas</p><br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <p>
+                                <strong><u>{{ $get_siswa->rombongan_belajar->wali_kelas->nama_lengkap }}</u></strong><br />
+                                NIP. {{ $get_siswa->rombongan_belajar->wali_kelas->nip }}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <?php
+    $ks = get_setting('jabatan', $get_siswa->sekolah_id, $get_siswa->semester_id);
+    $jabatan = str_replace('Plh. ', '', $ks);
+    $jabatan = str_replace('Plt. ', '', $jabatan);
+    $extend = str_replace('Kepala Sekolah', '', $ks);
+    $extend = str_replace(' ', '', $extend);
+    ?>
+    <table width="100%" style="margin-top:10px;">
+        <tr>
+            <td style="width:40%;padding-right:0px;" class="text-right">
+                <p><br>{{ $extend }}</p>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <p>&nbsp;</p>
+            </td>
+            <td style="width:60%;">
+                <p>Mengetahui,<br>{{ $jabatan }}</p>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <p class="nama_ttd">
+                    <strong><u>
+                            @if ($get_siswa->peserta_didik->sekolah->kasek)
+                                {{ $get_siswa->peserta_didik->sekolah->kasek->nama_lengkap }}
+                            @elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
+                                {{ $get_siswa->peserta_didik->sekolah->kepala_sekolah?->nama_lengkap }}
+                            @endif
+                        </u></strong>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:40%;"></td>
+            <td style="width:60%;" class="nip">
+                NIP.
+                @if ($get_siswa->peserta_didik->sekolah->kasek)
+                    {{ $get_siswa->peserta_didik->sekolah->kasek->nip }}
+                @elseif($get_siswa->peserta_didik->sekolah->kepala_sekolah)
+                    {{ $get_siswa->peserta_didik->sekolah->kepala_sekolah?->nip }}
+                @endif
+            </td>
+        </tr>
+    </table>
 @endsection

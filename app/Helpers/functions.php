@@ -324,6 +324,17 @@ function keterangan_ukk($n, $lang = 'ID')
         } else {
             $predikat 	= 'Belum Kompeten';
         }
+        if(semester_id() >= 20251){
+            if($n < 61){
+                $predikat 	= 'Belum Kompeten';
+            } elseif($n < 75){
+                $predikat 	= 'Cukup Kompeten';
+            } elseif($n < 90){
+                $predikat 	= 'Kompeten';
+            } else {
+                $predikat 	= 'Sangat Kompeten';
+            }
+        }
     } else {
         if (!$n) {
             $predikat 	= '';
@@ -340,6 +351,17 @@ function keterangan_ukk($n, $lang = 'ID')
             $predikat 	= 'Competent';
         } else {
             $predikat 	= 'Not Yet Competent';
+        }
+        if (semester_id() >= 20251) {
+            if ($n < 61) {
+                $predikat = 'Not Yet Competent';
+            } elseif ($n < 75) { // Meng-cover semua dari 61 sampai sebelum 75
+                $predikat = 'Fairly Competent'; 
+            } elseif ($n < 90) { // Meng-cover semua dari 75 sampai sebelum 90
+                $predikat = 'Competent';
+            } else {
+                $predikat = 'Highly Competent';
+            }
         }
     }
     return $predikat;

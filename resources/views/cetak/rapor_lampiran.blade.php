@@ -208,6 +208,30 @@
         $not_yet = '';
     }
     ?>
+    @if ($pd->kelas->semester->semester == 2)
+        <table width="100%" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">{{ $text_status }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:10px;">
+                        @if ($pd->kenaikan)
+                            @if ($pd->kenaikan->status == 3)
+                                LULUS
+                            @else
+                                {{ status_kenaikan($pd->kenaikan->status) }} {{ $pd->kenaikan->nama_kelas }}
+                            @endif
+                        @else
+                            {{ $not_yet }}
+                        @endif
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    @endif
     <table class="table table-bordered" style="margin-bottom: 0px;">
         <thead>
             <tr>

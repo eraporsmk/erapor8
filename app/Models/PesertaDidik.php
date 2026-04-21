@@ -246,4 +246,16 @@ class PesertaDidik extends Model
             'anggota_rombel_id'
         )->where('type', 'catatan_walas');
 	}
+    public function kenaikan(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            KenaikanKelas::class, 
+            AnggotaRombel::class,
+            'peserta_didik_id',
+            'anggota_rombel_id', 
+            'peserta_didik_id',
+            'anggota_rombel_id'
+        );
+		return $this->hasOne(KenaikanKelas::class, 'anggota_rombel_id', 'anggota_rombel_id');
+	}
 }
