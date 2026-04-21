@@ -50,7 +50,7 @@ class Erapor extends Command
                     if($sekolah){
                         $response = NULL;
                         try {
-                            $spinner = $this->spinner(100);
+                            $spinner = $this->output->createProgressBar(0);
                             $spinner->setMessage('Mengecek koneksi ke Server Direktorat...'."\n");
                             $spinner->start();
                             for ($i=0; $i < 100; $i++) { 

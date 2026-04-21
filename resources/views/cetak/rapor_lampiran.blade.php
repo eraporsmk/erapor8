@@ -17,7 +17,7 @@
             <td>{{ $pd->kelas->nama }}</td>
         </tr>
         <tr>
-            <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Pelajaran</td>
+            <td style="padding-top:5px; padding-bottom:5px; padding-left:0px;">Tahun Ajaran</td>
             <td class="text-center">:</td>
             <td>
                 {{ $pd->kelas->semester->tahun_ajaran_id }}/{{ $pd->kelas->semester->tahun_ajaran_id + 1 }}
@@ -30,6 +30,7 @@
             <td>{{ substr($pd->kelas->semester->nama, 10) }}</td>
         </tr>
     </table>
+    
     <?php
     if ($pd->kelas->tingkat == 10) {
         if (merdeka($pd->kelas->kurikulum->nama_kurikulum)) {
@@ -106,7 +107,7 @@
                 @endif
             </tbody>
         </table>
-        <br />
+        
     @endif
     @if ($pd->kelas->semester->tahun_ajaran_id >= 2025)
         <table class="table table-bordered" style="margin-bottom: 10px;">
@@ -117,19 +118,19 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="text-justify">
+                    <td style="text-align: justify;">
                         {{ $pd->kokurikuler?->uraian_deskripsi }}
                     </td>
                 </tr>
             </tbody>
         </table>
     @endif
-    <table class="table table-bordered" style="margin-bottom: 10px;">
+    <table class="table table-bordered" style="">
         <thead>
             <tr>
-                <th style="width: 5%; vertical-align: middle;">No</th>
-                <th style="width: 35%; vertical-align: middle;">Ekstrakurikuler</th>
-                <th style="width: 60%; vertical-align: middle;">Keterangan</th>
+                <th style="width: 5%;" style="vertical-align: middle; text-align: center;">No</th>
+                <th style="width: 35%;" style="vertical-align: middle;">Ekstrakurikuler</th>
+                <th style="width: 60%;" style="vertical-align: middle;">Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -138,7 +139,7 @@
                     <tr>
                         <td style="vertical-align: middle;">{{ $loop->iteration }}</td>
                         <td>{{ strtoupper($ekskul->rombongan_belajar?->nama) }}</td>
-                        <td>{{ $ekskul->single_nilai_ekstrakurikuler?->deskripsi_ekskul }}</td>
+                        <td style="text-align: justify;">{{ $ekskul->single_nilai_ekstrakurikuler?->deskripsi_ekskul }}</td>
                     </tr>
                 @endforeach
             @else
@@ -183,7 +184,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-justify">
+                            <td style="text-align: justify;">
                                 {{ $pd->catatan_walas?->uraian_deskripsi }}
                             </td>
                         </tr>
@@ -192,6 +193,7 @@
             </td>
         </tr>
     </table>
+    
     <?php
     if ($pd->kelas->semester->semester == 2) {
         if ($opsi == 'lulus') {
@@ -252,7 +254,8 @@
                 <br>
                 <br>
                 <br>
-                <p>...................................................................</p>
+                <br>
+                <p>..........................................</p>
             </td>
             <td style="width:5%"></td>
             <td style="width:55%; text-align: right;">
@@ -291,7 +294,7 @@
                 <br>
                 <p>&nbsp;</p>
             </td>
-            <td style="width:60%;">
+            <td>
                 <p>Mengetahui,<br>{{ $jabatan }}</p>
                 <br>
                 @if (get_setting('ttd_kepsek', $pd->sekolah_id, $pd->kelas->semester_id))
@@ -311,19 +314,14 @@
                             @elseif($pd->kelas->sekolah->kepala_sekolah)
                                 {{ $pd->kelas->sekolah->kepala_sekolah?->nama_lengkap }}
                             @endif
-                        </u></strong>
+                        </u></strong><br/>
+                        NIP.
+                        @if ($pd->kelas->sekolah->kasek)
+                            {{ $pd->kelas->sekolah->kasek->nip }}
+                        @elseif($pd->kelas->sekolah->kepala_sekolah)
+                            {{ $pd->kelas->sekolah->kepala_sekolah?->nip }}
+                        @endif
                 </p>
-            </td>
-        </tr>
-        <tr>
-            <td style="width:40%;"></td>
-            <td style="width:60%;" class="nip">
-                NIP.
-                @if ($pd->kelas->sekolah->kasek)
-                    {{ $pd->kelas->sekolah->kasek->nip }}
-                @elseif($pd->kelas->sekolah->kepala_sekolah)
-                    {{ $pd->kelas->sekolah->kepala_sekolah?->nip }}
-                @endif
             </td>
         </tr>
     </table>

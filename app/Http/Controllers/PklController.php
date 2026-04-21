@@ -37,18 +37,12 @@ class PklController extends Controller
                     },
                 ]);
             },
-            'akt_pd.dudi'
+            'dudi',
+            'akt_pd.dudi',
         ])->withCount('pd_pkl')->orderBy(request()->sortby, request()->sortbydesc)
         ->when(request()->q, function($query){
-            $query->where('nama', 'ILIKE', '%' . request()->q . '%');
-            $query->orWhereHas('wali_kelas', function($query){
+            $query->whereHas('akt_pd.dudi', function($query){
                 $query->where('nama', 'ILIKE', '%' . request()->q . '%');
-            });
-            $query->orWhereHas('jurusan_sp', function($query){
-                $query->where('nama_jurusan_sp', 'ILIKE', '%' . request()->q . '%');
-            });
-            $query->orWhereHas('kurikulum', function($query){
-                $query->where('nama_kurikulum', 'ILIKE', '%' . request()->q . '%');
             });
         })->paginate(request()->per_page);
         return response()->json(['status' => 'success', 'data' => $data]);

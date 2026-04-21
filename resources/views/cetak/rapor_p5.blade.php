@@ -25,7 +25,7 @@
 	<tr>
 		<th style="font-weight:bold;" class="text-right">Nama Peserta Didik</th>
 		<th style="font-weight:normal;">{{strtoupper($get_siswa->peserta_didik->nama)}}</th>
-		<th style="font-weight:bold;" class="text-right">Tahun Pelajaran</th>
+		<th style="font-weight:bold;" class="text-right">Tahun Ajaran</th>
 		<th style="font-weight:normal;">{{$semester->tahun_ajaran_id}}/{{$semester->tahun_ajaran_id + 1}}</th>
 	</tr>
 	<tr>
