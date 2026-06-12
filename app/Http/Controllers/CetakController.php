@@ -1030,6 +1030,14 @@ class CetakController extends Controller
 
 		GenerateBulkRaporJob::dispatch($job_id, $params);
 
+		// Otomatis trigger queue worker di background agar sysadmin tidak perlu setup supervisor
+		$base = base_path();
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			pclose(popen("start /B php \"{$base}\\artisan\" queue:work --stop-when-empty --timeout=600 > NUL 2>&1", "r"));
+		} else {
+			exec("php \"{$base}/artisan\" queue:work --stop-when-empty --timeout=600 > /dev/null 2>&1 &");
+		}
+
 		return response()->json(['job_id' => $job_id, 'total' => count($siswa_list)]);
 	}
 
