@@ -61,7 +61,7 @@ const changeTingkat = async (val) => {
 }
 const changeRombel = async (val) => {
   arrayData.value.siswa = []
-  if (val) {
+  if (val && val !== 'all') {
     loading.value.body = true;
     await getData({
       data: "siswa",
@@ -70,6 +70,115 @@ const changeRombel = async (val) => {
     });
   }
 }
+
+// Tambah opsi "Semua Rombel" di depan list
+const rombelOptions = computed(() => {
+  return [
+    { rombongan_belajar_id: 'all', nama: '== Semua Rombel ==' },
+    ...arrayData.value.rombel,
+  ]
+})
+
+// =============================================
+// Bulk Rapor
+// =============================================
+const bulkForm = ref({
+  komponen: {
+    cover: true,
+    akademik: true,
+    pts: false,
+    p5: false,
+    pelengkap: true,
+  },
+  format: 'zip',
+})
+const bulkStatus = ref({
+  loading: false,
+  job_id: null,
+  progress: 0,
+  total: 0,
+  status: null,
+  download_url: null,
+  error_msg: null,
+})
+let pollingInterval = null
+
+const getNamaRombel = () => {
+  if (form.value.rombongan_belajar_id === 'all') return 'Semua-Kelas'
+  const rombel = arrayData.value.rombel.find(r => r.rombongan_belajar_id === form.value.rombongan_belajar_id)
+  return rombel?.nama ?? ''
+}
+
+const unduhBulkRapor = async () => {
+  if (!form.value.rombongan_belajar_id) return
+  bulkStatus.value = { loading: true, job_id: null, progress: 0, total: 0, status: 'preparing', download_url: null, error_msg: null }
+
+  const payload = {
+    rombongan_belajar_ids: form.value.rombongan_belajar_id === 'all' ? 'all' : [form.value.rombongan_belajar_id],
+    nama_rombel: getNamaRombel(),
+    sekolah_id: form.value.sekolah_id,
+    semester_id: form.value.semester_id,
+    periode_aktif: $semester.nama,
+    komponen: bulkForm.value.komponen,
+    format: bulkForm.value.format,
+  }
+
+  try {
+    const response = await $api('/cetak/bulk-rapor', {
+      method: 'POST',
+      body: payload,
+    })
+    if (response?.redirect_to_queue) {
+      await startQueueJob(payload)
+    } else {
+      bulkStatus.value.loading = false
+      bulkStatus.value.status = 'done'
+    }
+  } catch (e) {
+    console.error(e)
+    bulkStatus.value.loading = false
+    bulkStatus.value.status = 'error'
+    bulkStatus.value.error_msg = 'Terjadi kesalahan saat memproses rapor. Coba lagi.'
+  }
+}
+
+const startQueueJob = async (payload) => {
+  try {
+    const response = await $api('/cetak/bulk-rapor/queue', {
+      method: 'POST',
+      body: payload,
+    })
+    bulkStatus.value.job_id = response.job_id
+    bulkStatus.value.total  = response.total
+    bulkStatus.value.status = 'queued'
+
+    pollingInterval = setInterval(async () => {
+      try {
+        const statusResp = await $api(`/cetak/bulk-rapor/status/${bulkStatus.value.job_id}`)
+        bulkStatus.value.progress = statusResp.progress ?? 0
+        bulkStatus.value.status   = statusResp.status
+        if (statusResp.status === 'done') {
+          clearInterval(pollingInterval)
+          bulkStatus.value.download_url = `/cetak/bulk-rapor/download/${bulkStatus.value.job_id}`
+          bulkStatus.value.loading = false
+        }
+        if (statusResp.status === 'error') {
+          clearInterval(pollingInterval)
+          bulkStatus.value.loading   = false
+          bulkStatus.value.error_msg = statusResp.message ?? 'Terjadi kesalahan saat memproses.'
+        }
+      } catch (pollErr) { console.error(pollErr) }
+    }, 3000)
+  } catch (e) {
+    console.error(e)
+    bulkStatus.value.loading = false
+    bulkStatus.value.status  = 'error'
+  }
+}
+
+onUnmounted(() => {
+  if (pollingInterval) clearInterval(pollingInterval)
+})
 </script>
 <template>
   <VCard class="mb-6">
@@ -108,7 +217,7 @@ const changeRombel = async (val) => {
             </VCol>
             <VCol cols="12" md="9">
               <AppSelect v-model="form.rombongan_belajar_id" placeholder="== Pilih Rombongan Belajar == "
-                :items="arrayData.rombel" clearable clear-icon="tabler-x" @update:model-value="changeRombel"
+                :items="rombelOptions" clearable clear-icon="tabler-x" @update:model-value="changeRombel"
                 item-value="rombongan_belajar_id" item-title="nama" :loading="loading.rombel"
                 :disabled="loading.rombel" />
             </VCol>
@@ -177,5 +286,76 @@ const changeRombel = async (val) => {
         </tbody>
       </VTable>
     </template>
+  </VCard>
+
+  <!-- Bulk Rapor Card -->
+  <VCard class="mt-6" v-if="form.rombongan_belajar_id">
+    <VCardItem class="pb-4">
+      <VCardTitle>Unduh Rapor Semua Siswa</VCardTitle>
+    </VCardItem>
+    <VDivider />
+    <VCardText>
+      <VRow>
+        <!-- Pilihan Komponen -->
+        <VCol cols="12">
+          <p class="text-body-2 font-weight-medium mb-2">Pilih Komponen Rapor:</p>
+          <VRow>
+            <VCol cols="6" md="4">
+              <VCheckbox v-model="bulkForm.komponen.cover" label="Cover (Halaman Depan)" />
+            </VCol>
+            <VCol cols="6" md="4">
+              <VCheckbox v-model="bulkForm.komponen.akademik" label="Rapor Akademik" />
+            </VCol>
+            <VCol cols="6" md="4" v-if="form.rapor_pts">
+              <VCheckbox v-model="bulkForm.komponen.pts" label="Rapor Tengah Semester" />
+            </VCol>
+            <VCol cols="6" md="4" v-if="form.merdeka && !form.is_new_ppa">
+              <VCheckbox v-model="bulkForm.komponen.p5" label="Rapor P5" />
+            </VCol>
+            <VCol cols="6" md="4">
+              <VCheckbox v-model="bulkForm.komponen.pelengkap" label="Dokumen Pendukung" />
+            </VCol>
+          </VRow>
+        </VCol>
+        <!-- Pilihan Format -->
+        <VCol cols="12">
+          <p class="text-body-2 font-weight-medium mb-2">Format Output:</p>
+          <VRadioGroup v-model="bulkForm.format" inline>
+            <VRadio label="ZIP (PDF per-siswa)" value="zip" />
+            <VRadio label="PDF Gabungan (1 file)" value="pdf" />
+          </VRadioGroup>
+        </VCol>
+        <!-- Tombol Download -->
+        <VCol cols="12">
+          <VBtn
+            prepend-icon="tabler-download"
+            color="primary"
+            :loading="bulkStatus.loading"
+            :disabled="bulkStatus.loading"
+            @click="unduhBulkRapor"
+          >
+            Unduh Rapor Semua Siswa
+          </VBtn>
+        </VCol>
+        <!-- Progress Bar -->
+        <VCol cols="12" v-if="bulkStatus.status === 'queued' || bulkStatus.status === 'processing'">
+          <p class="text-body-2 mb-1">Memproses {{ bulkStatus.progress }}% dari {{ bulkStatus.total }} siswa...</p>
+          <VProgressLinear :model-value="bulkStatus.progress" color="primary" height="8" rounded />
+        </VCol>
+        <!-- Tombol download setelah selesai -->
+        <VCol cols="12" v-if="bulkStatus.status === 'done' && bulkStatus.download_url">
+          <VAlert type="success" variant="tonal" class="d-flex align-center">
+            File rapor siap!
+            <VBtn :href="bulkStatus.download_url" color="success" class="ml-4" prepend-icon="tabler-download" size="small">
+              Klik untuk Download
+            </VBtn>
+          </VAlert>
+        </VCol>
+        <!-- Error -->
+        <VCol cols="12" v-if="bulkStatus.status === 'error'">
+          <VAlert type="error" variant="tonal">{{ bulkStatus.error_msg ?? 'Terjadi kesalahan. Coba lagi.' }}</VAlert>
+        </VCol>
+      </VRow>
+    </VCardText>
   </VCard>
 </template>
