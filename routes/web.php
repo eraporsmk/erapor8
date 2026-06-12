@@ -27,6 +27,12 @@ Route::group(['prefix' => 'cetak'], function () {
     Route::get('/rapor-akademik/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_akademik'])->name('rapor-akademik');
     Route::get('/rapor-cover/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_cover'])->name('rapor-cover');
     Route::get('/rapor-pelengkap/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_pelengkap'])->name('rapor-pelengkap');
+    // Bulk rapor routes
+    Route::post('/bulk-rapor', [CetakController::class, 'bulk_rapor'])->name('bulk-rapor');
+    Route::post('/bulk-rapor/queue', [CetakController::class, 'bulk_rapor_queue'])->name('bulk-rapor-queue');
+    Route::get('/bulk-rapor/status/{job_id}', [CetakController::class, 'bulk_rapor_status'])->name('bulk-rapor-status');
+    Route::get('/bulk-rapor/download/{job_id}', [CetakController::class, 'bulk_rapor_download'])->name('bulk-rapor-download');
+
     
     //Route::get('/rapor-akademik/{anggota_rombel_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_akademik'])->name('rapor-akademik');
 });
