@@ -17,6 +17,7 @@ use App\Exports\TemplateSumatifLingkupMateri;
 use App\Exports\TemplateSumatifAkhirSemester;
 use App\Exports\TemplateNilaiAkhir;
 use App\Exports\LeggerNilaiKurmerExport;
+use App\Exports\LeggerNilaiBulkExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Hash;
@@ -188,6 +189,11 @@ class DownloadController extends Controller
 			'semester_id' => request()->route('semester_id'),
 		])->download($nama_file);
     }
+	public function unduh_leger_nilai_bulk_semua($sekolah_id, $semester_id){
+		$semester = Semester::find($semester_id);
+		$nama_file = 'Leger-Nilai-Semua-Kelas-' . clean($semester->nama) . '.xlsx';
+		return Excel::download(new LeggerNilaiBulkExport($sekolah_id, $semester_id), $nama_file);
+	}
 	public function pengguna($data, $sekolah_id, $semester_id){
 		$semester = Semester::find($semester_id);
 		$users = User::where(function($query) use ($semester, $sekolah_id, $data){
