@@ -37,6 +37,8 @@ class GenerateBulkRaporJob implements ShouldQueue
         $nama_file   = $params['nama_file'];
         $total       = count($siswa_list);
 
+        \Log::info("GenerateBulkRaporJob started. job_id={$this->job_id}, total={$total}, first_siswa=" . json_encode($siswa_list[0] ?? []));
+
         Cache::put("bulk_rapor_{$this->job_id}", [
             'status'   => 'processing',
             'progress' => 0,
@@ -97,11 +99,23 @@ class GenerateBulkRaporJob implements ShouldQueue
 
     protected function generatePdfGabungan(CetakController $cetak, array $siswa_list, array $komponen, string $sekolah_id, string $semester_id, string $dir, string $nama_file, int $total): void
     {
-        $pdf      = null;
+        $config = [
+            'format'        => 'A4',
+            'margin_left'   => 15,
+            'margin_right'  => 15,
+            'margin_top'    => 15,
+            'margin_bottom' => 15,
+            'margin_header' => 5,
+            'margin_footer' => 5,
+        ];
+        $pdf   = \PDF::loadView('cetak.blank', [], [], $config);
+        $pdf->getMpdf()->defaultfooterfontsize = 7;
+        $pdf->getMpdf()->defaultfooterline     = 0;
         $first    = true;
+        $hasData  = false;
 
         foreach ($siswa_list as $index => $siswa) {
-            $siswa_pdf = $cetak->buildSiswaPdf(
+            $halaman = $cetak->buildSiswaHtmlViews(
                 $siswa['peserta_didik_id'],
                 $siswa['anggota_rombel_id'],
                 $komponen,
@@ -109,27 +123,24 @@ class GenerateBulkRaporJob implements ShouldQueue
                 $semester_id
             );
 
-            if ($siswa_pdf) {
-                if ($first) {
-                    $pdf   = $siswa_pdf;
-                    $first = false;
-                } else {
-                    // Append semua halaman siswa berikutnya ke PDF utama
-                    $pdf->getMpdf()->AddPage('P');
-                    $html = $siswa_pdf->getMpdf()->Output('', 'S');
-                    // Tambahkan pagebreak sebelum konten siswa baru
-                    $new_pages = $siswa_pdf->getMpdf()->page;
-                    for ($p = 1; $p <= $new_pages; $p++) {
-                        if ($p > 1) {
-                            $pdf->getMpdf()->AddPage('P');
-                        }
-                        // Tulis HTML dari PDF siswa ke PDF utama
-                        $content = $siswa_pdf->getMpdf()->pages[$p] ?? '';
-                        if ($content) {
-                            $pdf->getMpdf()->WriteHTML($content);
+            if (!empty($halaman)) {
+                $hasData = true;
+                if (!$first) {
+                    $pdf->getMpdf()->WriteHTML('<pagebreak />');
+                }
+                
+                $first_write = true;
+                foreach ($halaman as $section) {
+                    foreach ($section['views'] as $v) {
+                        if ($v === '<pagebreak />') {
+                            $pdf->getMpdf()->WriteHTML('<pagebreak />');
+                        } else {
+                            $pdf->getMpdf()->WriteHTML((string) $v);
+                            $first_write = false;
                         }
                     }
                 }
+                $first = false;
             }
 
             $progress = (int)(($index + 1) / $total * 100);
@@ -140,7 +151,7 @@ class GenerateBulkRaporJob implements ShouldQueue
             ], 3600);
         }
 
-        if ($pdf) {
+        if ($hasData) {
             $pdf_path = "{$dir}/{$nama_file}.pdf";
             $pdf->save($pdf_path);
 
