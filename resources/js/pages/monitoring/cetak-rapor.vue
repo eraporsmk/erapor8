@@ -314,7 +314,11 @@ onUnmounted(() => {
         <VRow>
           <!-- Info Target -->
           <VCol cols="12" md="6">
-            <p class="text-body-2 font-weight-medium mb-2">Pilih Rombongan Belajar:</p>
+            <p class="text-body-2 font-weight-medium mb-2">Pilih Tingkat Kelas (opsional):</p>
+            <AppSelect v-model="form.tingkat" placeholder="Semua Tingkat"
+              :items="tingkatKelas" clearable clear-icon="tabler-x" @update:model-value="changeTingkat" />
+
+            <p class="text-body-2 font-weight-medium mb-2 mt-4">Pilih Rombongan Belajar:</p>
             <AppSelect v-model="form.rombongan_belajar_id" placeholder="Semua Rombel"
               :items="rombelOptions" clearable clear-icon="tabler-x" @update:model-value="changeRombel"
               item-value="rombongan_belajar_id" item-title="nama" :loading="loading.rombel"
