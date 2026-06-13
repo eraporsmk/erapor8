@@ -105,19 +105,69 @@ const bulkStatus = ref({
 const isBulkDialogOpen = ref(false)
 let pollingInterval = null
 
+const filterJurusan = ref([])
+const filterTingkat = ref([])
+const allRombels = ref([])
+const jurusanOptions = ref([])
+const bulkSiswa = ref([])
+const bulkRombonganBelajarIds = ref([])
+
+const loadBulkDependencies = async () => {
+  if (allRombels.value.length === 0) {
+    loading.value.body = true
+    try {
+      const responseRombel = await $api('/monitoring/get-data', { method: 'POST', body: { data: 'semua_rombel', sekolah_id: form.value.sekolah_id, semester_id: form.value.semester_id } })
+      allRombels.value = responseRombel
+      const responseJurusan = await $api('/monitoring/get-data', { method: 'POST', body: { data: 'jurusan_sp', sekolah_id: form.value.sekolah_id } })
+      jurusanOptions.value = responseJurusan
+    } catch (e) { console.error(e) }
+    loading.value.body = false
+  }
+}
+
+watch(isBulkDialogOpen, (val) => {
+  if (val) loadBulkDependencies()
+})
+
+const filteredRombels = computed(() => {
+  return allRombels.value.filter(r => {
+    let matchJurusan = filterJurusan.value.length === 0 || filterJurusan.value.includes(r.jurusan_sp_id)
+    let matchTingkat = filterTingkat.value.length === 0 || filterTingkat.value.includes(r.tingkat)
+    return matchJurusan && matchTingkat
+  })
+})
+
+const applyFilter = () => {
+  const ids = filteredRombels.value.map(r => r.rombongan_belajar_id)
+  bulkRombonganBelajarIds.value = [...new Set([...bulkRombonganBelajarIds.value, ...ids])]
+}
+
+watch(bulkRombonganBelajarIds, async (newVal) => {
+  bulkSiswa.value = []
+  bulkForm.value.peserta_didik_ids = []
+  if (newVal.length > 0) {
+     try {
+         const resp = await $api('/monitoring/get-data', { method: 'POST', body: { data: 'siswa_by_rombels', rombongan_belajar_ids: newVal } })
+         bulkSiswa.value = resp.data_siswa
+         bulkForm.value.peserta_didik_ids = bulkSiswa.value.map(s => s.peserta_didik_id)
+     } catch (e) { console.error(e) }
+  }
+}, { deep: true })
+
 const getNamaRombel = () => {
-  if (form.value.rombongan_belajar_id === 'all') return 'Semua-Kelas'
-  const rombel = arrayData.value.rombel.find(r => r.rombongan_belajar_id === form.value.rombongan_belajar_id)
+  if (bulkRombonganBelajarIds.value.length === 0) return 'Belum ada kelas terpilih'
+  if (bulkRombonganBelajarIds.value.length > 1) return `Multi-Kelas (${bulkRombonganBelajarIds.value.length} rombel)`
+  const rombel = allRombels.value.find(r => r.rombongan_belajar_id === bulkRombonganBelajarIds.value[0])
   return rombel?.nama ?? ''
 }
 
 const unduhBulkRapor = async () => {
+  if (bulkRombonganBelajarIds.value.length === 0) return
   bulkStatus.value = { loading: true, job_id: null, progress: 0, total: 0, status: 'preparing', download_url: null, error_msg: null }
 
-  const rombelId = form.value.rombongan_belajar_id || 'all';
   const payload = {
-    rombongan_belajar_ids: rombelId === 'all' ? 'all' : [rombelId],
-    peserta_didik_ids: bulkForm.value.peserta_didik_ids.length ? bulkForm.value.peserta_didik_ids : 'all',
+    rombongan_belajar_ids: bulkRombonganBelajarIds.value,
+    peserta_didik_ids: bulkForm.value.peserta_didik_ids.length !== bulkSiswa.value.length ? bulkForm.value.peserta_didik_ids : 'all',
     nama_rombel: getNamaRombel(),
     sekolah_id: form.value.sekolah_id,
     semester_id: form.value.semester_id,
@@ -312,32 +362,43 @@ onUnmounted(() => {
       <VDivider />
       <VCardText>
         <VRow>
-          <!-- Info Target -->
+          <!-- Advanced Filters -->
           <VCol cols="12" md="6">
-            <p class="text-body-2 font-weight-medium mb-2">Pilih Tingkat Kelas (opsional):</p>
-            <AppSelect v-model="form.tingkat" placeholder="Semua Tingkat"
-              :items="tingkatKelas" clearable clear-icon="tabler-x" @update:model-value="changeTingkat" />
+            <p class="text-body-2 font-weight-medium mb-2">Filter Jurusan & Tingkat (Pencarian Rombel):</p>
+            <AppSelect v-model="filterJurusan" placeholder="Semua Jurusan"
+              :items="jurusanOptions" item-value="jurusan_sp_id" item-title="nama_jurusan_sp"
+              multiple clearable class="mb-3" />
+            
+            <AppSelect v-model="filterTingkat" placeholder="Semua Tingkat"
+              :items="tingkatKelas" multiple clearable />
 
-            <p class="text-body-2 font-weight-medium mb-2 mt-4">Pilih Rombongan Belajar:</p>
-            <AppSelect v-model="form.rombongan_belajar_id" placeholder="Semua Rombel"
-              :items="rombelOptions" clearable clear-icon="tabler-x" @update:model-value="changeRombel"
-              item-value="rombongan_belajar_id" item-title="nama" :loading="loading.rombel"
-              :disabled="loading.rombel" />
+            <VBtn color="secondary" variant="tonal" class="mt-3 w-100" prepend-icon="tabler-filter-plus" @click="applyFilter">
+              Tambahkan Rombel dari Filter ke Kotak Kanan
+            </VBtn>
           </VCol>
+
+          <!-- Pusat Kendali -->
           <VCol cols="12" md="6">
-            <p class="text-body-2 font-weight-medium mb-2">Pilih Siswa (Kosongkan untuk semua):</p>
+            <p class="text-body-2 font-weight-medium mb-2">Pilih Rombongan Belajar (Pusat Kendali):</p>
+            <AppAutocomplete v-model="bulkRombonganBelajarIds" placeholder="Semua Rombel di Sekolah"
+              :items="allRombels" item-value="rombongan_belajar_id" item-title="nama"
+              multiple clearable chips closable-chips class="mb-4" />
+            
+            <p class="text-body-2 font-weight-medium mb-2">Siswa (Hilangkan centang untuk mengecualikan):</p>
             <AppAutocomplete
               v-model="bulkForm.peserta_didik_ids"
-              :items="arrayData.siswa"
+              :items="bulkSiswa"
               item-title="nama"
               item-value="peserta_didik_id"
-              placeholder="Semua Siswa di Rombel"
+              placeholder="Semua Siswa"
               multiple
               clearable
-              chips
-              closable-chips
-              :disabled="!form.rombongan_belajar_id || form.rombongan_belajar_id === 'all'"
-            />
+              :disabled="bulkRombonganBelajarIds.length === 0"
+            >
+              <template #selection="{ item, index }">
+                <span v-if="index === 0" class="text-caption font-weight-bold text-primary">{{ bulkForm.peserta_didik_ids.length }} siswa akan diunduh</span>
+              </template>
+            </AppAutocomplete>
           </VCol>
           <!-- Pilihan Komponen -->
           <VCol cols="12">

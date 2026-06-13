@@ -200,6 +200,30 @@ class MonitoringController extends Controller
         $data = $this->{$function}();
         return response()->json($data);
     }
+    private function get_semua_rombel(){
+        $data = RombonganBelajar::where(function($query){
+            $query->where('semester_id', request()->semester_id);
+            $query->where('sekolah_id', request()->sekolah_id);
+            $query->where('jenis_rombel', 1);
+        })->orderBy('nama')->get();
+        return $data;
+    }
+    private function get_jurusan_sp(){
+        $data = \App\Models\JurusanSp::where('sekolah_id', request()->sekolah_id)->orderBy('nama_jurusan_sp')->get();
+        return $data;
+    }
+    private function get_siswa_by_rombels(){
+        $rombels = request()->rombongan_belajar_ids;
+        if(empty($rombels)){
+            return ['data_siswa' => []];
+        }
+        $data = PesertaDidik::withWhereHas('anggota_rombel', function($query) use ($rombels){
+            $query->whereIn('rombongan_belajar_id', $rombels);
+        })->orderByRaw('LOWER(nama) ASC')->get();
+        return [
+            'data_siswa' => $data,
+        ];
+    }
     private function get_rombel(){
         $data = RombonganBelajar::where(function($query){
             $query->where('semester_id', request()->semester_id);
