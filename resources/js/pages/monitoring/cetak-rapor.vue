@@ -90,6 +90,7 @@ const bulkForm = ref({
     p5: false,
     pelengkap: true,
   },
+  peserta_didik_ids: [],
   format: 'zip',
 })
 const bulkStatus = ref({
@@ -116,6 +117,7 @@ const unduhBulkRapor = async () => {
   const rombelId = form.value.rombongan_belajar_id || 'all';
   const payload = {
     rombongan_belajar_ids: rombelId === 'all' ? 'all' : [rombelId],
+    peserta_didik_ids: bulkForm.value.peserta_didik_ids.length ? bulkForm.value.peserta_didik_ids : 'all',
     nama_rombel: getNamaRombel(),
     sekolah_id: form.value.sekolah_id,
     semester_id: form.value.semester_id,
@@ -311,10 +313,27 @@ onUnmounted(() => {
       <VCardText>
         <VRow>
           <!-- Info Target -->
-          <VCol cols="12">
-            <VAlert type="info" variant="tonal" class="mb-2">
-              Anda akan mengunduh rapor untuk: <strong>{{ getNamaRombel() === 'Semua-Kelas' ? 'Semua Rombel (Seluruh Kelas)' : getNamaRombel() }}</strong>
-            </VAlert>
+          <VCol cols="12" md="6">
+            <p class="text-body-2 font-weight-medium mb-2">Pilih Rombongan Belajar:</p>
+            <AppSelect v-model="form.rombongan_belajar_id" placeholder="Semua Rombel"
+              :items="rombelOptions" clearable clear-icon="tabler-x" @update:model-value="changeRombel"
+              item-value="rombongan_belajar_id" item-title="nama" :loading="loading.rombel"
+              :disabled="loading.rombel" />
+          </VCol>
+          <VCol cols="12" md="6">
+            <p class="text-body-2 font-weight-medium mb-2">Pilih Siswa (Kosongkan untuk semua):</p>
+            <AppAutocomplete
+              v-model="bulkForm.peserta_didik_ids"
+              :items="arrayData.siswa"
+              item-title="nama"
+              item-value="peserta_didik_id"
+              placeholder="Semua Siswa di Rombel"
+              multiple
+              clearable
+              chips
+              closable-chips
+              :disabled="!form.rombongan_belajar_id || form.rombongan_belajar_id === 'all'"
+            />
           </VCol>
           <!-- Pilihan Komponen -->
           <VCol cols="12">

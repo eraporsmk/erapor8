@@ -45,6 +45,7 @@ const fetchData = async () => {
     defaultForm.value.merdeka = getData.merdeka
     defaultForm.value.is_ppa = getData.is_ppa
     defaultForm.value.is_new_ppa = getData.is_new_ppa
+    defaultForm.value.rombongan_belajar_id = getData.rombongan_belajar_id
     arrayData.value.siswa = getData.data_siswa
   } catch (error) {
     console.error(error);
@@ -64,6 +65,7 @@ const bulkForm = ref({
     p5: false,
     pelengkap: true,
   },
+  peserta_didik_ids: [],
   format: 'zip',
 })
 const bulkStatus = ref({
@@ -87,6 +89,7 @@ const unduhBulkRapor = async () => {
     sekolah_id: defaultForm.value.sekolah_id,
     semester_id: defaultForm.value.semester_id,
     periode_aktif: defaultForm.value.periode_aktif,
+    peserta_didik_ids: bulkForm.value.peserta_didik_ids.length ? bulkForm.value.peserta_didik_ids : 'all',
     komponen: bulkForm.value.komponen,
     format: bulkForm.value.format,
   }
@@ -247,12 +250,27 @@ onUnmounted(() => {
           </VRow>
         </VCol>
         <!-- Pilihan Format -->
-        <VCol cols="12">
+        <VCol cols="12" md="6">
           <p class="text-body-2 font-weight-medium mb-2">Format Output:</p>
           <VRadioGroup v-model="bulkForm.format" inline>
             <VRadio label="ZIP (PDF per-siswa)" value="zip" />
             <VRadio label="PDF Gabungan (1 file)" value="pdf" />
           </VRadioGroup>
+        </VCol>
+        <!-- Pilihan Siswa -->
+        <VCol cols="12" md="6">
+          <p class="text-body-2 font-weight-medium mb-2">Pilih Siswa Tertentu (Kosongkan untuk semua):</p>
+          <AppAutocomplete
+            v-model="bulkForm.peserta_didik_ids"
+            :items="arrayData.siswa"
+            item-title="nama"
+            item-value="peserta_didik_id"
+            placeholder="Pilih siswa..."
+            multiple
+            clearable
+            chips
+            closable-chips
+          />
         </VCol>
         <!-- Tombol Download -->
         <VCol cols="12">

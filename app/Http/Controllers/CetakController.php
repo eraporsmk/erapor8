@@ -729,7 +729,7 @@ class CetakController extends Controller
 	 * Ambil daftar siswa dari rombel yang dipilih.
 	 * $rombongan_belajar_ids bisa 'all' (semua rombel sekolah) atau array UUID.
 	 */
-	private function getSiswaForBulk($rombongan_belajar_ids, string $sekolah_id, string $semester_id)
+	private function getSiswaForBulk($rombongan_belajar_ids, string $sekolah_id, string $semester_id, $peserta_didik_ids = null)
 	{
 		if ($rombongan_belajar_ids === 'all') {
 			$rombels = RombonganBelajar::where('sekolah_id', $sekolah_id)
@@ -741,12 +741,22 @@ class CetakController extends Controller
 			$rombels = (array) $rombongan_belajar_ids;
 		}
 
-		return PesertaDidik::withWhereHas('anggota_rombel', function ($query) use ($rombels, $semester_id) {
+		$query = PesertaDidik::withWhereHas('anggota_rombel', function ($query) use ($rombels, $semester_id) {
 			$query->whereIn('rombongan_belajar_id', $rombels)
 				->whereHas('rombongan_belajar', function ($q) use ($semester_id) {
 					$q->where('semester_id', $semester_id);
 				});
-		})->orderByRaw('LOWER(nama) ASC')->get();
+		});
+
+		if (!empty($peserta_didik_ids)) {
+			if (is_array($peserta_didik_ids)) {
+				$query->whereIn('peserta_didik_id', $peserta_didik_ids);
+			} else if ($peserta_didik_ids !== 'all') {
+				$query->where('peserta_didik_id', $peserta_didik_ids);
+			}
+		}
+
+		return $query->orderByRaw('LOWER(nama) ASC')->get();
 	}
 
 	/**
@@ -754,19 +764,8 @@ class CetakController extends Controller
 	 * Dipanggil dari bulk sync dan dari GenerateBulkRaporJob.
 	 * Return: PDF object (mPDF wrapper) atau null jika siswa tidak ditemukan.
 	 */
-	public function buildSiswaPdf(string $peserta_didik_id, ?string $anggota_rombel_id, array $komponen, string $sekolah_id, string $semester_id)
+	public function buildSiswaHtmlViews(string $peserta_didik_id, ?string $anggota_rombel_id, array $komponen, string $sekolah_id, string $semester_id)
 	{
-		$pdf = null;
-		$config = [
-			'format'         => 'A4',
-			'margin_left'    => 15,
-			'margin_right'   => 15,
-			'margin_top'     => 15,
-			'margin_bottom'  => 15,
-			'margin_header'  => 5,
-			'margin_footer'  => 5,
-		];
-
 		$halaman = [];
 
 		// === Cover ===
@@ -924,8 +923,29 @@ class CetakController extends Controller
 		}
 
 		if (empty($halaman)) {
+			return [];
+		}
+
+		return $halaman;
+	}
+
+	public function buildSiswaPdf(string $peserta_didik_id, ?string $anggota_rombel_id, array $komponen, string $sekolah_id, string $semester_id)
+	{
+		$halaman = $this->buildSiswaHtmlViews($peserta_didik_id, $anggota_rombel_id, $komponen, $sekolah_id, $semester_id);
+
+		if (empty($halaman)) {
 			return null;
 		}
+
+		$config = [
+			'format'         => 'A4',
+			'margin_left'    => 15,
+			'margin_right'   => 15,
+			'margin_top'     => 15,
+			'margin_bottom'  => 15,
+			'margin_header'  => 5,
+			'margin_footer'  => 5,
+		];
 
 		// Gabungkan semua halaman ke satu PDF
 		$pdf = PDF::loadView('cetak.blank', [], [], $config);
@@ -966,44 +986,47 @@ class CetakController extends Controller
 	 */
 	public function bulk_rapor(Request $request)
 	{
+		\Log::info('bulk_rapor hit with: ' . json_encode($request->all()));
 		$data_siswa = $this->getSiswaForBulk(
 			$request->rombongan_belajar_ids,
 			$request->sekolah_id,
-			$request->semester_id
+			$request->semester_id,
+			$request->peserta_didik_ids
 		);
 
-		// Jika terlalu banyak siswa atau semua rombel, alihkan ke queue
-		if ($data_siswa->count() > 30 || $request->rombongan_belajar_ids === 'all') {
-			return response()->json(['redirect_to_queue' => true]);
-		}
-
-		$komponen    = $request->komponen ?? [];
-		$format      = $request->format ?? 'zip';
-		$sekolah_id  = $request->sekolah_id;
-		$semester_id = $request->semester_id;
-		$nama_file   = 'Rapor-Bulk-' . clean($request->nama_rombel ?? 'Kelas') . '-' . clean($request->periode_aktif ?? '');
-
-		if ($format === 'zip') {
-			return $this->generateBulkZip($data_siswa, $komponen, $sekolah_id, $semester_id, $nama_file);
-		} else {
-			return $this->generateBulkPdfGabungan($data_siswa, $komponen, $sekolah_id, $semester_id, $nama_file);
-		}
+		return response()->json(['redirect_to_queue' => true]);
 	}
 
 	/**
-	 * Bulk rapor via Queue (untuk >30 siswa atau semua rombel).
+	 * Endpoint untuk mengirim pembuatan rapor massal ke antrean.
 	 * POST /cetak/bulk-rapor/queue
 	 */
 	public function bulk_rapor_queue(Request $request)
 	{
-		$job_id     = Str::uuid()->toString();
-		$data_siswa = $this->getSiswaForBulk(
+		\Log::info('bulk_rapor_queue hit with: ' . json_encode($request->all()));
+		$siswa_list = $this->getSiswaForBulk(
 			$request->rombongan_belajar_ids,
 			$request->sekolah_id,
-			$request->semester_id
+			$request->semester_id,
+			$request->peserta_didik_ids
 		);
 
-		$siswa_list = $data_siswa->map(function ($s) {
+		if (empty($siswa_list)) {
+			\Log::error('bulk_rapor_queue: tidak ada siswa');
+			return response()->json(['error' => 'Tidak ada siswa ditemukan.'], 404);
+		}
+
+		$job_id = Str::uuid()->toString();
+
+		// Gunakan cache untuk melacak status progress
+		Cache::put("bulk_rapor_{$job_id}", [
+			'status' => 'processing',
+			'progress' => 0,
+			'total' => count($siswa_list),
+			'message' => 'Sedang menyiapkan data...'
+		], 3600);
+
+		$siswa_list_mapped = $siswa_list->map(function ($s) {
 			$ar = $s->anggota_rombel->first();
 			return [
 				'peserta_didik_id'  => $s->peserta_didik_id,
@@ -1014,28 +1037,31 @@ class CetakController extends Controller
 		})->values()->toArray();
 
 		$params = [
-			'siswa_list'  => $siswa_list,
-			'komponen'    => $request->komponen ?? [],
-			'format'      => $request->format ?? 'zip',
-			'sekolah_id'  => $request->sekolah_id,
+			'siswa_list' => $siswa_list_mapped,
+			'sekolah_id' => $request->sekolah_id,
 			'semester_id' => $request->semester_id,
-			'nama_file'   => 'Rapor-Bulk-' . clean($request->nama_rombel ?? 'Semua') . '-' . clean($request->periode_aktif ?? ''),
+			'komponen' => $request->komponen ?? [],
+			'format' => $request->format ?? 'zip',
+			'nama_file' => 'Rapor-Bulk-' . clean($request->nama_rombel ?? 'Semua') . '-' . clean($request->periode_aktif ?? ''),
+			'nama_rombel' => $request->nama_rombel ?? '',
+			'periode_aktif' => $request->periode_aktif ?? ''
 		];
 
-		Cache::put("bulk_rapor_{$job_id}", [
-			'status'   => 'queued',
-			'progress' => 0,
-			'total'    => count($siswa_list),
-		], 3600);
+		try {
+			GenerateBulkRaporJob::dispatch($job_id, $params);
+			\Log::info("bulk_rapor_queue: job dispatched $job_id");
+		} catch (\Exception $e) {
+			\Log::error("bulk_rapor_queue error dispatch: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+			throw $e;
+		}
 
-		GenerateBulkRaporJob::dispatch($job_id, $params);
-
-		// Otomatis trigger queue worker di background agar sysadmin tidak perlu setup supervisor
+		// Otomatis trigger queue worker di background menggunakan path absolut php eRaporSMK
 		$base = base_path();
+		$php = realpath(base_path('../php/php.exe')) ?: 'php';
 		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			pclose(popen("start /B php \"{$base}\\artisan\" queue:work --stop-when-empty --timeout=600 > NUL 2>&1", "r"));
+			pclose(popen("start /B \"\" \"{$php}\" \"{$base}\\artisan\" queue:work --stop-when-empty --timeout=600 > NUL 2>&1", "r"));
 		} else {
-			exec("php \"{$base}/artisan\" queue:work --stop-when-empty --timeout=600 > /dev/null 2>&1 &");
+			exec("\"{$php}\" \"{$base}/artisan\" queue:work --stop-when-empty --timeout=600 > /dev/null 2>&1 &");
 		}
 
 		return response()->json(['job_id' => $job_id, 'total' => count($siswa_list)]);
@@ -1119,22 +1145,28 @@ class CetakController extends Controller
 
 		foreach ($data_siswa as $siswa) {
 			$ar          = $siswa->anggota_rombel->first();
-			$siswa_content = $this->buildSiswaPdfContent(
+			$halaman = $this->buildSiswaHtmlViews(
 				$siswa->peserta_didik_id,
 				$ar?->anggota_rombel_id,
 				$komponen,
 				$sekolah_id,
 				$semester_id
 			);
-			if ($siswa_content) {
+			if (!empty($halaman)) {
 				if (!$first) {
 					$pdf->getMpdf()->WriteHTML('<pagebreak />');
 				}
-				// Append raw output ke mPDF utama tidak semudah WriteHTML
-				// Karena mPDF tidak bisa import halaman dari PDF binary secara native,
-				// kita pakai FPDI jika tersedia, atau fallback ke HTML concat
-				// Untuk saat ini: tulis ulang HTML tiap siswa (membutuhkan refactor buildSiswaHtml)
-				// TODO: implementasi FPDI merge jika diperlukan
+				$first_write = true;
+				foreach ($halaman as $section) {
+					foreach ($section['views'] as $v) {
+						if ($v === '<pagebreak />') {
+							$pdf->getMpdf()->WriteHTML('<pagebreak />');
+						} else {
+							$pdf->getMpdf()->WriteHTML((string) $v);
+							$first_write = false;
+						}
+					}
+				}
 				$first = false;
 			}
 		}
