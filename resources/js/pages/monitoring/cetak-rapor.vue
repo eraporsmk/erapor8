@@ -101,6 +101,7 @@ const bulkStatus = ref({
   download_url: null,
   error_msg: null,
 })
+const isBulkDialogOpen = ref(false)
 let pollingInterval = null
 
 const getNamaRombel = () => {
@@ -110,11 +111,11 @@ const getNamaRombel = () => {
 }
 
 const unduhBulkRapor = async () => {
-  if (!form.value.rombongan_belajar_id) return
   bulkStatus.value = { loading: true, job_id: null, progress: 0, total: 0, status: 'preparing', download_url: null, error_msg: null }
 
+  const rombelId = form.value.rombongan_belajar_id || 'all';
   const payload = {
-    rombongan_belajar_ids: form.value.rombongan_belajar_id === 'all' ? 'all' : [form.value.rombongan_belajar_id],
+    rombongan_belajar_ids: rombelId === 'all' ? 'all' : [rombelId],
     nama_rombel: getNamaRombel(),
     sekolah_id: form.value.sekolah_id,
     semester_id: form.value.semester_id,
@@ -184,6 +185,15 @@ onUnmounted(() => {
   <VCard class="mb-6">
     <VCardItem class="pb-4">
       <VCardTitle>Monitoring &raquo; Cetak Rapor</VCardTitle>
+      <template #append>
+        <VBtn
+          color="success"
+          prepend-icon="tabler-download"
+          @click="isBulkDialogOpen = true"
+        >
+          Unduh Semua Kelas
+        </VBtn>
+      </template>
     </VCardItem>
     <VDivider />
     <VCardText>
@@ -288,74 +298,92 @@ onUnmounted(() => {
     </template>
   </VCard>
 
-  <!-- Bulk Rapor Card -->
-  <VCard class="mt-6" v-if="form.rombongan_belajar_id">
-    <VCardItem class="pb-4">
-      <VCardTitle>Unduh Rapor Semua Siswa</VCardTitle>
-    </VCardItem>
-    <VDivider />
-    <VCardText>
-      <VRow>
-        <!-- Pilihan Komponen -->
-        <VCol cols="12">
-          <p class="text-body-2 font-weight-medium mb-2">Pilih Komponen Rapor:</p>
-          <VRow>
-            <VCol cols="6" md="4">
-              <VCheckbox v-model="bulkForm.komponen.cover" label="Cover (Halaman Depan)" />
-            </VCol>
-            <VCol cols="6" md="4">
-              <VCheckbox v-model="bulkForm.komponen.akademik" label="Rapor Akademik" />
-            </VCol>
-            <VCol cols="6" md="4" v-if="form.rapor_pts">
-              <VCheckbox v-model="bulkForm.komponen.pts" label="Rapor Tengah Semester" />
-            </VCol>
-            <VCol cols="6" md="4" v-if="form.merdeka && !form.is_new_ppa">
-              <VCheckbox v-model="bulkForm.komponen.p5" label="Rapor P5" />
-            </VCol>
-            <VCol cols="6" md="4">
-              <VCheckbox v-model="bulkForm.komponen.pelengkap" label="Dokumen Pendukung" />
-            </VCol>
-          </VRow>
-        </VCol>
-        <!-- Pilihan Format -->
-        <VCol cols="12">
-          <p class="text-body-2 font-weight-medium mb-2">Format Output:</p>
-          <VRadioGroup v-model="bulkForm.format" inline>
-            <VRadio label="ZIP (PDF per-siswa)" value="zip" />
-            <VRadio label="PDF Gabungan (1 file)" value="pdf" />
-          </VRadioGroup>
-        </VCol>
-        <!-- Tombol Download -->
-        <VCol cols="12">
-          <VBtn
-            prepend-icon="tabler-download"
-            color="primary"
-            :loading="bulkStatus.loading"
-            :disabled="bulkStatus.loading"
-            @click="unduhBulkRapor"
-          >
-            Unduh Rapor Semua Siswa
-          </VBtn>
-        </VCol>
-        <!-- Progress Bar -->
-        <VCol cols="12" v-if="bulkStatus.status === 'queued' || bulkStatus.status === 'processing'">
-          <p class="text-body-2 mb-1">Memproses {{ bulkStatus.progress }}% dari {{ bulkStatus.total }} siswa...</p>
-          <VProgressLinear :model-value="bulkStatus.progress" color="primary" height="8" rounded />
-        </VCol>
-        <!-- Tombol download setelah selesai -->
-        <VCol cols="12" v-if="bulkStatus.status === 'done' && bulkStatus.download_url">
-          <VAlert type="success" variant="tonal" class="d-flex align-center">
-            File rapor siap!
-            <VBtn :href="bulkStatus.download_url" color="success" class="ml-4" prepend-icon="tabler-download" size="small">
-              Klik untuk Download
-            </VBtn>
-          </VAlert>
-        </VCol>
-        <!-- Error -->
-        <VCol cols="12" v-if="bulkStatus.status === 'error'">
-          <VAlert type="error" variant="tonal">{{ bulkStatus.error_msg ?? 'Terjadi kesalahan. Coba lagi.' }}</VAlert>
-        </VCol>
-      </VRow>
-    </VCardText>
-  </VCard>
+  <!-- Bulk Rapor Dialog -->
+  <VDialog v-model="isBulkDialogOpen" max-width="800">
+    <VCard>
+      <VCardItem class="pb-4">
+        <VCardTitle>Unduh Rapor Semua Siswa</VCardTitle>
+        <template #append>
+          <VBtn icon="tabler-x" variant="text" @click="isBulkDialogOpen = false" />
+        </template>
+      </VCardItem>
+      <VDivider />
+      <VCardText>
+        <VRow>
+          <!-- Info Target -->
+          <VCol cols="12">
+            <VAlert type="info" variant="tonal" class="mb-2">
+              Anda akan mengunduh rapor untuk: <strong>{{ getNamaRombel() === 'Semua-Kelas' ? 'Semua Rombel (Seluruh Kelas)' : getNamaRombel() }}</strong>
+            </VAlert>
+          </VCol>
+          <!-- Pilihan Komponen -->
+          <VCol cols="12">
+            <p class="text-body-2 font-weight-medium mb-2">Pilih Komponen Rapor:</p>
+            <VRow>
+              <VCol cols="6" md="4">
+                <VCheckbox v-model="bulkForm.komponen.cover" label="Cover (Halaman Depan)" />
+              </VCol>
+              <VCol cols="6" md="4">
+                <VCheckbox v-model="bulkForm.komponen.akademik" label="Rapor Akademik" />
+              </VCol>
+              <VCol cols="6" md="4" v-if="form.rapor_pts || true">
+                <VCheckbox v-model="bulkForm.komponen.pts" label="Rapor Tengah Semester" />
+              </VCol>
+              <VCol cols="6" md="4" v-if="(form.merdeka && !form.is_new_ppa) || true">
+                <VCheckbox v-model="bulkForm.komponen.p5" label="Rapor P5" />
+              </VCol>
+              <VCol cols="6" md="4">
+                <VCheckbox v-model="bulkForm.komponen.pelengkap" label="Dokumen Pendukung" />
+              </VCol>
+            </VRow>
+          </VCol>
+          <!-- Pilihan Format -->
+          <VCol cols="12">
+            <p class="text-body-2 font-weight-medium mb-2">Format Output:</p>
+            <VRadioGroup v-model="bulkForm.format" inline>
+              <VRadio label="ZIP (PDF per-siswa)" value="zip" />
+              <VRadio label="PDF Gabungan (1 file)" value="pdf" />
+            </VRadioGroup>
+          </VCol>
+          <!-- Progress Bar -->
+          <VCol cols="12" v-if="bulkStatus.status === 'queued' || bulkStatus.status === 'processing'">
+            <p class="text-body-2 mb-1">Memproses {{ bulkStatus.progress }}% dari {{ bulkStatus.total }} siswa...</p>
+            <VProgressLinear :model-value="bulkStatus.progress" color="primary" height="8" rounded />
+          </VCol>
+          <!-- Tombol download setelah selesai -->
+          <VCol cols="12" v-if="bulkStatus.status === 'done' && bulkStatus.download_url">
+            <VAlert type="success" variant="tonal" class="d-flex align-center">
+              File rapor siap!
+              <VBtn :href="bulkStatus.download_url" color="success" class="ml-4" prepend-icon="tabler-download" size="small">
+                Klik untuk Download
+              </VBtn>
+            </VAlert>
+          </VCol>
+          <!-- Error -->
+          <VCol cols="12" v-if="bulkStatus.status === 'error'">
+            <VAlert type="error" variant="tonal">{{ bulkStatus.error_msg ?? 'Terjadi kesalahan. Coba lagi.' }}</VAlert>
+          </VCol>
+        </VRow>
+      </VCardText>
+      <VCardText class="d-flex justify-end pt-3">
+        <VBtn
+          variant="tonal"
+          color="secondary"
+          @click="isBulkDialogOpen = false"
+          class="mr-3"
+        >
+          Tutup
+        </VBtn>
+        <VBtn
+          prepend-icon="tabler-download"
+          color="primary"
+          :loading="bulkStatus.loading"
+          :disabled="bulkStatus.loading"
+          @click="unduhBulkRapor"
+        >
+          Unduh Rapor
+        </VBtn>
+      </VCardText>
+    </VCard>
+  </VDialog>
 </template>
