@@ -114,10 +114,25 @@ const anggota = async (rombongan_belajar_id) => {
 const loadingSinkron = ref([])
 const sinkron = async (ekstrakurikuler_id) => {
   loadingSinkron.value[ekstrakurikuler_id] = true
-  console.log(ekstrakurikuler_id);
+  try {
+    await $api('/sinkronisasi/dapodik', {
+      method: 'POST',
+      body: {
+        tujuan: 'anggota_ekskul',
+        satuan: 'anggota_ekskul',
+        sekolah_id: $user.sekolah_id,
+        semester_id: $semester.semester_id,
+      },
+    })
+    await fetchData()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loadingSinkron.value[ekstrakurikuler_id] = false
+  }
 }
 const reFecthAnggota = async () => {
-  getAnggota(rombonganBelajarId.value)
+  await anggota(rombonganBelajarId.value)
 }
 </script>
 <template>
@@ -162,7 +177,7 @@ const reFecthAnggota = async () => {
         <template #item.sinkron="{ item }">
           <VBtn color="error" @click="sinkron(item.ekstrakurikuler_id)" size="x-small"
             :loading="loadingSinkron[item.ekstrakurikuler_id]" :disabled="loadingSinkron[item.ekstrakurikuler_id]">
-            <VIcon start icon="tabler-refresh" />Sinkron Anggta
+            <VIcon start icon="tabler-refresh" />Sinkron Anggota
           </VBtn>
         </template>
         <!-- pagination -->
