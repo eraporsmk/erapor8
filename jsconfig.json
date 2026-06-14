@@ -10,7 +10,6 @@
     "./node_modules"
   ],
   "compilerOptions": {
-    "baseUrl": "./",
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "Bundler",
@@ -44,13 +43,13 @@
         "./resources/js/@core/utils/validators"
       ],
       "@db/*": [
-        "resources/js/plugins/fake-api-delete/handlers/*"
+        "./resources/js/plugins/fake-api-delete/handlers/*"
       ],
       "@api-utils/*": [
-        "resources/js/plugins/fake-api-delete/utils/*"
+        "./resources/js/plugins/fake-api-delete/utils/*"
       ],
       "@core-scss/*": [
-        "resources/styles/@core/*"
+        "./resources/styles/@core/*"
       ]
     },
     "types": [
