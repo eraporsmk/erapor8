@@ -23,7 +23,7 @@ Route::group(['prefix' => 'cetak'], function () {
     Route::get('/rapor-p5/{anggota_rombel_id}/{semester_id}', [CetakController::class, 'rapor_p5'])->name('rapor-p5');
     Route::get('/rapor-pkl/{peserta_didik_id}/{pkl_id}/{guru_id}/{semester_id}', [CetakController::class, 'rapor_pkl'])->name('rapor_pkl');
     Route::get('/rapor-akademik/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_akademik'])->name('rapor-akademik');
-    Route::get('/rapor-cover/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_cover'])->name('rapor-cover');
+    Route::get('/rapor-cover/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_cover'])->name('rapor-cover-new');
     Route::get('/rapor-pelengkap/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_pelengkap'])->name('rapor-pelengkap');
     
     //Route::get('/rapor-akademik/{anggota_rombel_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_akademik'])->name('rapor-akademik');
