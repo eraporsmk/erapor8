@@ -102,6 +102,7 @@ class Update extends Command
         $this->call('cache:clear');
         $this->call('view:clear');
         $this->call('config:cache');
+        $this->call('route:cache');
         Setting::updateOrCreate(
             [
                 'key' => 'app_version',
@@ -146,5 +147,6 @@ class Update extends Command
             ]
         );
         $this->info('Berhasil memperbaharui aplikasi e-Rapor SMK ke versi '.$version);
+        return self::SUCCESS;
     }
 }

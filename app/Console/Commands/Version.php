@@ -29,7 +29,29 @@ class Version extends Command
         if (version_compare(phpversion(), '8.2', '<')) {
             $this->error('Versi PHP tidak kompatible! Versi PHP saat ini: '.phpversion().'. Versi PHP yang dibutuhkan: 8.2');
         } else {
-            if ($this->option('force')){
+            $now = get_setting('app_version');
+            $this->info('Versi Aplikasi: '.$now);
+            $this->info('Versi Database: '.get_setting('db_version'));
+            $this->info('Untuk mengupdate aplikasi, silahkan jalankan: php artisan app:update');
+            // Menambahkan opsi konfirmasi interaktif (default: no)
+            if ($this->confirm('Apakah Anda ingin mengupdate aplikasi sekarang?', false)) {
+                $this->info('Menjalankan proses update...');
+                
+                // Memanggil artisan command app:update secara langsung
+                $exitCode = $this->call('app:update');
+
+                if ($exitCode === self::SUCCESS) {
+                    $this->info('Proses update selesai.');
+                } else {
+                    $this->error('Proses update gagal.');
+                }
+            } else {
+                $this->comment('Update dibatalkan. Anda dapat mengupdate kapan saja dengan menjalankan: php artisan app:update');
+            }
+
+            return self::SUCCESS;
+            //$this->prosesUpdate();
+            /*if ($this->option('force')){
                 $this->prosesUpdate();
             } else {
                 $this->info('Mengecek versi aplikasi...');
@@ -53,7 +75,7 @@ class Version extends Command
                     $this->info('Versi Aplikasi: '.$now);
                     $this->info('Versi Database: '.get_setting('db_version'));
                 }
-            }
+            }*/
         }
     }
     private function prosesUpdate(){
