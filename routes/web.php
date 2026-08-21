@@ -10,6 +10,8 @@ Route::group(['prefix' => 'downloads'], function () {
     Route::get('/template-sumatif-akhir-semester/{pembelajaran_id?}', [DownloadController::class, 'template_sumatif_akhir_semester'])->name('template-sumatif-akhir-semester');
     Route::get('/template-nilai-akhir/{pembelajaran_id?}', [DownloadController::class, 'template_nilai_akhir'])->name('template-nilai-akhir');
     Route::get('/leger-nilai-kurmer/{rombongan_belajar_id}/{sekolah_id}/{semester_id}', [DownloadController::class, 'unduh_leger_nilai_kurmer'])->name('unduh-leger-nilai-kurmer');
+    Route::get('/leger-nilai-bulk/{sekolah_id}/{semester_id}', [DownloadController::class, 'unduh_leger_nilai_bulk_semua'])->name('unduh-leger-nilai-bulk-semua');
+
     Route::get('/pengguna/{data}/{sekolah_id}/{semester_id}', [DownloadController::class, 'pengguna'])->name('unduh-pengguna');
     Route::get('/backup/{folder}/{filename}', function ($folder, $filename) {
         return Storage::disk('local')->download($folder.'/'.$filename);
@@ -25,6 +27,12 @@ Route::group(['prefix' => 'cetak'], function () {
     Route::get('/rapor-akademik/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_akademik'])->name('rapor-akademik');
     Route::get('/rapor-cover/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_cover'])->name('rapor-cover-new');
     Route::get('/rapor-pelengkap/{peserta_didik_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_pelengkap'])->name('rapor-pelengkap');
+    // Bulk rapor routes
+    Route::post('/bulk-rapor', [CetakController::class, 'bulk_rapor'])->name('bulk-rapor');
+    Route::post('/bulk-rapor/queue', [CetakController::class, 'bulk_rapor_queue'])->name('bulk-rapor-queue');
+    Route::get('/bulk-rapor/status/{job_id}', [CetakController::class, 'bulk_rapor_status'])->name('bulk-rapor-status');
+    Route::get('/bulk-rapor/download/{job_id}', [CetakController::class, 'bulk_rapor_download'])->name('bulk-rapor-download');
+
     
     //Route::get('/rapor-akademik/{anggota_rombel_id}/{sekolah_id}/{semester_id}', [CetakController::class, 'rapor_akademik'])->name('rapor-akademik');
 });

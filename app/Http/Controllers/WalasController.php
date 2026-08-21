@@ -449,6 +449,7 @@ class WalasController extends Controller
             'rapor_pts' => config('erapor.rapor_pts'),
             'is_ppa' => is_ppa($rombel->semester_id),
             'is_new_ppa' => is_new_ppa($rombel->semester_id),
+            'rombongan_belajar_id' => $rombel ? $rombel->rombongan_belajar_id : null,
         ];
         return $data;
     }

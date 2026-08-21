@@ -78,6 +78,10 @@ const unduhLegger = () => {
     window.open(url, '_blank').focus();
   }
 }
+const unduhSemuaLegger = () => {
+  const url = `/downloads/leger-nilai-bulk/${form.value.sekolah_id}/${form.value.semester_id}`
+  window.open(url, '_blank').focus();
+}
 const getNilai = (nilai, anggota_rombel_id) => {
   const nilai_akhir = nilai.find(item => item.anggota_rombel_id === anggota_rombel_id)
   return nilai_akhir?.nilai ?? '-'
@@ -105,6 +109,11 @@ const getRasio = (rasio) => {
   <VCard class="mb-6">
     <VCardItem class="pb-4">
       <VCardTitle>Monitoring &raquo; Unduh Legger</VCardTitle>
+      <template #append>
+        <VBtn prepend-icon="tabler-file-type-xls" color="success" @click="unduhSemuaLegger">
+          Unduh Semua Kelas
+        </VBtn>
+      </template>
     </VCardItem>
     <VDivider />
     <VCardText>
