@@ -15,6 +15,7 @@ use App\Models\RombelEmpatTahun;
 use App\Models\KenaikanKelas;
 use App\Models\Pembelajaran;
 use App\Models\CatatanWali;
+use App\Services\LegerAkhirService;
 
 class WalasController extends Controller
 {
@@ -449,6 +450,7 @@ class WalasController extends Controller
             'rapor_pts' => config('erapor.rapor_pts'),
             'is_ppa' => is_ppa($rombel->semester_id),
             'is_new_ppa' => is_new_ppa($rombel->semester_id),
+            'rombongan_belajar_id' => $rombel ? $rombel->rombongan_belajar_id : null,
         ];
         return $data;
     }
@@ -500,6 +502,25 @@ class WalasController extends Controller
             'is_new_ppa' => is_new_ppa($rombel->semester_id),
         ];
         return $data;
+    }
+    public function unduh_legger_akhir(){
+        $rombel = $this->getRombel();
+        if (! $rombel || (int) $rombel->tingkat !== 12) {
+            return [
+                'rombel' => $rombel,
+                'tahun_ajaran' => '-',
+                'semesters' => [],
+                'max_semester_count' => 0,
+                'mapel_list' => [],
+                'siswa_list' => [],
+            ];
+        }
+
+        return app(LegerAkhirService::class)->getLeggerAkhir(
+            $rombel->rombongan_belajar_id,
+            request()->sekolah_id,
+            request()->semester_id
+        );
     }
     private function kokurikuler(){
         $rombel = $this->getRombel();

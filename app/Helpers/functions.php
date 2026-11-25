@@ -78,12 +78,18 @@ function getUpdaterID($sekolah_id, $npsn, $semester_id, $email){
         $getPengguna = Http::withToken(get_setting('token_dapodik', $sekolah_id))->get(get_setting('url_dapodik', $sekolah_id).'/WebService/getPengguna?npsn='.$npsn.'&semester_id='.$semester_id);
         if($getPengguna->successful()){
             $users = $getPengguna->object();
-            if($users){
+            if($users && isset($users->rows) && count($users->rows) > 0){
                 $pengguna = collect($users->rows);
                 $user_id = $pengguna->first(function ($value, $key) use ($email){
-                    return $value->username == $email;
+                    return strtolower($value->username) == strtolower($email);
                 });
-                $updater_id = $user_id->pengguna_id;
+                
+                if($user_id){
+                    $updater_id = $user_id->pengguna_id;
+                } else {
+                    // Fallback to the first user (usually the school admin) if email is not found
+                    $updater_id = $pengguna->first()->pengguna_id;
+                }
             }
         }
     } catch (\Throwable $th) {
@@ -885,6 +891,8 @@ function simpan_ekskul($data){
                 'deleted_at' => NULL,
             ]
         );
+    } else {
+        abort(500, 'Sinkronisasi Ekskul Gagal: Pembina (PTK) tidak ditemukan di database eRapor. ID PTK Dapodik: ' . ($data->rombongan_belajar->ptk_id ?? 'NULL') . ' | Nama Ekskul: ' . ($data->nm_ekskul ?? 'NULL') . ' | ID Ekskul: ' . ($data->id_kelas_ekskul ?? 'NULL') . '. Pastikan data Guru/PTK tersebut sudah disinkronkan ke eRapor terlebih dahulu.');
     }
 }
 function simpan_anggota_ekskul($data){

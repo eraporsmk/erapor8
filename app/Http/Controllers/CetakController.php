@@ -19,6 +19,10 @@ use App\Models\PesertaDidik;
 use App\Models\Pembelajaran;
 use Carbon\Carbon;
 use PDF;
+use App\Jobs\GenerateBulkRaporJob;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use ZipArchive;
 
 class CetakController extends Controller
 {
@@ -715,5 +719,458 @@ class CetakController extends Controller
 		$pdf->getMpdf()->WriteHTML($rapor_catatan);
 		$pdf->getMpdf()->allow_charset_conversion = true;
 		return $pdf->stream('RAPOR '.$general_title.'.pdf');
+	}
+
+	// =========================================================
+	// BULK RAPOR — helpers dan endpoints
+	// =========================================================
+
+	/**
+	 * Ambil daftar siswa dari rombel yang dipilih.
+	 * $rombongan_belajar_ids bisa 'all' (semua rombel sekolah) atau array UUID.
+	 */
+	private function getSiswaForBulk($rombongan_belajar_ids, string $sekolah_id, string $semester_id, $peserta_didik_ids = null)
+	{
+		if ($rombongan_belajar_ids === 'all') {
+			$rombels = RombonganBelajar::where('sekolah_id', $sekolah_id)
+				->where('semester_id', $semester_id)
+				->where('jenis_rombel', 1)
+				->pluck('rombongan_belajar_id')
+				->toArray();
+		} else {
+			$rombels = (array) $rombongan_belajar_ids;
+		}
+
+		$query = PesertaDidik::withWhereHas('anggota_rombel', function ($query) use ($rombels, $semester_id) {
+			$query->whereIn('rombongan_belajar_id', $rombels)
+				->whereHas('rombongan_belajar', function ($q) use ($semester_id) {
+					$q->where('semester_id', $semester_id);
+				});
+		});
+
+		if (!empty($peserta_didik_ids)) {
+			if (is_array($peserta_didik_ids)) {
+				$query->whereIn('peserta_didik_id', $peserta_didik_ids);
+			} else if ($peserta_didik_ids !== 'all') {
+				$query->where('peserta_didik_id', $peserta_didik_ids);
+			}
+		}
+
+		return $query->orderByRaw('LOWER(nama) ASC')->get();
+	}
+
+	/**
+	 * Build mPDF object untuk satu siswa berdasarkan komponen yang dipilih.
+	 * Dipanggil dari bulk sync dan dari GenerateBulkRaporJob.
+	 * Return: PDF object (mPDF wrapper) atau null jika siswa tidak ditemukan.
+	 */
+	public function buildSiswaHtmlViews(string $peserta_didik_id, ?string $anggota_rombel_id, array $komponen, string $sekolah_id, string $semester_id)
+	{
+		$halaman = [];
+
+		// === Cover ===
+		if (!empty($komponen['cover'])) {
+			$pd = PesertaDidik::with([
+				'kelas' => function ($query) use ($semester_id) {
+					$query->where('rombongan_belajar.semester_id', $semester_id)
+						->where('jenis_rombel', 1)
+						->with(['sekolah' => function ($q) {
+							$q->with(['kepala_sekolah' => function ($q2) {
+								$q2->where('semester_id', semester_id());
+							}]);
+						}, 'kurikulum', 'wali_kelas']);
+				},
+				'prakerin'     => fn ($q) => $q->where('semester_id', $semester_id),
+				'ekskul'       => function ($q) use ($semester_id) {
+					$q->where('semester_id', $semester_id)
+						->with(['rombongan_belajar' => fn ($q2) => $q2->select('rombongan_belajar_id', 'nama'), 'single_nilai_ekstrakurikuler']);
+				},
+				'kehadiran'    => fn ($q) => $q->where('semester_id', $semester_id),
+				'kokurikuler'  => fn ($q) => $q->where('semester_id', $semester_id),
+				'catatan_walas' => fn ($q) => $q->where('semester_id', $semester_id),
+			])->find($peserta_didik_id);
+
+			if ($pd) {
+				$params = ['pd' => $pd];
+				$halaman[] = ['views' => [
+					view('cetak.rapor_cover', $params),
+					view('cetak.identitas_sekolah', $params),
+					'<pagebreak />',
+					view('cetak.identitas_peserta_didik', $params),
+				]];
+			}
+		}
+
+		// === Rapor Akademik (new PPA / merdeka) ===
+		if (!empty($komponen['akademik'])) {
+			$pd = PesertaDidik::with([
+				'kelas' => function ($query) use ($semester_id) {
+					$query->where('rombongan_belajar.semester_id', $semester_id)
+						->where('jenis_rombel', 1)
+						->with(['sekolah' => function ($q) use ($semester_id) {
+							$q->with(['kepala_sekolah' => fn ($q2) => $q2->where('semester_id', $semester_id)]);
+						}, 'kurikulum', 'wali_kelas']);
+				},
+				'prakerin'     => fn ($q) => $q->where('semester_id', $semester_id),
+				'ekskul'       => function ($q) use ($semester_id) {
+					$q->where('semester_id', $semester_id)
+						->with(['rombongan_belajar' => fn ($q2) => $q2->select('rombongan_belajar_id', 'nama'), 'single_nilai_ekstrakurikuler']);
+				},
+				'kehadiran'    => fn ($q) => $q->where('semester_id', $semester_id),
+				'kokurikuler'  => fn ($q) => $q->where('semester_id', $semester_id),
+				'catatan_walas' => fn ($q) => $q->where('semester_id', $semester_id),
+				'kenaikan'     => fn ($q) => $q->where('semester_id', $semester_id),
+			])->find($peserta_didik_id);
+
+			if ($pd) {
+				$pembelajaran = Pembelajaran::where(function ($query) use ($sekolah_id, $semester_id, $peserta_didik_id) {
+					$query->whereNull('induk_pembelajaran_id')
+						->whereNotNull('kelompok_id')
+						->whereNotNull('no_urut')
+						->whereHas('rombongan_belajar', function ($q) use ($sekolah_id, $semester_id, $peserta_didik_id) {
+							$q->where('sekolah_id', $sekolah_id)
+								->where('semester_id', $semester_id)
+								->whereHas('anggota_rombel', fn ($q2) => $q2->where('peserta_didik_id', $peserta_didik_id))
+								->whereIn('jenis_rombel', [1, 16]);
+						});
+				})->with([
+					'kelompok',
+					'nilai_akhir_pengetahuan' => fn ($q) => $q->whereHas('anggota_rombel', fn ($q2) => $q2->where('peserta_didik_id', $peserta_didik_id)),
+					'nilai_akhir_kurmer'      => fn ($q) => $q->whereHas('anggota_rombel', fn ($q2) => $q2->where('peserta_didik_id', $peserta_didik_id)),
+					'single_deskripsi_mata_pelajaran' => function ($q) use ($peserta_didik_id) {
+						$q->whereHas('anggota_rombel', fn ($q2) => $q2->where('peserta_didik_id', $peserta_didik_id))
+							->where('asal', 0);
+					},
+				])->orderBy('kelompok_id')->orderBy('no_urut')->get();
+
+				$tanggal_rapor = get_setting('tanggal_rapor', $sekolah_id, $semester_id);
+				if ($pd->kelas && $pd->kelas->semester?->semester == 2 && $pd->kelas->tingkat >= 12) {
+					$tanggal_rapor = get_setting('tanggal_rapor_kelas_akhir', $sekolah_id, $semester_id);
+				}
+				$tanggal_rapor = $tanggal_rapor
+					? Carbon::parse($tanggal_rapor)->translatedFormat('d F Y')
+					: Carbon::now()->translatedFormat('d F Y');
+
+				$rombel_4_tahun = RombelEmpatTahun::with(['rombongan_belajar'])
+					->where('sekolah_id', $sekolah_id)->where('semester_id', $semester_id)->get();
+				$jurusan_sp_id = $rombel_4_tahun->map(fn ($r) => $r->rombongan_belajar->jurusan_sp_id)->toArray();
+				$opsi  = 'naik';
+				$rombel = $pd->kelas;
+				if ($rombel && ($rombel->tingkat >= 12 || ($rombel->tingkat == 12 && !$rombel->rombel_empat_tahun))) {
+					$opsi = 'lulus';
+				}
+				if ($rombel && $rombel->tingkat == 12 && in_array($rombel->jurusan_sp_id, $jurusan_sp_id)) {
+					$opsi = 'naik';
+				}
+
+				$params = [
+					'pd'              => $pd,
+					'set_pembelajaran' => $pembelajaran,
+					'tanggal_rapor'   => $tanggal_rapor,
+					'opsi'            => $opsi,
+				];
+				$halaman[] = ['views' => [
+					view('cetak.rapor-akademik', $params),
+					'<pagebreak />',
+					view('cetak.rapor_lampiran', $params),
+				]];
+			}
+		}
+
+		// === Rapor P5 ===
+		if (!empty($komponen['p5']) && $anggota_rombel_id) {
+			$get_siswa = AnggotaRombel::with([
+				'peserta_didik',
+				'nilai_budaya_kerja',
+				'rombongan_belajar.sekolah',
+			])->find($anggota_rombel_id);
+
+			if ($get_siswa) {
+				$params = [
+					'semester'           => Semester::find($semester_id),
+					'get_siswa'          => $get_siswa,
+					'rencana_budaya_kerja' => RencanaBudayaKerja::withWhereHas('pembelajaran', fn ($q) => $q->has('induk'))
+						->where('rombongan_belajar_id', $get_siswa->rombongan_belajar_id)
+						->with([
+							'aspek_budaya_kerja' => function ($q) use ($anggota_rombel_id) {
+								$q->with(['elemen_budaya_kerja' => function ($q2) use ($anggota_rombel_id) {
+									$q2->with(['nilai_budaya_kerja' => fn ($q3) => $q3->where('anggota_rombel_id', $anggota_rombel_id)->whereNotNull('aspek_budaya_kerja_id')]);
+								}, 'budaya_kerja']);
+							},
+							'catatan_budaya_kerja' => fn ($q) => $q->where('anggota_rombel_id', $anggota_rombel_id),
+						])->get(),
+					'opsi_budaya_kerja'  => OpsiBudayaKerja::where('opsi_id', '<>', 1)->orderBy('updated_at', 'ASC')->get(),
+					'budaya_kerja'       => BudayaKerja::orderBy('budaya_kerja_id')->get(),
+				];
+				$halaman[] = ['views' => [view('cetak.rapor_p5', $params)]];
+			}
+		}
+
+		// === Dokumen Pendukung ===
+		if (!empty($komponen['pelengkap'])) {
+			$pd = PesertaDidik::with([
+				'sekolah',
+				'anggota_rombel' => function ($q) use ($semester_id) {
+					$q->with(['prestasi'])
+						->withWhereHas('rombongan_belajar', fn ($q2) => $q2->where('semester_id', $semester_id)->where('jenis_rombel', 1));
+				},
+			])->find($peserta_didik_id);
+
+			if ($pd) {
+				$params = ['pd' => $pd];
+				$halaman[] = ['views' => [view('cetak.rapor_pendukung', $params)]];
+			}
+		}
+
+		if (empty($halaman)) {
+			return [];
+		}
+
+		return $halaman;
+	}
+
+	public function buildSiswaPdf(string $peserta_didik_id, ?string $anggota_rombel_id, array $komponen, string $sekolah_id, string $semester_id)
+	{
+		$halaman = $this->buildSiswaHtmlViews($peserta_didik_id, $anggota_rombel_id, $komponen, $sekolah_id, $semester_id);
+
+		if (empty($halaman)) {
+			return null;
+		}
+
+		$config = [
+			'format'         => 'A4',
+			'margin_left'    => 15,
+			'margin_right'   => 15,
+			'margin_top'     => 15,
+			'margin_bottom'  => 15,
+			'margin_header'  => 5,
+			'margin_footer'  => 5,
+		];
+
+		// Gabungkan semua halaman ke satu PDF
+		$pdf = PDF::loadView('cetak.blank', [], [], $config);
+		$pdf->getMpdf()->defaultfooterfontsize = 7;
+		$pdf->getMpdf()->defaultfooterline     = 0;
+
+		$first_write = true;
+		foreach ($halaman as $section) {
+			foreach ($section['views'] as $v) {
+				if (!$first_write) {
+					// Sudah ada konten sebelumnya, tidak perlu AddPage karena mPDF menambah halaman otomatis
+				}
+				if ($v === '<pagebreak />') {
+					$pdf->getMpdf()->WriteHTML('<pagebreak />');
+				} else {
+					$pdf->getMpdf()->WriteHTML((string) $v);
+					$first_write = false;
+				}
+			}
+		}
+
+		return $pdf;
+	}
+
+	/**
+	 * Sama seperti buildSiswaPdf tapi return konten binary PDF (string).
+	 * Dipakai oleh GenerateBulkRaporJob untuk addFromString ke ZIP.
+	 */
+	public function buildSiswaPdfContent(string $peserta_didik_id, ?string $anggota_rombel_id, array $komponen, string $sekolah_id, string $semester_id): ?string
+	{
+		$pdf = $this->buildSiswaPdf($peserta_didik_id, $anggota_rombel_id, $komponen, $sekolah_id, $semester_id);
+		return $pdf ? $pdf->getMpdf()->Output('', 'S') : null;
+	}
+
+	/**
+	 * Bulk rapor synchronous (untuk ≤30 siswa, 1 rombel).
+	 * POST /cetak/bulk-rapor
+	 */
+	public function bulk_rapor(Request $request)
+	{
+		\Log::info('bulk_rapor hit with: ' . json_encode($request->all()));
+		$data_siswa = $this->getSiswaForBulk(
+			$request->rombongan_belajar_ids,
+			$request->sekolah_id,
+			$request->semester_id,
+			$request->peserta_didik_ids
+		);
+
+		return response()->json(['redirect_to_queue' => true]);
+	}
+
+	/**
+	 * Endpoint untuk mengirim pembuatan rapor massal ke antrean.
+	 * POST /cetak/bulk-rapor/queue
+	 */
+	public function bulk_rapor_queue(Request $request)
+	{
+		\Log::info('bulk_rapor_queue hit with: ' . json_encode($request->all()));
+		$siswa_list = $this->getSiswaForBulk(
+			$request->rombongan_belajar_ids,
+			$request->sekolah_id,
+			$request->semester_id,
+			$request->peserta_didik_ids
+		);
+
+		if (empty($siswa_list)) {
+			\Log::error('bulk_rapor_queue: tidak ada siswa');
+			return response()->json(['error' => 'Tidak ada siswa ditemukan.'], 404);
+		}
+
+		$job_id = Str::uuid()->toString();
+
+		// Gunakan cache untuk melacak status progress
+		Cache::put("bulk_rapor_{$job_id}", [
+			'status' => 'processing',
+			'progress' => 0,
+			'total' => count($siswa_list),
+			'message' => 'Sedang menyiapkan data...'
+		], 3600);
+
+		$siswa_list_mapped = $siswa_list->map(function ($s) {
+			$ar = $s->anggota_rombel->first();
+			return [
+				'peserta_didik_id'  => $s->peserta_didik_id,
+				'anggota_rombel_id' => $ar?->anggota_rombel_id,
+				'nama'              => $s->nama,
+				'nisn'              => $s->nisn,
+			];
+		})->values()->toArray();
+
+		$params = [
+			'siswa_list' => $siswa_list_mapped,
+			'sekolah_id' => $request->sekolah_id,
+			'semester_id' => $request->semester_id,
+			'komponen' => $request->komponen ?? [],
+			'format' => $request->format ?? 'zip',
+			'nama_file' => 'Rapor-Bulk-' . clean($request->nama_rombel ?? 'Semua') . '-' . clean($request->periode_aktif ?? ''),
+			'nama_rombel' => $request->nama_rombel ?? '',
+			'periode_aktif' => $request->periode_aktif ?? ''
+		];
+
+		try {
+			GenerateBulkRaporJob::dispatch($job_id, $params);
+			\Log::info("bulk_rapor_queue: job dispatched $job_id");
+		} catch (\Exception $e) {
+			\Log::error("bulk_rapor_queue error dispatch: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+			throw $e;
+		}
+
+		// Otomatis trigger queue worker di background menggunakan path absolut php eRaporSMK
+		$base = base_path();
+		$php = realpath(base_path('../php/php.exe')) ?: 'php';
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			pclose(popen("start /B \"\" \"{$php}\" \"{$base}\\artisan\" queue:work --stop-when-empty --timeout=600 > NUL 2>&1", "r"));
+		} else {
+			exec("\"{$php}\" \"{$base}/artisan\" queue:work --stop-when-empty --timeout=600 > /dev/null 2>&1 &");
+		}
+
+		return response()->json(['job_id' => $job_id, 'total' => count($siswa_list)]);
+	}
+
+	/**
+	 * Polling status queue job.
+	 * GET /cetak/bulk-rapor/status/{job_id}
+	 */
+	public function bulk_rapor_status(string $job_id)
+	{
+		$status = Cache::get("bulk_rapor_{$job_id}", ['status' => 'not_found']);
+		unset($status['file_path']); // jangan expose path server ke frontend
+		return response()->json($status);
+	}
+
+	/**
+	 * Download hasil bulk rapor setelah Job selesai.
+	 * GET /cetak/bulk-rapor/download/{job_id}
+	 */
+	public function bulk_rapor_download(string $job_id)
+	{
+		$status = Cache::get("bulk_rapor_{$job_id}");
+		if (!$status || $status['status'] !== 'done') {
+			abort(404, 'File belum siap atau sudah kadaluarsa.');
+		}
+		return response()->download($status['file_path'], $status['filename'])->deleteFileAfterSend(false);
+	}
+
+	/**
+	 * Generate bulk rapor synchronous → ZIP (PDF per-siswa).
+	 */
+	private function generateBulkZip($data_siswa, array $komponen, string $sekolah_id, string $semester_id, string $nama_file)
+	{
+		$tmp_dir  = storage_path('app/temp');
+		if (!file_exists($tmp_dir)) {
+			mkdir($tmp_dir, 0755, true);
+		}
+		$zip_path = $tmp_dir . '/' . Str::uuid() . '.zip';
+
+		$zip = new ZipArchive();
+		$zip->open($zip_path, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+		foreach ($data_siswa as $siswa) {
+			$ar      = $siswa->anggota_rombel->first();
+			$content = $this->buildSiswaPdfContent(
+				$siswa->peserta_didik_id,
+				$ar?->anggota_rombel_id,
+				$komponen,
+				$sekolah_id,
+				$semester_id
+			);
+			if ($content) {
+				$filename = ($siswa->nisn ?? 'noNISN') . '-' . clean($siswa->nama) . '.pdf';
+				$zip->addFromString($filename, $content);
+			}
+		}
+
+		$zip->close();
+		return response()->download($zip_path, $nama_file . '.zip')->deleteFileAfterSend(true);
+	}
+
+	/**
+	 * Generate bulk rapor synchronous → satu PDF gabungan.
+	 */
+	private function generateBulkPdfGabungan($data_siswa, array $komponen, string $sekolah_id, string $semester_id, string $nama_file)
+	{
+		$config = [
+			'format'        => 'A4',
+			'margin_left'   => 15,
+			'margin_right'  => 15,
+			'margin_top'    => 15,
+			'margin_bottom' => 15,
+			'margin_header' => 5,
+			'margin_footer' => 5,
+		];
+		$pdf   = PDF::loadView('cetak.blank', [], [], $config);
+		$pdf->getMpdf()->defaultfooterfontsize = 7;
+		$pdf->getMpdf()->defaultfooterline     = 0;
+		$first = true;
+
+		foreach ($data_siswa as $siswa) {
+			$ar          = $siswa->anggota_rombel->first();
+			$halaman = $this->buildSiswaHtmlViews(
+				$siswa->peserta_didik_id,
+				$ar?->anggota_rombel_id,
+				$komponen,
+				$sekolah_id,
+				$semester_id
+			);
+			if (!empty($halaman)) {
+				if (!$first) {
+					$pdf->getMpdf()->WriteHTML('<pagebreak />');
+				}
+				$first_write = true;
+				foreach ($halaman as $section) {
+					foreach ($section['views'] as $v) {
+						if ($v === '<pagebreak />') {
+							$pdf->getMpdf()->WriteHTML('<pagebreak />');
+						} else {
+							$pdf->getMpdf()->WriteHTML((string) $v);
+							$first_write = false;
+						}
+					}
+				}
+				$first = false;
+			}
+		}
+
+		return $pdf->stream($nama_file . '.pdf');
 	}
 }

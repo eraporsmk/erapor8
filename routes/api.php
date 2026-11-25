@@ -160,6 +160,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/hapus', [ProjekController::class, 'hapus']);
         Route::post('/show', [ProjekController::class, 'show']);
     });
+    Route::group(['prefix' => 'cetak'], function () {
+        Route::post('/bulk-rapor', [\App\Http\Controllers\CetakController::class, 'bulk_rapor']);
+        Route::post('/bulk-rapor/queue', [\App\Http\Controllers\CetakController::class, 'bulk_rapor_queue']);
+        Route::get('/bulk-rapor/status/{job_id}', [\App\Http\Controllers\CetakController::class, 'bulk_rapor_status']);
+    });
+
     Route::group(['prefix' => 'walas'], function () {
         Route::get('/', [WalasController::class, 'index']);
         Route::post('/save', [WalasController::class, 'save']);
