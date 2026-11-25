@@ -9,6 +9,9 @@ definePage({
 onMounted(async () => {
   await fetchData();
 });
+const isSemesterGenap = computed(() => {
+  return String($semester.semester_id ?? '').endsWith('2') || Number($semester.semester) === 2
+})
 const loading = ref({
   body: false,
 })
@@ -23,10 +26,13 @@ const defaultForm = ref({
   merdeka: false,
   is_ppa: false,
   rombongan_belajar_id: null,
+  tingkat: null,
+  mode_legger: 'semester',
 })
 const arrayData = ref({
   siswa: [],
   pembelajaran: [],
+  legger_akhir: null,
 })
 const fetchData = async () => {
   loading.value.body = true;
@@ -44,6 +50,7 @@ const fetchData = async () => {
     }));
     let getData = response.data.value
     defaultForm.value.rombongan_belajar_id = getData.rombel.rombongan_belajar_id
+    defaultForm.value.tingkat = getData.rombel.tingkat
     defaultForm.value.merdeka = getData.merdeka
     defaultForm.value.is_ppa = getData.is_ppa
     arrayData.value.siswa = getData.data_siswa
@@ -54,9 +61,32 @@ const fetchData = async () => {
     loading.value.body = false;
   }
 }
+const changeModeLegger = async (val) => {
+  if (val === 'akhir' && !arrayData.value.legger_akhir) {
+    loading.value.body = true;
+    try {
+      const response = await useApi(createUrl('/walas', {
+        query: {
+          user_id: defaultForm.value.user_id,
+          guru_id: defaultForm.value.guru_id,
+          sekolah_id: defaultForm.value.sekolah_id,
+          semester_id: defaultForm.value.semester_id,
+          aksi: 'unduh-legger-akhir',
+        },
+      }));
+      arrayData.value.legger_akhir = response.data.value;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loading.value.body = false;
+    }
+  }
+}
 const unduhLegger = () => {
   if (defaultForm.value.rombongan_belajar_id) {
-    if (defaultForm.value.merdeka || defaultForm.value.is_ppa) {
+    if (defaultForm.value.mode_legger === 'akhir') {
+      var url = `/downloads/leger-nilai-akhir/${defaultForm.value.rombongan_belajar_id}/${defaultForm.value.sekolah_id}/${defaultForm.value.semester_id}`
+    } else if (defaultForm.value.merdeka || defaultForm.value.is_ppa) {
       var url = `/downloads/leger-nilai-kurmer/${defaultForm.value.rombongan_belajar_id}/${defaultForm.value.sekolah_id}/${defaultForm.value.semester_id}`
     } else {
       var url = `/downloads/leger-nilai-rapor/${defaultForm.value.rombongan_belajar_id}`
@@ -90,11 +120,31 @@ const getRasio = (rasio) => {
 <template>
   <VCard class="mb-6">
     <VCardItem class="pb-4">
-      <VCardTitle>Unduh Legger</VCardTitle>
+      <VCardTitle>Unduh Leger</VCardTitle>
       <template #append>
-        <VBtn prepend-icon="tabler-file-type-xls" @click="unduhLegger">
-          Unduh Legger
-        </VBtn>
+        <div class="d-flex flex-wrap align-center gap-2">
+          <template v-if="isSemesterGenap && defaultForm.tingkat == 12">
+            <VBtn
+              size="small"
+              :variant="defaultForm.mode_legger === 'semester' ? 'flat' : 'tonal'"
+              color="primary"
+              @click="defaultForm.mode_legger = 'semester'; changeModeLegger('semester')"
+            >
+              Semester Berjalan
+            </VBtn>
+            <VBtn
+              size="small"
+              :variant="defaultForm.mode_legger === 'akhir' ? 'flat' : 'tonal'"
+              color="primary"
+              @click="defaultForm.mode_legger = 'akhir'; changeModeLegger('akhir')"
+            >
+              Nilai Akhir (Kelas 10–12)
+            </VBtn>
+          </template>
+          <VBtn prepend-icon="tabler-file-type-xls" color="success" @click="unduhLegger">
+            {{ defaultForm.mode_legger === 'akhir' ? 'Unduh Leger Akhir' : 'Unduh Leger' }}
+          </VBtn>
+        </div>
       </template>
     </VCardItem>
     <template v-if="loading.body">
@@ -102,6 +152,9 @@ const getRasio = (rasio) => {
       <VCardText class="text-center">
         <VProgressCircular :size="60" indeterminate color="error" class="my-10" />
       </VCardText>
+    </template>
+    <template v-else-if="defaultForm.mode_legger === 'akhir' && arrayData.legger_akhir">
+      <LeggerAkhirTable :data="arrayData.legger_akhir" />
     </template>
     <template v-else>
       <VTable class="text-no-wrap" v-if="arrayData.siswa.length">

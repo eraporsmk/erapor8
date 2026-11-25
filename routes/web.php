@@ -11,6 +11,8 @@ Route::group(['prefix' => 'downloads'], function () {
     Route::get('/template-nilai-akhir/{pembelajaran_id?}', [DownloadController::class, 'template_nilai_akhir'])->name('template-nilai-akhir');
     Route::get('/leger-nilai-kurmer/{rombongan_belajar_id}/{sekolah_id}/{semester_id}', [DownloadController::class, 'unduh_leger_nilai_kurmer'])->name('unduh-leger-nilai-kurmer');
     Route::get('/leger-nilai-bulk/{sekolah_id}/{semester_id}', [DownloadController::class, 'unduh_leger_nilai_bulk_semua'])->name('unduh-leger-nilai-bulk-semua');
+    Route::get('/leger-nilai-akhir/{rombongan_belajar_id}/{sekolah_id}/{semester_id}', [DownloadController::class, 'unduh_leger_nilai_akhir'])->name('unduh-leger-nilai-akhir');
+    Route::get('/leger-nilai-akhir-bulk/{sekolah_id}/{semester_id}', [DownloadController::class, 'unduh_leger_nilai_akhir_bulk'])->name('unduh-leger-nilai-akhir-bulk');
 
     Route::get('/pengguna/{data}/{sekolah_id}/{semester_id}', [DownloadController::class, 'pengguna'])->name('unduh-pengguna');
     Route::get('/backup/{folder}/{filename}', function ($folder, $filename) {

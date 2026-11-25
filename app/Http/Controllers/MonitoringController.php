@@ -10,6 +10,7 @@ use App\Models\RombonganBelajar;
 use App\Models\RencanaUkk;
 use App\Models\PraktikKerjaLapangan;
 use App\Models\PesertaDidik;
+use App\Services\LegerAkhirService;
 
 class MonitoringController extends Controller
 {
@@ -282,5 +283,12 @@ class MonitoringController extends Controller
             'is_ppa' => is_ppa($rombel->semester_id),
         ];
         return $data;
+    }
+    private function get_legger_akhir(){
+        return app(LegerAkhirService::class)->getLeggerAkhir(
+            request()->rombongan_belajar_id,
+            request()->sekolah_id,
+            request()->semester_id
+        );
     }
 }

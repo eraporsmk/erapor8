@@ -18,6 +18,8 @@ use App\Exports\TemplateSumatifAkhirSemester;
 use App\Exports\TemplateNilaiAkhir;
 use App\Exports\LeggerNilaiKurmerExport;
 use App\Exports\LeggerNilaiBulkExport;
+use App\Exports\LeggerAkhirExport;
+use App\Exports\LeggerAkhirBulkExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Hash;
@@ -193,6 +195,16 @@ class DownloadController extends Controller
 		$semester = Semester::find($semester_id);
 		$nama_file = 'Leger-Nilai-Semua-Kelas-' . clean($semester->nama) . '.xlsx';
 		return Excel::download(new LeggerNilaiBulkExport($sekolah_id, $semester_id), $nama_file);
+	}
+	public function unduh_leger_nilai_akhir($rombongan_belajar_id, $sekolah_id, $semester_id){
+		$rombongan_belajar = RombonganBelajar::findOrFail($rombongan_belajar_id);
+		$nama_file = clean('Leger Nilai Akhir Kelas 10-12 ' . $rombongan_belajar->nama) . '.xlsx';
+		return Excel::download(new LeggerAkhirExport($rombongan_belajar_id, $sekolah_id, $semester_id), $nama_file);
+	}
+	public function unduh_leger_nilai_akhir_bulk($sekolah_id, $semester_id){
+		$semester = Semester::find($semester_id);
+		$nama_file = 'Leger-Nilai-Akhir-Semua-Kelas-12-' . clean($semester->nama) . '.xlsx';
+		return Excel::download(new LeggerAkhirBulkExport($sekolah_id, $semester_id), $nama_file);
 	}
 	public function pengguna($data, $sekolah_id, $semester_id){
 		$semester = Semester::find($semester_id);

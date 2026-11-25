@@ -15,11 +15,16 @@ const form = ref({
   sekolah_id: $user.sekolah_id,
   merdeka: false,
   is_ppa: false,
+  mode_legger: 'semester',
 })
 const arrayData = ref({
   rombel: [],
   siswa: [],
   pembelajaran: [],
+  legger_akhir: null,
+})
+const isSemesterGenap = computed(() => {
+  return String($semester.semester_id ?? '').endsWith('2') || Number($semester.semester) === 2
 })
 const loading = ref({
   rombel: false,
@@ -41,36 +46,57 @@ const getData = async (postData) => {
         form.value.merdeka = getData.merdeka
         form.value.is_ppa = getData.is_ppa
       }
+      if (postData.data == "legger-akhir") {
+        arrayData.value.legger_akhir = getData
+      }
     },
   });
 }
 const changeTingkat = async (val) => {
   form.value.rombongan_belajar_id = null;
+  form.value.mode_legger = 'semester';
   arrayData.value.rombel = []
   arrayData.value.siswa = []
+  arrayData.value.legger_akhir = null
   if (val) {
     loading.value.rombel = true;
-    await getData({
-      data: "rombel",
-    }).then(() => {
+    try {
+      await getData({ data: "rombel" });
+    } finally {
       loading.value.rombel = false;
-    });
+    }
   }
 }
 const changeRombel = async (val) => {
   arrayData.value.siswa = []
+  arrayData.value.legger_akhir = null
   if (val) {
     loading.value.body = true;
-    await getData({
-      data: "legger",
-    }).then(() => {
+    try {
+      await getData({
+        data: form.value.mode_legger === 'akhir' ? "legger-akhir" : "legger",
+      });
+    } finally {
       loading.value.body = false;
+    }
+  }
+}
+const changeModeLegger = async (val) => {
+  if (!form.value.rombongan_belajar_id) return;
+  loading.value.body = true;
+  try {
+    await getData({
+      data: val === 'akhir' ? "legger-akhir" : "legger",
     });
+  } finally {
+    loading.value.body = false;
   }
 }
 const unduhLegger = () => {
   if (form.value.rombongan_belajar_id) {
-    if (form.value.merdeka || form.value.is_ppa) {
+    if (form.value.mode_legger === 'akhir') {
+      var url = `/downloads/leger-nilai-akhir/${form.value.rombongan_belajar_id}/${form.value.sekolah_id}/${form.value.semester_id}`
+    } else if (form.value.merdeka || form.value.is_ppa) {
       var url = `/downloads/leger-nilai-kurmer/${form.value.rombongan_belajar_id}/${form.value.sekolah_id}/${form.value.semester_id}`
     } else {
       var url = `/downloads/leger-nilai-rapor/${form.value.rombongan_belajar_id}`
@@ -80,6 +106,10 @@ const unduhLegger = () => {
 }
 const unduhSemuaLegger = () => {
   const url = `/downloads/leger-nilai-bulk/${form.value.sekolah_id}/${form.value.semester_id}`
+  window.open(url, '_blank').focus();
+}
+const unduhSemuaLeggerAkhir = () => {
+  const url = `/downloads/leger-nilai-akhir-bulk/${form.value.sekolah_id}/${form.value.semester_id}`
   window.open(url, '_blank').focus();
 }
 const getNilai = (nilai, anggota_rombel_id) => {
@@ -108,11 +138,21 @@ const getRasio = (rasio) => {
 <template>
   <VCard class="mb-6">
     <VCardItem class="pb-4">
-      <VCardTitle>Monitoring &raquo; Unduh Legger</VCardTitle>
+      <VCardTitle>Monitoring &raquo; Unduh Leger</VCardTitle>
       <template #append>
-        <VBtn prepend-icon="tabler-file-type-xls" color="success" @click="unduhSemuaLegger">
-          Unduh Semua Kelas
-        </VBtn>
+        <div class="d-flex flex-wrap gap-2">
+          <VBtn
+            v-if="isSemesterGenap"
+            prepend-icon="tabler-file-type-xls"
+            color="primary"
+            @click="unduhSemuaLeggerAkhir"
+          >
+            Unduh Semua Leger Akhir Kelas 12
+          </VBtn>
+          <VBtn prepend-icon="tabler-file-type-xls" color="success" @click="unduhSemuaLegger">
+            Unduh Semua Kelas
+          </VBtn>
+        </div>
       </template>
     </VCardItem>
     <VDivider />
@@ -153,14 +193,39 @@ const getRasio = (rasio) => {
             </VCol>
           </VRow>
         </VCol>
-        <VCol cols="12" v-if="arrayData.siswa.length">
+        <VCol cols="12" v-if="isSemesterGenap && form.tingkat == 12 && form.rombongan_belajar_id">
           <VRow no-gutters>
             <VCol cols="12" md="3" class="d-flex align-items-center">
-              <label class="v-label text-body-2 text-high-emphasis">Unduh Legger</label>
+              <label class="v-label text-body-2 text-high-emphasis">Jenis Leger</label>
+            </VCol>
+            <VCol cols="12" md="9">
+              <div class="d-flex flex-wrap gap-2">
+                <VBtn
+                  :variant="form.mode_legger === 'semester' ? 'flat' : 'tonal'"
+                  color="primary"
+                  @click="form.mode_legger = 'semester'; changeModeLegger('semester')"
+                >
+                  Semester Berjalan
+                </VBtn>
+                <VBtn
+                  :variant="form.mode_legger === 'akhir' ? 'flat' : 'tonal'"
+                  color="primary"
+                  @click="form.mode_legger = 'akhir'; changeModeLegger('akhir')"
+                >
+                  Nilai Akhir (Kelas 10–12)
+                </VBtn>
+              </div>
+            </VCol>
+          </VRow>
+        </VCol>
+        <VCol cols="12" v-if="arrayData.siswa.length || arrayData.legger_akhir?.siswa_list?.length">
+          <VRow no-gutters>
+            <VCol cols="12" md="3" class="d-flex align-items-center">
+              <label class="v-label text-body-2 text-high-emphasis">Unduh Leger</label>
             </VCol>
             <VCol cols="12" md="9">
               <VBtn prepend-icon="tabler-file-type-xls" @click="unduhLegger">
-                Unduh Legger
+                {{ form.mode_legger === 'akhir' ? 'Unduh Leger Nilai Akhir (Kelas 10–12)' : 'Unduh Leger' }}
               </VBtn>
             </VCol>
           </VRow>
@@ -172,6 +237,9 @@ const getRasio = (rasio) => {
       <VCardText class="text-center">
         <VProgressCircular :size="60" indeterminate color="error" class="my-10" />
       </VCardText>
+    </template>
+    <template v-else-if="form.mode_legger === 'akhir' && arrayData.legger_akhir">
+      <LeggerAkhirTable :data="arrayData.legger_akhir" />
     </template>
     <template v-else>
       <VTable class="text-no-wrap" v-if="arrayData.siswa.length">
